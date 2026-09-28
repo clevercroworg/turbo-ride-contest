@@ -51,17 +51,17 @@ export function Nav({ onBuyTicketsClick, userCredits = 0, memberEmail }: NavProp
             : "bg-white/80 backdrop-blur-xs border-b border-zinc-200/50"
         }`}
       >
-        <div className="max-w-7xl mx-auto w-full px-6 lg:px-12 flex items-center justify-between">
+        <div className="max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 flex items-center justify-between gap-2">
           
           {/* Brand Logo */}
           <Link href="/" className="flex items-center group py-2 shrink-0">
-            <span className="font-display text-2xl font-black tracking-tight text-zinc-950 uppercase">
+            <span className="font-display text-lg sm:text-xl md:text-2xl font-black tracking-tight text-zinc-950 uppercase whitespace-nowrap">
               WINMY<span className="text-[#ea580c]">PORSCHE</span>
             </span>
           </Link>
 
           {/* Clean, Spacious Navigation Links */}
-          <nav className="hidden lg:flex items-center gap-10">
+          <nav className="hidden lg:flex items-center gap-8 xl:gap-10">
             {navLinks.map((link) => (
               <a
                 key={link.label}
@@ -74,19 +74,19 @@ export function Nav({ onBuyTicketsClick, userCredits = 0, memberEmail }: NavProp
           </nav>
 
           {/* Right Action Area */}
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-2 sm:gap-3 shrink-0">
             {memberEmail ? (
               <Link
                 href="/members"
-                className="hidden sm:inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-zinc-100 hover:bg-zinc-200 border border-zinc-200 text-zinc-900 text-xs font-semibold transition-colors"
+                className="hidden sm:inline-flex items-center gap-2 px-3 sm:px-4 py-1.5 sm:py-2 rounded-lg bg-zinc-100 hover:bg-zinc-200 border border-zinc-200 text-zinc-900 text-xs font-semibold transition-colors"
               >
-                <Gauge size={16} weight="bold" className="text-[#ea580c]" />
-                <span>My Garage ({userCredits.toLocaleString("en-IN")} Credits)</span>
+                <Gauge size={15} weight="bold" className="text-[#ea580c]" />
+                <span className="truncate">My Garage ({userCredits.toLocaleString("en-IN")})</span>
               </Link>
             ) : (
               <Link
                 href="/login"
-                className="hidden sm:inline-flex items-center text-sm font-medium text-zinc-600 hover:text-zinc-950 px-3 py-2 transition-colors"
+                className="hidden sm:inline-flex items-center text-xs sm:text-sm font-medium text-zinc-600 hover:text-zinc-950 px-2 sm:px-3 py-1.5 transition-colors"
               >
                 Member Login
               </Link>
@@ -96,20 +96,20 @@ export function Nav({ onBuyTicketsClick, userCredits = 0, memberEmail }: NavProp
             <button
               type="button"
               onClick={onBuyTicketsClick}
-              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg bg-[#ea580c] hover:bg-[#c2410c] text-white text-xs sm:text-sm font-bold uppercase tracking-wide transition-all shadow-sm active:scale-95 cursor-pointer shrink-0"
+              className="inline-flex items-center gap-1.5 px-3 sm:px-4 py-1.5 sm:py-2 rounded-lg bg-[#ea580c] hover:bg-[#c2410c] text-white text-xs sm:text-sm font-bold uppercase tracking-wider transition-all shadow-sm active:scale-95 cursor-pointer shrink-0"
             >
-              <Ticket size={16} weight="fill" />
-              <span>Get Tickets</span>
+              <Ticket size={15} weight="fill" className="shrink-0" />
+              <span className="whitespace-nowrap">Get Tickets</span>
             </button>
 
             {/* Mobile Menu Button */}
             <button
               type="button"
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="lg:hidden w-10 h-10 rounded-lg flex items-center justify-center text-zinc-900 hover:bg-zinc-100 transition-colors cursor-pointer"
+              className="lg:hidden w-8 h-8 sm:w-9 sm:h-9 rounded-lg flex items-center justify-center text-zinc-900 hover:bg-zinc-100 transition-colors cursor-pointer shrink-0"
               aria-label="Toggle menu"
             >
-              {mobileMenuOpen ? <X size={22} weight="bold" /> : <List size={22} weight="bold" />}
+              {mobileMenuOpen ? <X size={20} weight="bold" /> : <List size={20} weight="bold" />}
             </button>
           </div>
 
