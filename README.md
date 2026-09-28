@@ -1,36 +1,38 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# TurboRide Contest & Supercar Giveaway Platform
 
-## Getting Started
+The official **Zero-Loss Guarantee** Supercar Contest & Member Garage platform for TurboRide Supercars.
 
-First, run the development server:
+---
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+## 🏎️ Core Mechanics
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+1. **Zero-Loss Guarantee**:
+   - Tickets cost ₹1,000 each to enter the draw for a Porsche 718 Cayman (worth ₹1.6 Cr).
+   - Every ticket purchase automatically deposits **1,000 Drive Credits (1:1 INR value)** into the member's account.
+   - Credits never expire and can be redeemed for real supercar track/highway drive laps or media experiences on the TurboRide booking engine.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+2. **Custom 5-Digit Ticket System**:
+   - Members can manually select their lucky 5-digit number (e.g. `40821`) or use the server-side Auto-Pick generator.
+   - Strictly enforced uniqueness per contest at the database level.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+3. **2-Tier Referral Engine**:
+   - **Tier 1**: 25% Drive Credits bonus on all referred ticket purchases.
+   - **Tier 2**: Upon buying 25 tickets, members unlock **25% Cash Commission** (`is_cash_unlocked = true`) withdrawable directly to UPI or bank accounts.
 
-## Learn More
+---
 
-To learn more about Next.js, take a look at the following resources:
+## 🗺️ Route Structure
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+*   `/`: Public contest landing page (Hero, live ticket progress bar, Zero Loss Manifesto, Fleet showcase, Prize tiers, Referral engine, FAQs, and ticket checkout modal).
+*   `/login`: Passwordless phone / email login to Member Garage.
+*   `/members`: Member Garage Dashboard (Ticket numbers list, manual/auto-pick, Drive Credits wallet, referral affiliate link & metrics, cash payout claims).
+*   `/members/rewards`: Rewards garage for redeeming Drive Credits for Lamborghini, Ferrari, McLaren, Porsche track runs, or 4K drone reels.
+*   `/admin`: Superadmin Console (Overview metrics, `/contests`, `/members`, `/orders`, `/referrals`, `/redemptions`, `/settings`).
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+---
 
-## Deploy on Vercel
+## 🔗 Shared Integrations
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+*   **Database**: Shared Neon PostgreSQL instance (`user_credits`, `credit_transactions`, `contests`, `contest_tickets`, `referral_profiles`, `reward_redemptions`).
+*   **Booking Engine Integration**: Redemptions in `/members/rewards` debit credits and redirect to `${NEXT_PUBLIC_BOOKING_APP_URL}/checkout` with pre-filled parameters.
+*   **Architecture Reference**: See `../PROJECT_STRUCTURE.md` for complete ecosystem documentation.
