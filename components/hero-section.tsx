@@ -83,8 +83,8 @@ export function HeroSection({
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 w-full">
         
         {/* Top Campaign Bar: Crisp Editorial Meta */}
-        <div className="flex flex-wrap items-center justify-between gap-2 pb-2.5 mb-4 sm:mb-5 border-b border-zinc-200/90 font-mono text-[11px] sm:text-xs text-zinc-700">
-          <div className="flex items-center gap-2 sm:gap-3">
+        <div className="flex flex-wrap items-center justify-between gap-2 pb-2 mb-3 sm:mb-5 border-b border-zinc-200/80 font-mono text-[11px] sm:text-xs text-zinc-700">
+          <div className="hidden sm:flex items-center gap-2 sm:gap-3">
             <span className="text-zinc-950 font-bold uppercase tracking-wider flex items-center gap-1.5">
               <span className="w-1.5 h-1.5 rounded-full bg-[#ea580c] animate-pulse" />
               TurboRide Supercar Club
@@ -95,9 +95,9 @@ export function HeroSection({
             </span>
           </div>
 
-          <div className="flex items-center gap-3 uppercase tracking-wider font-mono text-[10px] sm:text-[11px]">
-            <span className="flex items-center gap-1.5 text-emerald-800 font-bold bg-white/90 px-2.5 py-0.5 rounded-full border border-emerald-300 shadow-2xs">
-              <ShieldCheck size={14} weight="fill" className="text-emerald-600" />
+          <div className="flex items-center gap-3 uppercase tracking-wider font-mono text-[10px] sm:text-[11px] w-full sm:w-auto">
+            <span className="flex items-center gap-1.5 text-emerald-800 font-bold bg-white/95 px-2.5 py-0.5 rounded-full border border-emerald-300 shadow-2xs">
+              <ShieldCheck size={14} weight="fill" className="text-emerald-600 shrink-0" />
               <span>100% Capital Returned in Drive Credits</span>
             </span>
             <span className="text-zinc-300 hidden md:inline">/</span>
