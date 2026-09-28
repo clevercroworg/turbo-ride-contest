@@ -2,13 +2,29 @@
 
 import { ShieldCheck, ArrowRight, Gauge, VideoCamera, ClockCounterClockwise, Sparkle } from "@phosphor-icons/react"
 
-export function ValueMatrix() {
-  const tiers = [
-    { tickets: "01", cost: "₹1,000", credits: "1,000", entries: "1 Entry", badge: "" },
-    { tickets: "10", cost: "₹10,000", credits: "10,000", entries: "10 Entries", badge: "POPULAR" },
-    { tickets: "50", cost: "₹50,000", credits: "50,000", entries: "50 Entries", badge: "VIP CLUB" },
-    { tickets: "100", cost: "₹1,00,000", credits: "1,00,000", entries: "100 Entries", badge: "TRACK DAY VIP" },
+interface ValueMatrixProps {
+  ticketPrice?: number
+  carName?: string
+}
+
+export function ValueMatrix({
+  ticketPrice = 1000,
+  carName = "Porsche 718 Cayman",
+}: ValueMatrixProps = {}) {
+  const counts = [
+    { count: 1, badge: "" },
+    { count: 10, badge: "POPULAR" },
+    { count: 50, badge: "VIP CLUB" },
+    { count: 100, badge: "TRACK DAY VIP" },
   ]
+
+  const tiers = counts.map(({ count, badge }) => ({
+    tickets: String(count).padStart(2, "0"),
+    cost: `₹${(count * ticketPrice).toLocaleString("en-IN")}`,
+    credits: (count * ticketPrice).toLocaleString("en-IN"),
+    entries: count === 1 ? "1 Entry" : `${count} Entries`,
+    badge,
+  }))
 
   return (
     <section className="py-16 sm:py-20 bg-[#fafafa] border-t border-zinc-200">
@@ -50,7 +66,7 @@ export function ValueMatrix() {
                   1 : 1 PARITY
                 </span>
                 <span className="text-xs font-mono text-[#ea580c] font-bold uppercase tracking-wide mt-1 block">
-                  ₹1,000 Deposit = 1,000 Permanent Credits
+                  ₹{ticketPrice.toLocaleString("en-IN")} Deposit = {ticketPrice.toLocaleString("en-IN")} Permanent Credits
                 </span>
               </div>
 

@@ -2,13 +2,23 @@
 
 import { Wallet, Hash, Broadcast, Gauge, ArrowRight } from "@phosphor-icons/react"
 
-export function HowItWorks() {
+interface HowItWorksProps {
+  ticketPrice?: number
+  targetTickets?: number
+  carName?: string
+}
+
+export function HowItWorks({
+  ticketPrice = 1000,
+  targetTickets = 10000,
+  carName = "Porsche 718 Cayman",
+}: HowItWorksProps = {}) {
   const steps = [
     {
       num: "01",
       icon: Wallet,
-      action: "Deposit ₹1,000",
-      detail: "1,000 Drive Credits credited instantly to your wallet.",
+      action: `Deposit ₹${ticketPrice.toLocaleString("en-IN")}`,
+      detail: `${ticketPrice.toLocaleString("en-IN")} Drive Credits credited instantly to your wallet.`,
       badge: "1:1 Value Ratio",
     },
     {
@@ -23,13 +33,13 @@ export function HowItWorks() {
       icon: Broadcast,
       action: "Live Streamed Draw",
       detail: "Official draw broadcasted live on YouTube and Instagram.",
-      badge: "10,000 Entry Cap",
+      badge: `${targetTickets.toLocaleString("en-IN")} Entry Cap`,
     },
     {
       num: "04",
       icon: Gauge,
       action: "Zero Capital Loss",
-      detail: "Win the Porsche 718 or use credits for Buddh Circuit drives.",
+      detail: `Win the ${carName} or use credits for Buddh Circuit drives.`,
       badge: "Permanent Credits",
     },
   ]

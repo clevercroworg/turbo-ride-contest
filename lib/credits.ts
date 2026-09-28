@@ -68,8 +68,17 @@ export async function buyContestTicketsAction(params: {
     await client.query("BEGIN")
 
     const orderId = `ORD-${Date.now()}-${Math.floor(100 + Math.random() * 900)}`
-    const cost = ticketCount * 1000
-    const creditsIssued = ticketCount * 1000
+
+    // Fetch dynamic contest ticket price & credit parity
+    const contestRes = await client.query(
+      `SELECT ticket_price, credits_per_ticket FROM contests WHERE id = $1 LIMIT 1`,
+      [contestId]
+    )
+    const ticketPrice = Number(contestRes.rows[0]?.ticket_price) || 1000
+    const creditsPerTicket = Number(contestRes.rows[0]?.credits_per_ticket) || ticketPrice
+
+    const cost = ticketCount * ticketPrice
+    const creditsIssued = ticketCount * creditsPerTicket
     const primaryId = userEmail ? userEmail.trim().toLowerCase() : userPhone.trim()
 
     // 1. Record Order in contest_orders

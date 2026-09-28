@@ -41,7 +41,7 @@ export function HeroSection({
   ]
 
   const totalCost = selectedTickets * ticketPrice
-  const totalCredits = selectedTickets * 1000
+  const totalCredits = selectedTickets * ticketPrice
 
   return (
     <section className="relative pt-20 sm:pt-22 lg:pt-24 pb-6 sm:pb-8 lg:pb-10 overflow-hidden lg:min-h-[calc(100vh-5rem)] lg:flex lg:flex-col lg:justify-center border-b border-zinc-200">

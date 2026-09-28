@@ -14,15 +14,19 @@ import {
   LockKeyOpen,
 } from "@phosphor-icons/react"
 
-export function ReferralEngine() {
+interface ReferralEngineProps {
+  ticketPrice?: number
+}
+
+export function ReferralEngine({ ticketPrice = 1000 }: ReferralEngineProps = {}) {
   const stops = [1, 5, 10, 25, 50, 100, 250, 500, 1000]
   const [stopIndex, setStopIndex] = useState(3) // Default 25 tickets
   const [copied, setCopied] = useState(false)
 
   const activeTickets = stops[stopIndex]
-  // 1 ticket = ₹1,000. 25% of credits = activeTickets * 1000 * 0.25 = activeTickets * 250
-  const driveCredits = activeTickets * 250
-  const cashCommission = activeTickets * 250
+  // 25% of ticket value issued as credits & cash commission (when unlocked)
+  const driveCredits = Math.round(activeTickets * (ticketPrice * 0.25))
+  const cashCommission = Math.round(activeTickets * (ticketPrice * 0.25))
 
   const handleCopy = () => {
     if (typeof navigator !== "undefined" && navigator.clipboard) {

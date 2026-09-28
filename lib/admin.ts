@@ -138,7 +138,7 @@ export async function getAdminOverviewData() {
     const revenueFromOrders = orders
       .filter((o) => o.status === "completed")
       .reduce((sum, o) => sum + Number(o.amount_paid || 0), 0)
-    const grossRevenue = revenueFromOrders > 0 ? revenueFromOrders : ticketsSold * 1000
+    const grossRevenue = revenueFromOrders > 0 ? revenueFromOrders : ticketsSold * Number(activeContest?.ticket_price || 1000)
 
     const activeMembersCount = Math.max(members.length, 2184)
 

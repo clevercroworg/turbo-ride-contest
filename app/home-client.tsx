@@ -49,10 +49,17 @@ export function HomeClient({ contest, memberEmail, userCredits = 0 }: HomeClient
         />
 
         {/* 3. The Protocol: 4-Step Telemetry Track */}
-        <HowItWorks />
+        <HowItWorks
+          ticketPrice={contest.ticketPrice}
+          targetTickets={contest.targetTickets}
+          carName={contest.carName}
+        />
 
         {/* 4. The Principle: Zero Loss Guarantee Bento */}
-        <ValueMatrix />
+        <ValueMatrix
+          ticketPrice={contest.ticketPrice}
+          carName={contest.carName}
+        />
 
         {/* 4. The Fleet: Interactive Supercar Stage */}
         <FleetShowcase />
@@ -64,7 +71,9 @@ export function HomeClient({ contest, memberEmail, userCredits = 0 }: HomeClient
         />
 
         {/* 6. Referral Engine: 2-Tier Program */}
-        <ReferralEngine />
+        <ReferralEngine
+          ticketPrice={contest.ticketPrice}
+        />
 
         {/* 7. Clear FAQ */}
         <FaqAccordion />

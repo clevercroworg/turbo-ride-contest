@@ -61,7 +61,7 @@ export function TicketCheckoutModal({
 
       setSuccessOrder({
         orderId: res.orderId || "COMPLETED",
-        credits: res.creditsAdded || ticketCount * 1000,
+        credits: res.creditsAdded || ticketCount * ticketPrice,
       })
 
       // Confetti burst
@@ -268,13 +268,13 @@ export function TicketCheckoutModal({
                 <span>
                   {loading
                     ? "Locking In Your Tickets..."
-                    : `Pay ₹${(ticketCount * 1000).toLocaleString("en-IN")} & Get ${ticketCount} Tickets`}
+                    : `Pay ₹${(ticketCount * ticketPrice).toLocaleString("en-IN")} & Get ${ticketCount} ${ticketCount === 1 ? "Ticket" : "Tickets"}`}
                 </span>
               </button>
 
               <div className="flex items-center justify-center gap-2 text-[11px] text-zinc-500 font-mono">
                 <ShieldCheck size={14} className="text-emerald-600" />
-                <span>100% Value Guarantee · ₹1,000 = 1,000 Permanent Credits</span>
+                <span>100% Value Guarantee · ₹{ticketPrice.toLocaleString("en-IN")} = {ticketPrice.toLocaleString("en-IN")} Permanent Credits</span>
               </div>
 
             </form>
