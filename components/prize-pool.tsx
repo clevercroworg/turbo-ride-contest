@@ -1,5 +1,6 @@
 import Image from "next/image"
 import { Trophy, DeviceMobile, Sparkle, ShieldCheck, Gauge, Broadcast, Check } from "@phosphor-icons/react/dist/ssr"
+import { PorscheSpecs } from "./porsche-specs"
 
 interface PrizePoolProps {
   carName?: string
@@ -98,8 +99,11 @@ export function PrizePool({
           </div>
         </div>
 
+        {/* Verified Grand Prize 100-Point Inspection Passport */}
+        <PorscheSpecs />
+
         {/* 2nd & 3rd Prize Grid: Balanced 2-Column Format */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-8 mt-8">
           
           {/* 2nd Prize Card: Apple iPhone 16 Pro */}
           <div className="rounded-2xl bg-white border border-zinc-200 overflow-hidden shadow-sm flex flex-col justify-between group">

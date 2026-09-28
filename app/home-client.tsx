@@ -3,6 +3,7 @@
 import { useState } from "react"
 import { Nav } from "@/components/nav"
 import { HeroSection } from "@/components/hero-section"
+import { HowItWorks } from "@/components/how-it-works"
 import { ValueMatrix } from "@/components/value-matrix"
 import { FleetShowcase } from "@/components/fleet-showcase"
 import { PrizePool } from "@/components/prize-pool"
@@ -47,7 +48,10 @@ export function HomeClient({ contest, memberEmail, userCredits = 0 }: HomeClient
           worthDisplay={contest.worthDisplay}
         />
 
-        {/* 3. The Principle: Zero Loss Guarantee Editorial Manifesto */}
+        {/* 3. The Protocol: 4-Step Telemetry Track */}
+        <HowItWorks />
+
+        {/* 4. The Principle: Zero Loss Guarantee Bento */}
         <ValueMatrix />
 
         {/* 4. The Fleet: Interactive Supercar Stage */}

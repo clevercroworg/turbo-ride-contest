@@ -78,7 +78,7 @@ export function Nav({ onBuyTicketsClick, userCredits = 0, memberEmail }: NavProp
             {memberEmail ? (
               <Link
                 href="/members"
-                className="hidden sm:inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-zinc-100 hover:bg-zinc-200 text-zinc-900 text-xs font-semibold transition-colors"
+                className="hidden sm:inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-zinc-100 hover:bg-zinc-200 border border-zinc-200 text-zinc-900 text-xs font-semibold transition-colors"
               >
                 <Gauge size={16} weight="bold" className="text-[#ea580c]" />
                 <span>My Garage ({userCredits.toLocaleString("en-IN")} Credits)</span>
