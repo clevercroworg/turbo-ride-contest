@@ -48,25 +48,26 @@ export function HeroSection({
       
       {/* 
         Apt Automotive Studio Background:
-        WHITE -> RADIANT ORANGE HALO -> WHITE ONLY
-        Smooth, luminous gradient without any dark/black tones
+        WHITE AT TOP -> VIBRANT GLOWING RACING ORANGE AT BOTTOM -> WHITE SEAM
+        No black, proper radiant orange atmosphere rising from the stage floor
       */}
       <div 
         className="absolute inset-0 pointer-events-none"
         style={{
           background: `
-            radial-gradient(ellipse 85% 55% at 50% 50%, rgba(234, 88, 12, 0.32) 0%, rgba(249, 115, 22, 0.18) 38%, rgba(254, 215, 170, 0.08) 65%, transparent 85%),
-            radial-gradient(ellipse 65% 50% at 75% 52%, rgba(249, 115, 22, 0.28) 0%, rgba(254, 215, 170, 0.1) 45%, transparent 70%),
-            linear-gradient(180deg, #ffffff 0%, #fffbf5 12%, #ffedd5 38%, #fed7aa 50%, #ffedd5 64%, #fffbf5 86%, #ffffff 100%)
+            radial-gradient(ellipse 110% 70% at 50% 82%, rgba(234, 88, 12, 0.75) 0%, rgba(249, 115, 22, 0.5) 40%, rgba(254, 215, 170, 0.2) 70%, transparent 100%),
+            radial-gradient(ellipse 75% 50% at 80% 80%, rgba(249, 115, 22, 0.55) 0%, transparent 60%),
+            radial-gradient(ellipse 75% 50% at 20% 80%, rgba(234, 88, 12, 0.45) 0%, transparent 60%),
+            linear-gradient(180deg, #ffffff 0%, #ffffff 24%, #fff7ed 46%, #fed7aa 64%, #f97316 80%, #ea580c 90%, #ffffff 100%)
           `,
         }}
       />
 
-      {/* Subtle Precision Studio Grid (Warm Amber Dots) */}
+      {/* Precision Paddock Alignment Grid */}
       <div 
-        className="absolute inset-0 pointer-events-none opacity-25"
+        className="absolute inset-0 pointer-events-none opacity-30"
         style={{
-          backgroundImage: `radial-gradient(rgba(234, 88, 12, 0.25) 1px, transparent 1px)`,
+          backgroundImage: `radial-gradient(rgba(234, 88, 12, 0.3) 1px, transparent 1px)`,
           backgroundSize: "28px 28px",
         }}
       />
@@ -82,25 +83,25 @@ export function HeroSection({
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 w-full">
         
         {/* Top Campaign Bar: Crisp Editorial Meta */}
-        <div className="flex flex-wrap items-center justify-between gap-2 pb-2.5 mb-4 sm:mb-5 border-b border-zinc-200/80 font-mono text-[11px] sm:text-xs text-zinc-600">
+        <div className="flex flex-wrap items-center justify-between gap-2 pb-2.5 mb-4 sm:mb-5 border-b border-zinc-200/90 font-mono text-[11px] sm:text-xs text-zinc-700">
           <div className="flex items-center gap-2 sm:gap-3">
             <span className="text-zinc-950 font-bold uppercase tracking-wider flex items-center gap-1.5">
               <span className="w-1.5 h-1.5 rounded-full bg-[#ea580c] animate-pulse" />
               TurboRide Supercar Club
             </span>
             <span className="text-zinc-300">/</span>
-            <span className="text-zinc-500 font-medium">
+            <span className="text-zinc-600 font-medium">
               Draw Cap: {totalCap.toLocaleString("en-IN")} Verified Entries
             </span>
           </div>
 
           <div className="flex items-center gap-3 uppercase tracking-wider font-mono text-[10px] sm:text-[11px]">
-            <span className="flex items-center gap-1.5 text-emerald-700 font-bold bg-emerald-50 px-2.5 py-0.5 rounded-full border border-emerald-200">
-              <ShieldCheck size={14} weight="fill" />
+            <span className="flex items-center gap-1.5 text-emerald-800 font-bold bg-white/90 px-2.5 py-0.5 rounded-full border border-emerald-300 shadow-2xs">
+              <ShieldCheck size={14} weight="fill" className="text-emerald-600" />
               <span>100% Capital Returned in Drive Credits</span>
             </span>
             <span className="text-zinc-300 hidden md:inline">/</span>
-            <span className="text-zinc-500 font-medium hidden md:inline">Buddh Circuit Delivery</span>
+            <span className="text-zinc-600 font-medium hidden md:inline">Buddh Circuit Delivery</span>
           </div>
         </div>
 
@@ -112,7 +113,7 @@ export function HeroSection({
             
             {/* Header Area: Strict Stack Discipline (Max 4 Text Elements) */}
             <div className="mb-3">
-              <div className="inline-flex items-center gap-2 px-2.5 py-0.5 rounded-full text-[10px] font-mono font-black bg-orange-100/90 text-[#ea580c] uppercase tracking-wider border border-orange-200 mb-2">
+              <div className="inline-flex items-center gap-2 px-2.5 py-0.5 rounded-full text-[10px] font-mono font-black bg-white/90 text-[#ea580c] uppercase tracking-wider border border-orange-200 shadow-2xs mb-2">
                 OFFICIAL GRAND PRIZE DRAW #01
               </div>
 
@@ -124,12 +125,12 @@ export function HeroSection({
             </div>
 
             {/* Subtext: Strict 16 Words (Under 20 Words Cap) */}
-            <p className="text-xs sm:text-[13px] text-zinc-600 font-normal leading-relaxed mb-3.5 max-w-lg">
+            <p className="text-xs sm:text-[13px] text-zinc-700 font-medium leading-relaxed mb-3.5 max-w-lg">
               Deposit ₹{ticketPrice.toLocaleString("en-IN")} to enter the verified <strong className="text-zinc-950 font-bold">{carName}</strong> draw. Receive {ticketPrice.toLocaleString("en-IN")} permanent Buddh Circuit Drive Credits instantly.
             </p>
 
             {/* Interactive Allocation Terminal Card */}
-            <div className="rounded-2xl bg-white/95 backdrop-blur-md border border-zinc-200/90 p-3.5 sm:p-4 shadow-[0_8px_30px_rgba(234,88,12,0.08)] relative">
+            <div className="rounded-2xl bg-white/95 backdrop-blur-md border border-orange-200/80 p-3.5 sm:p-4 shadow-[0_12px_36px_rgba(234,88,12,0.14)] relative">
               
               {/* Terminal Header */}
               <div className="flex items-center justify-between gap-2 pb-2 mb-2.5 border-b border-zinc-100 font-mono">
@@ -182,17 +183,17 @@ export function HeroSection({
               </div>
 
               {/* Dynamic Live Telemetry Calculation Grid */}
-              <div className="grid grid-cols-3 gap-2 py-1.5 px-3 rounded-xl bg-zinc-50 border border-zinc-200 font-mono text-xs mb-2.5">
+              <div className="grid grid-cols-3 gap-2 py-1.5 px-3 rounded-xl bg-orange-50/60 border border-orange-200/70 font-mono text-xs mb-2.5">
                 <div className="min-w-0">
-                  <span className="text-zinc-400 block text-[9px] uppercase font-bold tracking-wider truncate">
+                  <span className="text-zinc-500 block text-[9px] uppercase font-bold tracking-wider truncate">
                     Capital Escrow
                   </span>
                   <span className="text-xs sm:text-sm font-black text-zinc-950 tracking-tight block truncate mt-0.5">
                     ₹{totalCost.toLocaleString("en-IN")}
                   </span>
                 </div>
-                <div className="min-w-0 border-x border-zinc-200 px-2 text-center">
-                  <span className="text-zinc-400 block text-[9px] uppercase font-bold tracking-wider truncate">
+                <div className="min-w-0 border-x border-orange-200 px-2 text-center">
+                  <span className="text-zinc-500 block text-[9px] uppercase font-bold tracking-wider truncate">
                     Drive Credits
                   </span>
                   <span className="text-xs sm:text-sm font-black text-emerald-600 tracking-tight block truncate mt-0.5">
@@ -200,7 +201,7 @@ export function HeroSection({
                   </span>
                 </div>
                 <div className="min-w-0 text-right">
-                  <span className="text-zinc-400 block text-[9px] uppercase font-bold tracking-wider truncate">
+                  <span className="text-zinc-500 block text-[9px] uppercase font-bold tracking-wider truncate">
                     Draw Entries
                   </span>
                   <span className="text-xs sm:text-sm font-black text-[#ea580c] tracking-tight block truncate mt-0.5">
@@ -213,7 +214,7 @@ export function HeroSection({
               <button
                 type="button"
                 onClick={() => onBuyClick(selectedTickets)}
-                className="w-full py-2.5 sm:py-3 px-4 rounded-xl bg-[#ea580c] hover:bg-[#c2410c] text-white font-mono text-xs sm:text-sm font-black uppercase tracking-wider transition-all shadow-[0_4px_16px_rgba(234,88,12,0.3)] hover:shadow-[0_6px_22px_rgba(234,88,12,0.45)] active:scale-[0.99] flex items-center justify-center gap-2 cursor-pointer mb-2.5"
+                className="w-full py-2.5 sm:py-3 px-4 rounded-xl bg-[#ea580c] hover:bg-[#c2410c] text-white font-mono text-xs sm:text-sm font-black uppercase tracking-wider transition-all shadow-[0_4px_16px_rgba(234,88,12,0.35)] hover:shadow-[0_6px_22px_rgba(234,88,12,0.5)] active:scale-[0.99] flex items-center justify-center gap-2 cursor-pointer mb-2.5"
               >
                 <Ticket size={15} weight="fill" className="shrink-0" />
                 <span className="truncate">
@@ -224,7 +225,7 @@ export function HeroSection({
 
               {/* Real-time Allocation Progress Bar */}
               <div className="pt-1.5 border-t border-zinc-100 font-mono text-xs">
-                <div className="flex items-center justify-between gap-1 text-zinc-500 mb-1 text-[10px] sm:text-[11px]">
+                <div className="flex items-center justify-between gap-1 text-zinc-600 mb-1 text-[10px] sm:text-[11px]">
                   <span className="tracking-tight truncate">
                     Live Allocation: <strong className="text-zinc-950 font-bold">{ticketsSold.toLocaleString("en-IN")}</strong> / {totalCap.toLocaleString("en-IN")} Entries
                   </span>
@@ -232,7 +233,7 @@ export function HeroSection({
                     {progressPercent}% Claimed
                   </span>
                 </div>
-                <div className="w-full h-1.5 bg-zinc-100 rounded-full overflow-hidden flex">
+                <div className="w-full h-1.5 bg-zinc-200/80 rounded-full overflow-hidden flex">
                   <div 
                     className="h-full bg-gradient-to-r from-orange-500 to-[#ea580c] transition-all duration-500 rounded-full"
                     style={{ width: `${progressPercent}%` }}
@@ -244,13 +245,13 @@ export function HeroSection({
 
           </div>
 
-          {/* Right Column: High-Impact Automotive Stage Bathed in Orange Studio Halo */}
+          {/* Right Column: High-Impact Automotive Stage Grounded on Radiant Orange */}
           <div className="lg:col-span-6 flex flex-col justify-center pt-2 lg:pt-0">
             
             {/* Top Telemetry Specs Strip */}
-            <div className="w-full flex items-center justify-between font-mono pb-2 mb-2 border-b border-zinc-200/80">
+            <div className="w-full flex items-center justify-between font-mono pb-2 mb-2 border-b border-zinc-200/90">
               <div className="flex flex-col items-start min-w-0">
-                <span className="text-[10px] uppercase tracking-wider text-zinc-400 font-bold block mb-0.5">
+                <span className="text-[10px] uppercase tracking-wider text-zinc-500 font-bold block mb-0.5">
                   Powertrain
                 </span>
                 <span className="text-xs sm:text-sm font-black text-zinc-950 tracking-tight leading-none truncate">
@@ -259,7 +260,7 @@ export function HeroSection({
               </div>
 
               <div className="flex flex-col items-center min-w-0 px-2">
-                <span className="text-[10px] uppercase tracking-wider text-zinc-400 font-bold block mb-0.5">
+                <span className="text-[10px] uppercase tracking-wider text-zinc-500 font-bold block mb-0.5">
                   0-100 km/h
                 </span>
                 <span className="text-xs sm:text-sm font-black text-zinc-950 tracking-tight leading-none">
@@ -291,25 +292,25 @@ export function HeroSection({
                   width={880}
                   height={350}
                   priority
-                  className="relative z-10 w-full h-auto object-contain group-hover:scale-[1.015] transition-transform duration-500 select-none drop-shadow-[0_15px_30px_rgba(234,88,12,0.15)]"
+                  className="relative z-10 w-full h-auto object-contain group-hover:scale-[1.015] transition-transform duration-500 select-none drop-shadow-[0_20px_35px_rgba(234,88,12,0.25)]"
                 />
 
                 {/* Studio Ground Shadow anchored directly under tires */}
-                <div className="absolute -bottom-2 sm:-bottom-3 left-1/2 -translate-x-1/2 w-4/5 h-4 sm:h-6 bg-zinc-950/20 rounded-full blur-md sm:blur-xl transform scale-y-50 pointer-events-none" />
-                <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-2/3 h-2 sm:h-4 bg-orange-500/25 rounded-full blur-xs sm:blur-md pointer-events-none" />
+                <div className="absolute -bottom-2 sm:-bottom-3 left-1/2 -translate-x-1/2 w-4/5 h-4 sm:h-6 bg-zinc-950/25 rounded-full blur-md sm:blur-xl transform scale-y-50 pointer-events-none" />
+                <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-2/3 h-2 sm:h-4 bg-orange-600/35 rounded-full blur-xs sm:blur-md pointer-events-none" />
               </div>
             </motion.div>
 
             {/* Bottom Delivery & Cash Option Bar */}
-            <div className="w-full flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 text-xs font-mono pt-2.5 border-t border-zinc-200/80">
+            <div className="w-full flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 text-xs font-mono pt-2.5 border-t border-zinc-200/90">
               <div className="flex items-center gap-2 text-zinc-950 font-bold">
-                <div className="w-5 h-5 rounded-md bg-orange-50 border border-orange-200 flex items-center justify-center shrink-0">
+                <div className="w-5 h-5 rounded-md bg-white border border-orange-200 shadow-2xs flex items-center justify-center shrink-0">
                   <Gauge size={13} weight="bold" className="text-[#ea580c]" />
                 </div>
                 <span className="text-[11px] sm:text-xs tracking-tight">Buddh Circuit Delivery</span>
               </div>
 
-              <div className="flex items-center justify-between sm:justify-end gap-2 text-zinc-600 text-xs">
+              <div className="flex items-center justify-between sm:justify-end gap-2 text-zinc-700 text-xs">
                 <span className="text-zinc-500 text-[11px] font-medium">Or choose</span>
                 <span className="inline-flex items-center font-black text-zinc-950 bg-white border border-zinc-200 shadow-2xs px-2.5 py-0.5 rounded-md text-[11px] sm:text-xs tracking-tight">
                   ₹75 Lakh Cash Option
