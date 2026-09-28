@@ -16,7 +16,17 @@ export async function getUserDriveCredits(email?: string, phone?: string): Promi
   if (!email && !phone) return 0
   try {
     const cleanEmail = email?.trim().toLowerCase() || ""
-    const digits = phone?.replace(/\D/g, "") || ""
+    let digits = phone?.replace(/\D/g, "") || ""
+
+    if (!digits && cleanEmail) {
+      const pRes = await pool.query(
+        `SELECT user_phone FROM referral_profiles WHERE LOWER(user_email) = $1 AND user_phone IS NOT NULL AND user_phone != '' LIMIT 1`,
+        [cleanEmail]
+      )
+      if (pRes.rows.length > 0) {
+        digits = pRes.rows[0].user_phone.replace(/\D/g, "")
+      }
+    }
     
     // In shared database, user_credits uses 'identifier' (either email or phone) and 'credits_remaining'
     const res = await pool.query(

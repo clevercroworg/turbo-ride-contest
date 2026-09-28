@@ -1148,9 +1148,19 @@ export function MemberDashboardClient({
                 {searchTicketQuery
                   ? `No tickets match "${searchTicketQuery}".`
                   : ticketFilter === "past"
-                  ? "You have no tickets from past draws. All entries are in the active live draw!"
+                  ? "You have no tickets from past draws. All your entries are in the active live draw!"
                   : "No active draw tickets found."}
               </p>
+              {ticketFilter === "past" && (
+                <button
+                  type="button"
+                  onClick={() => setTicketFilter("active")}
+                  className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-[#ea580c] hover:bg-[#c2410c] text-white text-xs font-mono font-bold transition-colors cursor-pointer mt-2 shadow-xs"
+                >
+                  <span>View {activeTicketsList.length} Active Tickets</span>
+                  <ArrowRight size={13} weight="bold" />
+                </button>
+              )}
               {searchTicketQuery && (
                 <button
                   type="button"

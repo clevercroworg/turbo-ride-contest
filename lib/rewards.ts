@@ -166,8 +166,12 @@ export async function redeemRewardAction(params: {
 
     // 5. Insert corresponding voucher into shared vouchers table
     await client.query(
-      `INSERT INTO vouchers (code, kind, status, face_value, discount_value, purchaser_email, recipient_email, purchaser_name, recipient_name, single_use, max_use, used_count, created_at, expires_at)
-       VALUES ($1, 'track_pass', 'active', $2, $2, $3, $3, $4, $4, true, 1, 0, NOW(), NOW() + interval '90 days')
+      `INSERT INTO vouchers (
+        code, kind, discount_kind, status, face_value, discount_value,
+        purchaser_email, recipient_email, purchaser_name, recipient_name,
+        single_use, max_use, used_count, created_at, expires_at
+       )
+       VALUES ($1, 'gift', 'amount', 'active', $2, $2, $3, $3, $4, $4, true, 1, 0, NOW(), NOW() + interval '90 days')
        ON CONFLICT (code) DO NOTHING`,
       [passCode, reward.creditsRequired, cleanEmail, userName || "Member"]
     )
@@ -260,11 +264,11 @@ export async function cancelRedemptionAction(params: {
       [redemptionId]
     )
 
-    // 3. Mark voucher in vouchers table as voided
+    // 3. Mark voucher in vouchers table as disabled
     if (redemption.ref_code) {
       await client.query(
         `UPDATE vouchers 
-         SET status = 'void' 
+         SET status = 'disabled' 
          WHERE code = $1`,
         [redemption.ref_code]
       )

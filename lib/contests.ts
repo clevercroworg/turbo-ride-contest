@@ -47,16 +47,40 @@ export async function getUserTickets(
   phone?: string,
   contestId?: string
 ): Promise<ContestTicket[]> {
-  const cleanEmail = email?.trim().toLowerCase() || ""
-  const digits = phone?.replace(/\D/g, "") || (email?.replace(/\D/g, "") || "")
-  if (!cleanEmail && !digits) return []
+  let cleanEmail = email?.trim().toLowerCase() || ""
+  let cleanPhone = phone?.replace(/\D/g, "") || ""
+
+  // Auto-resolve associated phone/email if only one was provided
+  try {
+    if (!cleanPhone && cleanEmail) {
+      const pRes = await pool.query(
+        `SELECT user_phone FROM referral_profiles WHERE LOWER(user_email) = $1 AND user_phone IS NOT NULL AND user_phone != '' LIMIT 1`,
+        [cleanEmail]
+      )
+      if (pRes.rows.length > 0) {
+        cleanPhone = pRes.rows[0].user_phone.replace(/\D/g, "")
+      }
+    } else if (!cleanEmail && cleanPhone) {
+      const eRes = await pool.query(
+        `SELECT user_email FROM referral_profiles WHERE user_phone = $1 AND user_email IS NOT NULL AND user_email != '' LIMIT 1`,
+        [cleanPhone]
+      )
+      if (eRes.rows.length > 0) {
+        cleanEmail = eRes.rows[0].user_email.trim().toLowerCase()
+      }
+    }
+  } catch {
+    // fallback
+  }
+
+  if (!cleanEmail && !cleanPhone) return []
 
   try {
     const whereClauses: string[] = [
       `((ct.user_email IS NOT NULL AND LOWER(ct.user_email) = $1)
         OR (ct.user_phone IS NOT NULL AND ct.user_phone != '' AND ct.user_phone LIKE $2))`
     ]
-    const params: any[] = [cleanEmail || "NOMATCH", `%${digits ? digits.slice(-10) : "NOMATCH"}`]
+    const params: any[] = [cleanEmail || "NOMATCH", `%${cleanPhone ? cleanPhone.slice(-10) : "NOMATCH"}`]
 
     if (contestId && contestId !== "all") {
       params.push(contestId)
@@ -95,9 +119,32 @@ export async function getUserTicketStats(
   availableToAssign: number
   tickets: ContestTicket[]
 }> {
-  const cleanEmail = email?.trim().toLowerCase() || ""
-  const digits = phone?.replace(/\D/g, "") || (email?.replace(/\D/g, "") || "")
-  if (!cleanEmail && !digits) {
+  let cleanEmail = email?.trim().toLowerCase() || ""
+  let cleanPhone = phone?.replace(/\D/g, "") || ""
+
+  try {
+    if (!cleanPhone && cleanEmail) {
+      const pRes = await pool.query(
+        `SELECT user_phone FROM referral_profiles WHERE LOWER(user_email) = $1 AND user_phone IS NOT NULL AND user_phone != '' LIMIT 1`,
+        [cleanEmail]
+      )
+      if (pRes.rows.length > 0) {
+        cleanPhone = pRes.rows[0].user_phone.replace(/\D/g, "")
+      }
+    } else if (!cleanEmail && cleanPhone) {
+      const eRes = await pool.query(
+        `SELECT user_email FROM referral_profiles WHERE user_phone = $1 AND user_email IS NOT NULL AND user_email != '' LIMIT 1`,
+        [cleanPhone]
+      )
+      if (eRes.rows.length > 0) {
+        cleanEmail = eRes.rows[0].user_email.trim().toLowerCase()
+      }
+    }
+  } catch {
+    // fallback
+  }
+
+  if (!cleanEmail && !cleanPhone) {
     return { totalBought: 0, totalAssigned: 0, availableToAssign: 0, tickets: [] }
   }
 
@@ -112,9 +159,9 @@ export async function getUserTicketStats(
              OR (user_phone IS NOT NULL AND user_phone != '' AND user_phone LIKE $3)
            )
            AND status = 'completed'`,
-        [contestId, cleanEmail || "NOMATCH", `%${digits ? digits.slice(-10) : "NOMATCH"}`]
+        [contestId, cleanEmail || "NOMATCH", `%${cleanPhone ? cleanPhone.slice(-10) : "NOMATCH"}`]
       ),
-      getUserTickets(email, phone)
+      getUserTickets(cleanEmail, cleanPhone, contestId)
     ])
 
     const totalBought = Number(ordersRes.rows[0]?.total_bought) || 0
