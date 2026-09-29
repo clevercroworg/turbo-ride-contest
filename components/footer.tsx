@@ -113,9 +113,9 @@ export function Footer() {
             © {new Date().getFullYear()} TurboRide Supercar Club Pvt Ltd. All rights reserved.
           </p>
           <div className="flex items-center gap-4 sm:gap-6 flex-wrap justify-center font-medium text-zinc-600">
-            <a href="#faq" className="hover:text-zinc-950 transition-colors">Privacy Policy</a>
-            <a href="#faq" className="hover:text-zinc-950 transition-colors">Terms of Membership</a>
-            <a href="#faq" className="hover:text-zinc-950 transition-colors">Draw Regulations</a>
+            <Link href="/privacy" className="hover:text-zinc-950 transition-colors">Privacy Policy</Link>
+            <Link href="/terms" className="hover:text-zinc-950 transition-colors">Terms of Membership</Link>
+            <Link href="/draw-regulations" className="hover:text-zinc-950 transition-colors">Draw Regulations</Link>
           </div>
         </div>
 
