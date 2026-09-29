@@ -44,8 +44,8 @@ export function EntryAllocation({
   const totalCredits = selectedTickets * ticketPrice
 
   const renderCalculatorCard = () => (
-    <div className="max-w-xl mx-auto">
-      <div className="rounded-none bg-white border border-zinc-200 p-5 sm:p-7 shadow-[0_16px_48px_rgba(234,88,12,0.10)] relative">
+    <div className="max-w-xl md:max-w-2xl lg:max-w-xl mx-auto">
+      <div className="rounded-none bg-white border border-zinc-200 p-3.5 xs:p-4 sm:p-7 shadow-[0_16px_48px_rgba(234,88,12,0.10)] relative">
         
         {/* Terminal Header */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1.5 pb-3.5 mb-4 border-b border-zinc-100">
@@ -61,7 +61,7 @@ export function EntryAllocation({
         </div>
 
         {/* 5 Selector Buttons - Sharp Edged */}
-        <div className="grid grid-cols-5 gap-1.5 sm:gap-2.5 mb-4">
+        <div className="grid grid-cols-5 gap-1 xs:gap-1.5 sm:gap-2.5 mb-4">
           {ticketOptions.map((opt) => {
             const isSelected = selectedTickets === opt.count
             return (
@@ -69,7 +69,7 @@ export function EntryAllocation({
                 key={opt.count}
                 type="button"
                 onClick={() => setSelectedTickets(opt.count)}
-                className={`relative py-2.5 sm:py-3 px-1 rounded-none flex flex-col items-center justify-center transition-all cursor-pointer border ${
+                className={`relative py-2 xs:py-2.5 sm:py-3 px-0.5 xs:px-1 rounded-none flex flex-col items-center justify-center transition-all cursor-pointer border ${
                   isSelected
                     ? "bg-zinc-950 text-white border-zinc-950 shadow-md scale-[1.02]"
                     : "bg-zinc-50 hover:bg-zinc-100 text-zinc-800 border-zinc-200"
@@ -77,7 +77,7 @@ export function EntryAllocation({
               >
                 {opt.bonus && (
                   <span
-                    className={`absolute -top-2.5 left-1/2 -translate-x-1/2 text-[9px] sm:text-[10px] font-extrabold uppercase px-1.5 sm:px-2 py-0.5 rounded-none tracking-tight whitespace-nowrap shadow-xs ${
+                    className={`absolute -top-2.5 left-1/2 -translate-x-1/2 text-[8px] xs:text-[9px] sm:text-[10px] font-extrabold uppercase px-1 xs:px-1.5 sm:px-2 py-0.5 rounded-none tracking-tight whitespace-nowrap shadow-xs ${
                       isSelected
                         ? "bg-[#ea580c] text-white"
                         : "bg-orange-100 text-[#ea580c] border border-orange-200"
@@ -86,10 +86,10 @@ export function EntryAllocation({
                     {opt.bonus}
                   </span>
                 )}
-                <span className="text-base sm:text-xl font-black leading-none tabular-nums">
+                <span className="text-sm xs:text-base sm:text-xl font-black leading-none tabular-nums">
                   {opt.label}
                 </span>
-                <span className={`text-[10px] sm:text-xs font-bold mt-1 ${isSelected ? "text-zinc-200" : "text-zinc-950"}`}>
+                <span className={`text-[9px] xs:text-[10px] sm:text-xs font-bold mt-1 ${isSelected ? "text-zinc-200" : "text-zinc-950"}`}>
                   {opt.count === 1 ? "Ticket" : "Tickets"}
                 </span>
               </button>

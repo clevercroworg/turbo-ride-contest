@@ -51,11 +51,11 @@ export function Nav({ onBuyTicketsClick, userCredits = 0, memberEmail }: NavProp
             : "bg-transparent border-none"
         }`}
       >
-        <div className="max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 flex items-center justify-between gap-2">
+        <div className="max-w-7xl mx-auto w-full px-3.5 sm:px-6 lg:px-8 flex items-center justify-between gap-1.5 sm:gap-2">
           
           {/* Brand Logo - Adaptive Contrast */}
           <Link href="/" className="flex items-center group py-2 shrink-0">
-            <span className="font-display text-lg sm:text-xl md:text-2xl font-black tracking-tight uppercase whitespace-nowrap transition-colors duration-300">
+            <span className="font-display text-base xs:text-lg sm:text-xl md:text-2xl font-black tracking-tight uppercase whitespace-nowrap transition-colors duration-300">
               <span className={scrolled || mobileMenuOpen ? "text-zinc-950" : "text-white"}>WINMY</span>
               <span className={scrolled || mobileMenuOpen ? "text-[#ea580c]" : "text-zinc-950"}>PORSCHE</span>
             </span>
@@ -79,7 +79,7 @@ export function Nav({ onBuyTicketsClick, userCredits = 0, memberEmail }: NavProp
           </nav>
 
           {/* Right Action Area */}
-          <div className="flex items-center gap-2 sm:gap-3 shrink-0">
+          <div className="flex items-center gap-1.5 xs:gap-2 sm:gap-3 shrink-0">
             {memberEmail ? (
               <Link
                 href="/members"
@@ -109,7 +109,7 @@ export function Nav({ onBuyTicketsClick, userCredits = 0, memberEmail }: NavProp
             <button
               type="button"
               onClick={onBuyTicketsClick}
-              className={`inline-flex items-center gap-1.5 px-3 sm:px-4 py-1.5 sm:py-2 rounded-none text-xs sm:text-sm font-bold uppercase tracking-wider transition-all duration-300 shadow-sm active:scale-95 cursor-pointer shrink-0 ${
+              className={`inline-flex items-center gap-1.5 px-2.5 xs:px-3 sm:px-4 py-1.5 sm:py-2 rounded-none text-[11px] xs:text-xs sm:text-sm font-bold uppercase tracking-wider transition-all duration-300 shadow-sm active:scale-95 cursor-pointer shrink-0 ${
                 scrolled || mobileMenuOpen
                   ? "bg-[#ea580c] hover:bg-[#c2410c] text-white"
                   : "bg-zinc-950 hover:bg-black text-white border border-zinc-900"
