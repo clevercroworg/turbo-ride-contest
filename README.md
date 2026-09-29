@@ -47,10 +47,12 @@ The official **Zero-Loss Guarantee** Supercar Contest & Member Garage platform f
         *   Tablet Portrait (`md:` 768px–1023px, single column 672px max): `md:text-[44px]`
         *   Tablet Landscape (`lg:` 1024px–1279px, dual column 464px each): `lg:text-[36px]`
         *   Desktop (`xl:` 1280px+): `xl:text-[48px] 2xl:text-[52px]`
-*   **Adaptive Navbar (`components/nav.tsx`)**:
+*   **Adaptive Navbar & Animated Cockpit Menu (`components/nav.tsx`)**:
     *   Top position (`scrollY <= 20`): `bg-transparent border-none`, white/black logo, white links, solid jet black button.
     *   Scrolled position (`scrollY > 20`): `bg-white/95 backdrop-blur-md border-b border-zinc-200 shadow-xs`, black/orange logo, orange button.
     *   Ultra-small screens (320px–360px): `px-3.5`, responsive logo `text-base xs:text-lg sm:text-xl md:text-2xl`, button `px-2.5 xs:px-3 text-[11px] xs:text-xs`.
+    *   **Creative Animated Menu Icon Trigger**: Custom vector SVG with 3 aerodynamic supercar wing louvres. Top and bottom slats rotate ±45° on click to morph into a razor-sharp mechanical `X`. The middle bar features an illuminated Racing Orange speed slat and an RPM telemetry dot that collapse out smoothly on open.
+    *   **Supercar Cockpit Mobile Drawer**: Industrial-brutalist telemetry navigation panel with numbered monospace indexes (`01` to `05`), subtitles, arrow indicators, quick legal links (`/terms`, `/draw-regulations`, `/privacy`), and garage login/tickets CTA.
 *   **Bottom Delivery & Cash Option Bar**:
     *   Left: Buddh Circuit Delivery (`text-xs xs:text-[13px] sm:text-sm font-black`) with gauge icon (`size={16}`).
     *   Right: `₹75 Lakh Cash Option` badge (`text-xs xs:text-[13px] sm:text-sm font-black bg-zinc-950 text-white`).
