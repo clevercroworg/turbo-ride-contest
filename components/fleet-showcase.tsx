@@ -90,7 +90,7 @@ export function FleetShowcase() {
           <h2 className="text-2xl sm:text-3xl lg:text-4xl font-black text-zinc-950 uppercase tracking-tight leading-none mb-3">
             SUPERCAR SEAT TIME
           </h2>
-          <p className="text-sm sm:text-base lg:text-lg text-zinc-950 font-medium leading-relaxed max-w-2xl mx-auto">
+          <p className="text-sm sm:text-base lg:text-lg text-zinc-950 font-medium leading-relaxed max-w-2xl mx-auto px-4 xs:px-6 sm:px-0">
             1 Credit = ₹1. Convert your deposits into supercar track laps, 4K FPV drone reels, or studio photoshoots.
           </p>
         </div>

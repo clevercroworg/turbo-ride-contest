@@ -29,7 +29,7 @@ export function InteractiveCalculator({ onBuyTickets }: CalculatorProps) {
           <h2 className="text-3xl sm:text-4xl font-black tracking-tight text-zinc-950 mb-3 uppercase">
             Ticket & Credit Calculator
           </h2>
-          <p className="text-base text-zinc-950 font-medium leading-relaxed">
+          <p className="text-base text-zinc-950 font-medium leading-relaxed px-4 xs:px-6 sm:px-0">
             Slide to see your credit allocation and the exact supercar experiences unlocked.
           </p>
         </div>

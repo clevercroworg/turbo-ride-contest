@@ -55,7 +55,7 @@ export function ReferralEngine({ ticketPrice = 1000 }: ReferralEngineProps = {})
           <h2 className="text-2xl sm:text-3xl lg:text-4xl font-black text-zinc-950 uppercase tracking-tight leading-none mb-3">
             INVITE & EARN CASH
           </h2>
-          <p className="text-sm sm:text-base lg:text-lg text-zinc-950 font-medium leading-relaxed max-w-2xl mx-auto">
+          <p className="text-sm sm:text-base lg:text-lg text-zinc-950 font-medium leading-relaxed max-w-2xl mx-auto px-4 xs:px-6 sm:px-0">
             Earn 25% in permanent Drive Credits on every referral, plus 25% direct cash commission.
           </p>
         </div>
