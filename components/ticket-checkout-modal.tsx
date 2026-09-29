@@ -144,13 +144,13 @@ export function TicketCheckoutModal({
           /* Checkout Form */
           <div>
             <div className="mb-5 sm:mb-6">
-              <span className="text-xs font-bold uppercase tracking-wider text-[#ea580c] block mb-1">
+              <span className="text-xs font-black uppercase tracking-wider text-[#ea580c] block mb-1">
                 Official Entry
               </span>
               <h3 className="text-xl sm:text-2xl font-black text-zinc-950 tracking-tight">
                 Deposit & Claim Tickets
               </h3>
-              <p className="text-xs text-zinc-500 mt-0.5">
+              <p className="text-sm text-zinc-950 font-medium mt-1">
                 100% of your deposit is credited as TurboRide Drive Credits.
               </p>
             </div>
@@ -159,7 +159,7 @@ export function TicketCheckoutModal({
               
               {/* Ticket Quantity Stepper */}
               <div>
-                <label className="block text-xs uppercase text-zinc-600 font-bold mb-2">
+                <label className="block text-xs uppercase text-zinc-950 font-black mb-2">
                   Select Tickets (₹{ticketPrice.toLocaleString("en-IN")} each)
                 </label>
                 <div className="grid grid-cols-6 gap-1.5 mb-2">
@@ -171,7 +171,7 @@ export function TicketCheckoutModal({
                       className={`py-2 rounded-lg text-xs font-bold transition-all cursor-pointer ${
                         ticketCount === p
                           ? "bg-[#ea580c] text-white font-black shadow-xs"
-                          : "bg-zinc-100 text-zinc-700 hover:bg-zinc-200 border border-zinc-200"
+                          : "bg-zinc-100 text-zinc-950 hover:bg-zinc-200 border border-zinc-200 font-bold"
                       }`}
                     >
                       {p}
@@ -183,11 +183,11 @@ export function TicketCheckoutModal({
               {/* Total Summary Strip */}
               <div className="p-3.5 rounded-xl bg-zinc-50 border border-zinc-200 flex items-center justify-between text-xs">
                 <div>
-                  <span className="text-zinc-500 font-semibold block">Total Due</span>
+                  <span className="text-zinc-950 font-black block">Total Due</span>
                   <span className="text-lg font-black text-zinc-950 tabular-nums">₹{(ticketCount * ticketPrice).toLocaleString("en-IN")}</span>
                 </div>
                 <div className="text-right">
-                  <span className="text-zinc-500 font-semibold block">Credits Received</span>
+                  <span className="text-zinc-950 font-black block">Credits Received</span>
                   <span className="text-base font-black text-emerald-600 tabular-nums">+{(ticketCount * ticketPrice).toLocaleString("en-IN")} Credits</span>
                 </div>
               </div>
@@ -195,7 +195,7 @@ export function TicketCheckoutModal({
               {/* Contact Fields */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-xs uppercase text-zinc-600 font-bold mb-1">
+                  <label className="block text-xs uppercase text-zinc-950 font-bold mb-1">
                     Your Name
                   </label>
                   <input
@@ -204,12 +204,12 @@ export function TicketCheckoutModal({
                     placeholder="Raghav Sharma"
                     value={userName}
                     onChange={(e) => setUserName(e.target.value)}
-                    className="w-full px-3.5 py-2.5 rounded-xl bg-white border border-zinc-300 text-zinc-900 text-sm placeholder:text-zinc-400 focus:outline-none focus:border-[#ea580c]"
+                    className="w-full px-3.5 py-2.5 rounded-xl bg-white border border-zinc-300 text-zinc-950 text-sm font-semibold placeholder:text-zinc-400 focus:outline-none focus:border-[#ea580c]"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-xs uppercase text-zinc-600 font-bold mb-1">
+                  <label className="block text-xs uppercase text-zinc-950 font-bold mb-1">
                     WhatsApp Phone
                   </label>
                   <input
@@ -218,14 +218,14 @@ export function TicketCheckoutModal({
                     placeholder="9876543210"
                     value={userPhone}
                     onChange={(e) => setUserPhone(e.target.value)}
-                    className="w-full px-3.5 py-2.5 rounded-xl bg-white border border-zinc-300 text-zinc-900 text-sm placeholder:text-zinc-400 focus:outline-none focus:border-[#ea580c]"
+                    className="w-full px-3.5 py-2.5 rounded-xl bg-white border border-zinc-300 text-zinc-950 text-sm font-semibold placeholder:text-zinc-400 focus:outline-none focus:border-[#ea580c]"
                   />
                 </div>
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-xs uppercase text-zinc-600 font-bold mb-1">
+                  <label className="block text-xs uppercase text-zinc-950 font-bold mb-1">
                     Email Address
                   </label>
                   <input
@@ -234,12 +234,12 @@ export function TicketCheckoutModal({
                     placeholder="raghav@gmail.com"
                     value={userEmail}
                     onChange={(e) => setUserEmail(e.target.value)}
-                    className="w-full px-3.5 py-2.5 rounded-xl bg-white border border-zinc-300 text-zinc-900 text-sm placeholder:text-zinc-400 focus:outline-none focus:border-[#ea580c]"
+                    className="w-full px-3.5 py-2.5 rounded-xl bg-white border border-zinc-300 text-zinc-950 text-sm font-semibold placeholder:text-zinc-400 focus:outline-none focus:border-[#ea580c]"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-xs uppercase text-zinc-600 font-bold mb-1">
+                  <label className="block text-xs uppercase text-zinc-950 font-bold mb-1">
                     Referral Code (Optional)
                   </label>
                   <input
@@ -247,13 +247,13 @@ export function TicketCheckoutModal({
                     placeholder="TRB100"
                     value={referralCode}
                     onChange={(e) => setReferralCode(e.target.value.toUpperCase())}
-                    className="w-full px-3.5 py-2.5 rounded-xl bg-white border border-zinc-300 text-zinc-900 text-sm placeholder:text-zinc-400 focus:outline-none focus:border-[#ea580c] uppercase font-semibold"
+                    className="w-full px-3.5 py-2.5 rounded-xl bg-white border border-zinc-300 text-zinc-950 text-sm placeholder:text-zinc-400 focus:outline-none focus:border-[#ea580c] uppercase font-bold"
                   />
                 </div>
               </div>
 
               {error && (
-                <div className="p-3 rounded-xl bg-red-50 border border-red-200 text-red-600 text-xs">
+                <div className="p-3 rounded-xl bg-red-50 border border-red-200 text-red-600 text-xs font-semibold">
                   {error}
                 </div>
               )}
@@ -262,7 +262,7 @@ export function TicketCheckoutModal({
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full py-3.5 sm:py-4 rounded-xl bg-[#ea580c] hover:bg-[#c2410c] text-white font-bold text-xs sm:text-sm uppercase tracking-wider transition-all shadow-md active:scale-98 disabled:opacity-50 flex items-center justify-center gap-2 cursor-pointer"
+                className="w-full py-3.5 sm:py-4 rounded-xl bg-[#ea580c] hover:bg-[#c2410c] text-white font-black text-xs sm:text-sm uppercase tracking-wider transition-all shadow-md active:scale-98 disabled:opacity-50 flex items-center justify-center gap-2 cursor-pointer"
               >
                 <Ticket size={18} weight="fill" />
                 <span>
@@ -272,8 +272,8 @@ export function TicketCheckoutModal({
                 </span>
               </button>
 
-              <div className="flex items-center justify-center gap-2 text-xs text-zinc-500 font-medium">
-                <ShieldCheck size={15} className="text-emerald-600 shrink-0" weight="fill" />
+              <div className="flex items-center justify-center gap-2 text-xs text-zinc-950 font-bold">
+                <ShieldCheck size={16} className="text-emerald-600 shrink-0" weight="fill" />
                 <span>100% Capital Protected · ₹{ticketPrice.toLocaleString("en-IN")} = {ticketPrice.toLocaleString("en-IN")} Drive Credits</span>
               </div>
 

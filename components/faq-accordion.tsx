@@ -50,19 +50,19 @@ export function FaqAccordion() {
         
         {/* Creative Automotive Telemetry Deco & Single Line Heading */}
         <div className="text-center max-w-3xl mx-auto mb-8 sm:mb-12">
-          <div className="flex items-center justify-center gap-2.5 mb-2.5">
-            <span className="w-6 sm:w-10 h-px bg-gradient-to-r from-transparent to-[#ea580c]" />
-            <span className="text-[10px] sm:text-[11px] font-mono tracking-widest text-[#ea580c] font-black uppercase flex items-center gap-1.5">
-              <span className="w-1.5 h-1.5 bg-[#ea580c] rotate-45 inline-block" />
-              07 // AUDIT & DISCLOSURES
-              <span className="w-1.5 h-1.5 bg-[#ea580c] rotate-45 inline-block" />
+          <div className="flex items-center justify-center gap-2 mb-2.5">
+            <span className="w-4 sm:w-8 h-px bg-gradient-to-r from-transparent to-[#ea580c] shrink" />
+            <span className="text-[11px] sm:text-xs font-mono tracking-wider text-[#ea580c] font-black uppercase flex items-center gap-1.5 whitespace-nowrap">
+              <span className="w-1.5 h-1.5 bg-[#ea580c] rotate-45 inline-block shrink-0" />
+              07 · AUDIT & DISCLOSURES
+              <span className="w-1.5 h-1.5 bg-[#ea580c] rotate-45 inline-block shrink-0" />
             </span>
-            <span className="w-6 sm:w-10 h-px bg-gradient-to-l from-transparent to-[#ea580c]" />
+            <span className="w-4 sm:w-8 h-px bg-gradient-to-l from-transparent to-[#ea580c] shrink" />
           </div>
           <h2 className="text-2xl sm:text-3xl lg:text-4xl font-black text-zinc-950 uppercase tracking-tight leading-none mb-3">
             FAQS & VERIFICATION
           </h2>
-          <p className="text-sm sm:text-base lg:text-lg text-zinc-600 font-medium leading-relaxed max-w-2xl mx-auto">
+          <p className="text-sm sm:text-base lg:text-lg text-zinc-950 font-medium leading-relaxed max-w-2xl mx-auto">
             Clear answers on draw mechanics, credit redemption, capital escrow, and supercar delivery.
           </p>
         </div>
@@ -82,10 +82,10 @@ export function FaqAccordion() {
                   className="w-full p-4 sm:p-5 text-left flex items-center justify-between gap-3 text-zinc-950 hover:text-[#ea580c] transition-colors cursor-pointer"
                 >
                   <div className="flex items-center gap-3 min-w-0">
-                    <span className="text-xs font-black text-[#ea580c] shrink-0">
+                    <span className="text-xs sm:text-sm font-black text-[#ea580c] shrink-0">
                       {faq.num}
                     </span>
-                    <span className="font-bold text-sm sm:text-base tracking-tight truncate">
+                    <span className="font-black text-sm sm:text-base tracking-tight truncate">
                       {faq.q}
                     </span>
                   </div>
@@ -93,7 +93,7 @@ export function FaqAccordion() {
                     className={`w-6 h-6 rounded-none flex items-center justify-center shrink-0 transition-transform duration-200 border ${
                       isOpen
                         ? "rotate-180 bg-[#ea580c] text-white border-[#ea580c]"
-                        : "bg-zinc-50 text-zinc-600 border-zinc-200"
+                        : "bg-zinc-50 text-zinc-950 border-zinc-200"
                     }`}
                   >
                     <CaretDown size={13} weight="bold" />
@@ -109,7 +109,7 @@ export function FaqAccordion() {
                       transition={{ duration: 0.2, ease: [0.16, 1, 0.3, 1] }}
                       className="overflow-hidden border-t border-zinc-100 bg-zinc-50/50"
                     >
-                      <div className="p-4 sm:p-5 text-xs sm:text-sm text-zinc-600 leading-relaxed">
+                      <div className="p-4 sm:p-5 text-sm sm:text-base text-zinc-950 leading-relaxed font-medium">
                         {faq.a}
                       </div>
                     </motion.div>

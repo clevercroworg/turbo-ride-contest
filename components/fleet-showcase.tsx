@@ -78,24 +78,23 @@ export function FleetShowcase() {
         
         {/* Creative Automotive Telemetry Deco & Single Line Heading */}
         <div className="text-center max-w-3xl mx-auto mb-8 sm:mb-12">
-          <div className="flex items-center justify-center gap-2.5 mb-2.5">
-            <span className="w-6 sm:w-10 h-px bg-gradient-to-r from-transparent to-[#ea580c]" />
-            <span className="text-[10px] sm:text-[11px] font-mono tracking-widest text-[#ea580c] font-black uppercase flex items-center gap-1.5">
-              <span className="w-1.5 h-1.5 bg-[#ea580c] rotate-45 inline-block" />
-              04 // FLEET EXPERIENCES
-              <span className="w-1.5 h-1.5 bg-[#ea580c] rotate-45 inline-block" />
+          <div className="flex items-center justify-center gap-2 mb-2.5">
+            <span className="w-4 sm:w-8 h-px bg-gradient-to-r from-transparent to-[#ea580c] shrink" />
+            <span className="text-[11px] sm:text-xs font-mono tracking-wider text-[#ea580c] font-black uppercase flex items-center gap-1.5 whitespace-nowrap">
+              <span className="w-1.5 h-1.5 bg-[#ea580c] rotate-45 inline-block shrink-0" />
+              04 · FLEET EXPERIENCES
+              <span className="w-1.5 h-1.5 bg-[#ea580c] rotate-45 inline-block shrink-0" />
             </span>
-            <span className="w-6 sm:w-10 h-px bg-gradient-to-l from-transparent to-[#ea580c]" />
+            <span className="w-4 sm:w-8 h-px bg-gradient-to-l from-transparent to-[#ea580c] shrink" />
           </div>
           <h2 className="text-2xl sm:text-3xl lg:text-4xl font-black text-zinc-950 uppercase tracking-tight leading-none mb-3">
             SUPERCAR SEAT TIME
           </h2>
-          <p className="text-sm sm:text-base lg:text-lg text-zinc-600 font-medium leading-relaxed max-w-2xl mx-auto">
+          <p className="text-sm sm:text-base lg:text-lg text-zinc-950 font-medium leading-relaxed max-w-2xl mx-auto">
             1 Credit = ₹1. Convert your deposits into supercar track laps, 4K FPV drone reels, or studio photoshoots.
           </p>
         </div>
 
-        {/* 6-Card Grid */}
         {/* 6-Card Grid - Sharp Edged Architectural Styling */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
           {fleetItems.map((item) => (
@@ -129,7 +128,7 @@ export function FleetShowcase() {
                   <h3 className="text-base sm:text-lg font-black text-zinc-950 uppercase tracking-tight truncate">
                     {item.name}
                   </h3>
-                  <p className="text-xs text-zinc-500 font-medium mt-0.5 truncate">
+                  <p className="text-xs sm:text-sm text-zinc-950 font-bold mt-0.5 truncate">
                     {item.subtitle}
                   </p>
                 </div>
@@ -138,7 +137,7 @@ export function FleetShowcase() {
                   <span className="text-lg sm:text-xl font-black text-[#ea580c] block leading-none tabular-nums">
                     {item.credits.toLocaleString("en-IN")}
                   </span>
-                  <span className="text-[10px] text-zinc-400 font-semibold block uppercase tracking-wider mt-1">
+                  <span className="text-[10px] text-zinc-950 font-bold block uppercase tracking-wider mt-1">
                     Credits
                   </span>
                 </div>

@@ -69,14 +69,14 @@ export function PorscheSpecs() {
     <div className="mt-6 sm:mt-8 rounded-none bg-white border border-zinc-200 p-4 sm:p-6 lg:p-8 shadow-xs">
       
       {/* Header - Single line on mobile */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-3 mb-4 sm:mb-6 border-b border-zinc-100 gap-1 sm:gap-2">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-3.5 mb-4 sm:mb-6 border-b border-zinc-100 gap-1.5 sm:gap-2">
         <div className="flex items-center gap-2 min-w-0">
-          <span className="w-2 h-2 rounded-full bg-emerald-500 shrink-0" />
-          <span className="text-xs sm:text-sm uppercase tracking-wider font-extrabold text-zinc-950 truncate">
+          <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 shrink-0" />
+          <span className="text-sm sm:text-base uppercase tracking-wider font-black text-zinc-950 truncate">
             OFFICIAL VEHICLE PASSPORT<span className="hidden sm:inline"> · 100-POINT INSPECTION</span>
           </span>
         </div>
-        <span className="text-[11px] sm:text-xs text-zinc-500 font-medium truncate">
+        <span className="text-xs sm:text-sm text-zinc-950 font-bold truncate">
           RTO Verified · Zero Hypothecation
         </span>
       </div>
@@ -88,25 +88,25 @@ export function PorscheSpecs() {
           return (
             <div 
               key={cluster.category} 
-              className="rounded-none border border-zinc-200/80 md:border-0 p-2 sm:p-0 bg-zinc-50/50 md:bg-transparent"
+              className="rounded-none border border-zinc-200/80 md:border-0 p-2.5 sm:p-0 bg-zinc-50/50 md:bg-transparent"
             >
               {/* Mobile Clickable Accordion Header / Desktop Static Header */}
               <button
                 type="button"
                 onClick={() => toggleCluster(cluster.category)}
-                className="w-full flex items-center justify-between py-1.5 md:py-0 text-left cursor-pointer md:cursor-default md:pointer-events-none pb-2 border-b border-zinc-200/80 md:border-zinc-100 mb-2 sm:mb-3"
+                className="w-full flex items-center justify-between py-2 md:py-0 text-left cursor-pointer md:cursor-default md:pointer-events-none pb-2 border-b border-zinc-200/80 md:border-zinc-100 mb-2.5 sm:mb-3"
               >
-                <span className="text-[11px] sm:text-xs uppercase font-extrabold tracking-wider text-[#ea580c] block">
+                <span className="text-xs sm:text-sm uppercase font-black tracking-wider text-[#ea580c] block">
                   {cluster.category}
                 </span>
 
                 {/* Dropdown Indicator (Mobile Only) */}
-                <div className="md:hidden flex items-center gap-1.5 text-zinc-400">
-                  <span className="text-[10px] font-semibold">
+                <div className="md:hidden flex items-center gap-1.5 text-zinc-700">
+                  <span className="text-xs font-bold">
                     {isOpen ? "Hide" : "View"}
                   </span>
                   <CaretDown 
-                    size={14} 
+                    size={16} 
                     weight="bold" 
                     className={`transition-transform duration-200 ${isOpen ? "rotate-180 text-[#ea580c]" : ""}`} 
                   />
@@ -114,22 +114,22 @@ export function PorscheSpecs() {
               </button>
 
               {/* Specs List: Collapsible on mobile, always visible on desktop */}
-              <div className={`space-y-2 ${isOpen ? "block" : "hidden md:block"}`}>
+              <div className={`space-y-2 sm:space-y-2.5 ${isOpen ? "block" : "hidden md:block"}`}>
                 {cluster.specs.map((item) => {
                   const Icon = item.icon
                   return (
                     <div
                       key={item.label}
-                      className="p-2 sm:p-2.5 rounded-none bg-white md:bg-zinc-50 border border-zinc-200/80 hover:bg-zinc-100/60 transition-colors flex items-start gap-2.5"
+                      className="p-2.5 sm:p-3 rounded-none bg-white md:bg-zinc-50 border border-zinc-200 hover:bg-zinc-100/80 transition-colors flex items-center gap-3"
                     >
-                      <div className="w-6 h-6 rounded-none bg-orange-50 border border-orange-200/60 flex items-center justify-center text-[#ea580c] shrink-0 mt-0.5">
-                        <Icon size={13} weight="bold" />
+                      <div className="w-8 h-8 rounded-none bg-orange-100/80 border border-orange-200 flex items-center justify-center text-[#ea580c] shrink-0">
+                        <Icon size={16} weight="bold" />
                       </div>
                       <div className="min-w-0 flex-1">
-                        <span className="text-[9px] sm:text-[10px] uppercase tracking-wider text-zinc-400 font-bold block mb-0.5">
+                        <span className="text-[11px] sm:text-xs uppercase tracking-wider text-zinc-950 font-extrabold block mb-0.5">
                           {item.label}
                         </span>
-                        <span className="text-[11px] sm:text-xs font-bold text-zinc-900 block truncate">
+                        <span className="text-xs sm:text-sm font-black text-zinc-950 block truncate">
                           {item.value}
                         </span>
                       </div>
@@ -143,12 +143,12 @@ export function PorscheSpecs() {
       </div>
 
       {/* Bottom Legal Verification Guarantee */}
-      <div className="mt-4 sm:mt-5 pt-3 border-t border-zinc-100 flex flex-col sm:flex-row sm:items-center justify-between gap-1 text-[10px] sm:text-xs text-zinc-500 font-medium">
-        <span className="flex items-center gap-1.5 text-zinc-900 truncate">
-          <CheckCircle size={14} weight="fill" className="text-emerald-600 shrink-0" />
+      <div className="mt-4 sm:mt-5 pt-3.5 border-t border-zinc-100 flex flex-col sm:flex-row sm:items-center justify-between gap-1.5 text-xs sm:text-sm text-zinc-950 font-semibold">
+        <span className="flex items-center gap-1.5 text-zinc-950 truncate">
+          <CheckCircle size={16} weight="fill" className="text-emerald-600 shrink-0" />
           <span className="truncate">RTO transfer fees, Karnataka road taxes, and handover covered</span>
         </span>
-        <span className="text-[#ea580c] font-bold shrink-0">100% Turnkey Handover</span>
+        <span className="text-[#ea580c] font-black shrink-0">100% Turnkey Handover</span>
       </div>
 
     </div>

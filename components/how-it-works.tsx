@@ -50,19 +50,19 @@ export function HowItWorks({
         
         {/* Creative Automotive Telemetry Deco & Single Line Heading */}
         <div className="text-center max-w-3xl mx-auto mb-8 sm:mb-12">
-          <div className="flex items-center justify-center gap-2.5 mb-2.5">
-            <span className="w-6 sm:w-10 h-px bg-gradient-to-r from-transparent to-[#ea580c]" />
-            <span className="text-[10px] sm:text-[11px] font-mono tracking-widest text-[#ea580c] font-black uppercase flex items-center gap-1.5">
-              <span className="w-1.5 h-1.5 bg-[#ea580c] rotate-45 inline-block" />
-              02 // ZERO-LOSS PROTOCOL
-              <span className="w-1.5 h-1.5 bg-[#ea580c] rotate-45 inline-block" />
+          <div className="flex items-center justify-center gap-2 mb-2.5">
+            <span className="w-4 sm:w-8 h-px bg-gradient-to-r from-transparent to-[#ea580c] shrink" />
+            <span className="text-[11px] sm:text-xs font-mono tracking-wider text-[#ea580c] font-black uppercase flex items-center gap-1.5 whitespace-nowrap">
+              <span className="w-1.5 h-1.5 bg-[#ea580c] rotate-45 inline-block shrink-0" />
+              02 · ZERO-LOSS PROTOCOL
+              <span className="w-1.5 h-1.5 bg-[#ea580c] rotate-45 inline-block shrink-0" />
             </span>
-            <span className="w-6 sm:w-10 h-px bg-gradient-to-l from-transparent to-[#ea580c]" />
+            <span className="w-4 sm:w-8 h-px bg-gradient-to-l from-transparent to-[#ea580c] shrink" />
           </div>
           <h2 className="text-2xl sm:text-3xl lg:text-4xl font-black text-zinc-950 uppercase tracking-tight leading-none mb-3">
             HOW IT WORKS
           </h2>
-          <p className="text-sm sm:text-base lg:text-lg text-zinc-600 font-medium leading-relaxed max-w-2xl mx-auto">
+          <p className="text-sm sm:text-base lg:text-lg text-zinc-950 font-medium leading-relaxed max-w-2xl mx-auto">
             100% of your deposit returns as permanent Buddh Circuit Drive Credits. Win a supercar or hit the track.
           </p>
         </div>
@@ -78,22 +78,22 @@ export function HowItWorks({
               >
                 <div>
                   <div className="flex items-center justify-between pb-3 mb-3 border-b border-zinc-200/60">
-                    <span className="text-2xl font-black text-zinc-300 tabular-nums">
+                    <span className="text-2xl font-black text-zinc-400 tabular-nums">
                       {step.num}
                     </span>
-                    <span className="text-[10px] uppercase font-bold text-[#ea580c] bg-orange-50 border border-orange-200 px-2 py-0.5 rounded-none">
+                    <span className="text-xs uppercase font-extrabold text-[#ea580c] bg-orange-100/80 border border-orange-200 px-2 py-0.5 rounded-none">
                       {step.badge}
                     </span>
                   </div>
 
                   <div className="flex items-center gap-2 mb-2">
                     <Icon size={20} weight="bold" className="text-zinc-950 shrink-0" />
-                    <h3 className="text-base sm:text-lg font-bold text-zinc-950 uppercase tracking-tight">
+                    <h3 className="text-base sm:text-lg font-black text-zinc-950 uppercase tracking-tight">
                       {step.action}
                     </h3>
                   </div>
 
-                  <p className="text-xs sm:text-sm text-zinc-600 leading-relaxed font-normal">
+                  <p className="text-xs sm:text-sm text-zinc-950 leading-relaxed font-medium">
                     {step.detail}
                   </p>
                 </div>

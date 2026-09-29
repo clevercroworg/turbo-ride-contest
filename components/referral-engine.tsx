@@ -43,19 +43,19 @@ export function ReferralEngine({ ticketPrice = 1000 }: ReferralEngineProps = {})
         
         {/* Creative Automotive Telemetry Deco & Single Line Heading */}
         <div className="text-center max-w-3xl mx-auto mb-8 sm:mb-12">
-          <div className="flex items-center justify-center gap-2.5 mb-2.5">
-            <span className="w-6 sm:w-10 h-px bg-gradient-to-r from-transparent to-[#ea580c]" />
-            <span className="text-[10px] sm:text-[11px] font-mono tracking-widest text-[#ea580c] font-black uppercase flex items-center gap-1.5">
-              <span className="w-1.5 h-1.5 bg-[#ea580c] rotate-45 inline-block" />
-              06 // SYNDICATE NETWORK
-              <span className="w-1.5 h-1.5 bg-[#ea580c] rotate-45 inline-block" />
+          <div className="flex items-center justify-center gap-2 mb-2.5">
+            <span className="w-4 sm:w-8 h-px bg-gradient-to-r from-transparent to-[#ea580c] shrink" />
+            <span className="text-[11px] sm:text-xs font-mono tracking-wider text-[#ea580c] font-black uppercase flex items-center gap-1.5 whitespace-nowrap">
+              <span className="w-1.5 h-1.5 bg-[#ea580c] rotate-45 inline-block shrink-0" />
+              06 · SYNDICATE NETWORK
+              <span className="w-1.5 h-1.5 bg-[#ea580c] rotate-45 inline-block shrink-0" />
             </span>
-            <span className="w-6 sm:w-10 h-px bg-gradient-to-l from-transparent to-[#ea580c]" />
+            <span className="w-4 sm:w-8 h-px bg-gradient-to-l from-transparent to-[#ea580c] shrink" />
           </div>
           <h2 className="text-2xl sm:text-3xl lg:text-4xl font-black text-zinc-950 uppercase tracking-tight leading-none mb-3">
             INVITE & EARN CASH
           </h2>
-          <p className="text-sm sm:text-base lg:text-lg text-zinc-600 font-medium leading-relaxed max-w-2xl mx-auto">
+          <p className="text-sm sm:text-base lg:text-lg text-zinc-950 font-medium leading-relaxed max-w-2xl mx-auto">
             Earn 25% in permanent Drive Credits on every referral, plus 25% direct cash commission.
           </p>
         </div>
@@ -69,17 +69,17 @@ export function ReferralEngine({ ticketPrice = 1000 }: ReferralEngineProps = {})
             {/* Box 1: Your Referral Link Card - Sharp Edged */}
             <div className="rounded-none bg-white border border-zinc-200 p-4 sm:p-6 shadow-2xs">
               <div className="flex items-center justify-between gap-2 mb-3">
-                <span className="text-xs font-bold uppercase tracking-wide text-zinc-500">
+                <span className="text-xs font-black uppercase tracking-wide text-zinc-950">
                   YOUR SYNDICATE LINK
                 </span>
-                <span className="text-[11px] font-bold text-[#ea580c] bg-orange-50 border border-orange-200 px-2 py-0.5 rounded-none">
+                <span className="text-xs font-bold text-[#ea580c] bg-orange-50 border border-orange-200 px-2.5 py-0.5 rounded-none">
                   Instant 25% Match
                 </span>
               </div>
 
               {/* Input & Copy Button Bar */}
               <div className="bg-zinc-50 rounded-none p-1.5 pl-3 sm:pl-4 flex items-center justify-between gap-2 border border-zinc-200">
-                <span className="text-xs sm:text-sm text-zinc-800 font-semibold truncate select-all">
+                <span className="text-xs sm:text-sm text-zinc-950 font-bold truncate select-all">
                   winmyporsche.in/r/4821
                 </span>
                 <button
@@ -106,7 +106,7 @@ export function ReferralEngine({ ticketPrice = 1000 }: ReferralEngineProps = {})
             <div className="rounded-none bg-white border border-zinc-200 p-4 sm:p-6 shadow-2xs flex-1 flex flex-col justify-between">
               <div>
                 <div className="flex items-center justify-between pb-2 mb-3 border-b border-zinc-100">
-                  <span className="text-xs font-bold uppercase tracking-wide text-zinc-500">
+                  <span className="text-xs font-black uppercase tracking-wide text-zinc-950">
                     SIMULATE EARNINGS
                   </span>
                   <span className="text-xs font-black text-[#ea580c] bg-orange-50 px-2.5 py-0.5 rounded-none border border-orange-200 tabular-nums">
@@ -118,26 +118,26 @@ export function ReferralEngine({ ticketPrice = 1000 }: ReferralEngineProps = {})
                 <div className="grid grid-cols-2 gap-2.5 sm:gap-4 mb-4">
                   {/* Metric 1: Drive Credits */}
                   <div className="rounded-none border border-zinc-200 bg-zinc-50 p-3 sm:p-4">
-                    <span className="text-[11px] text-zinc-500 font-bold uppercase block mb-1">
+                    <span className="text-xs text-zinc-950 font-black uppercase block mb-1">
                       Drive Credits (1:1)
                     </span>
                     <span className="text-xl sm:text-2xl font-black text-zinc-950 block leading-none tabular-nums">
                       +{driveCredits.toLocaleString("en-IN")}
                     </span>
-                    <span className="text-[11px] text-zinc-500 font-medium block mt-1.5">
+                    <span className="text-xs text-zinc-950 font-semibold block mt-1.5">
                       25% credit match
                     </span>
                   </div>
 
                   {/* Metric 2: Cash Commission */}
                   <div className="rounded-none border border-orange-200 bg-orange-50/50 p-3 sm:p-4">
-                    <span className="text-[11px] text-[#ea580c] font-bold uppercase block mb-1">
+                    <span className="text-xs text-[#ea580c] font-black uppercase block mb-1">
                       Cash Commission
                     </span>
                     <span className="text-xl sm:text-2xl font-black text-[#ea580c] block leading-none tabular-nums">
                       ₹{cashCommission.toLocaleString("en-IN")}
                     </span>
-                    <span className="text-[11px] text-zinc-600 font-medium block mt-1.5">
+                    <span className="text-xs text-zinc-950 font-semibold block mt-1.5">
                       25% direct cash
                     </span>
                   </div>
@@ -235,7 +235,7 @@ export function ReferralEngine({ ticketPrice = 1000 }: ReferralEngineProps = {})
               </div>
 
               {/* Bottom Clarification */}
-              <p className="text-[11px] sm:text-xs text-zinc-500 font-medium pt-3 mt-1 border-t border-zinc-100">
+              <p className="text-xs text-zinc-950 font-medium pt-3 mt-1 border-t border-zinc-100">
                 * Drive credits are instant from referral #1. 25% cash commission unlocks after 25 personal entries.
               </p>
             </div>
@@ -251,10 +251,10 @@ export function ReferralEngine({ ticketPrice = 1000 }: ReferralEngineProps = {})
                 01
               </span>
               <div className="min-w-0">
-                <h3 className="text-sm sm:text-base font-bold text-zinc-950 uppercase tracking-tight mb-0.5">
+                <h3 className="text-sm sm:text-base font-black text-zinc-950 uppercase tracking-tight mb-0.5">
                   Share Your Unique Link
                 </h3>
-                <p className="text-xs sm:text-sm text-zinc-600 leading-relaxed">
+                <p className="text-xs sm:text-sm text-zinc-950 font-medium leading-relaxed">
                   Every member receives a dedicated syndicate link. Share with friends on WhatsApp, Instagram, or car clubs.
                 </p>
               </div>
@@ -266,10 +266,10 @@ export function ReferralEngine({ ticketPrice = 1000 }: ReferralEngineProps = {})
                 02
               </span>
               <div className="min-w-0">
-                <h3 className="text-sm sm:text-base font-bold text-zinc-950 uppercase tracking-tight mb-0.5">
+                <h3 className="text-sm sm:text-base font-black text-zinc-950 uppercase tracking-tight mb-0.5">
                   Accrue 25% Drive Credits
                 </h3>
-                <p className="text-xs sm:text-sm text-zinc-600 leading-relaxed">
+                <p className="text-xs sm:text-sm text-zinc-950 font-medium leading-relaxed">
                   Whenever an invitee joins and buys tickets, you instantly get 25% in permanent Drive Credits (₹250/ticket).
                 </p>
               </div>
@@ -281,10 +281,10 @@ export function ReferralEngine({ ticketPrice = 1000 }: ReferralEngineProps = {})
                 03
               </span>
               <div className="min-w-0">
-                <h3 className="text-sm sm:text-base font-bold text-zinc-950 uppercase tracking-tight mb-0.5">
+                <h3 className="text-sm sm:text-base font-black text-zinc-950 uppercase tracking-tight mb-0.5">
                   Unlock 25% Cash Commission
                 </h3>
-                <p className="text-xs sm:text-sm text-zinc-600 leading-relaxed">
+                <p className="text-xs sm:text-sm text-zinc-950 font-medium leading-relaxed">
                   Hold 25 personal entries to unlock ₹250 cash per referral, paid directly to your bank account or UPI.
                 </p>
               </div>

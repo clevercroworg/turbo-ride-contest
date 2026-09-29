@@ -73,7 +73,7 @@ export function HeroSection({
               TurboRide Supercar Club
             </span>
             <span className="text-zinc-300">/</span>
-            <span className="text-zinc-600 font-medium">
+            <span className="text-zinc-950 font-semibold">
               Draw Cap: {totalCap.toLocaleString("en-IN")} Verified Entries
             </span>
           </div>
@@ -90,15 +90,15 @@ export function HeroSection({
           {/* Left Column: Bold Headline & Sleek CTA */}
           <div className="lg:col-span-6 xl:col-span-5 flex flex-col justify-center text-center lg:text-left">
             
-            {/* Creative Telemetry Deco */}
-            <div className="flex items-center justify-center lg:justify-start gap-2.5 mb-2 sm:mb-2.5">
-              <span className="w-6 sm:w-10 h-px bg-gradient-to-r from-transparent to-[#ea580c]" />
-              <span className="text-[10px] sm:text-[11px] font-mono tracking-widest text-[#ea580c] font-black uppercase flex items-center gap-1.5">
-                <span className="w-1.5 h-1.5 bg-[#ea580c] rotate-45 inline-block" />
-                OFFICIAL DRAW #01 // ZERO-LOSS PROTOCOL
-                <span className="w-1.5 h-1.5 bg-[#ea580c] rotate-45 inline-block" />
+            {/* Creative Telemetry Deco - Punchy & Never Wraps */}
+            <div className="flex items-center justify-center lg:justify-start gap-2 mb-2 sm:mb-2.5">
+              <span className="w-4 sm:w-8 h-px bg-gradient-to-r from-transparent to-[#ea580c] shrink" />
+              <span className="text-[11px] sm:text-xs font-mono tracking-wider text-[#ea580c] font-black uppercase flex items-center gap-1.5 whitespace-nowrap">
+                <span className="w-1.5 h-1.5 bg-[#ea580c] rotate-45 inline-block shrink-0" />
+                DRAW #01 · ZERO LOSS
+                <span className="w-1.5 h-1.5 bg-[#ea580c] rotate-45 inline-block shrink-0" />
               </span>
-              <span className="w-6 sm:w-10 h-px bg-gradient-to-l from-transparent to-[#ea580c]" />
+              <span className="w-4 sm:w-8 h-px bg-gradient-to-l from-transparent to-[#ea580c] shrink" />
             </div>
 
             {/* Sharp, Well Font Sized Headline */}
@@ -107,40 +107,40 @@ export function HeroSection({
               <span className="text-[#ea580c]">100% CREDITS BACK.</span>
             </h1>
 
-            {/* Well-Sized Subtext */}
-            <p className="text-xs sm:text-sm lg:text-base text-zinc-600 font-medium leading-relaxed mb-3 sm:mb-4 max-w-md mx-auto lg:mx-0">
-              Deposit ₹{ticketPrice.toLocaleString("en-IN")} to enter the verified <strong className="text-zinc-950 font-bold">{carName}</strong> draw. 100% returned in Buddh Circuit Drive Credits.
+            {/* Well-Sized Subtext in Full Black */}
+            <p className="text-sm sm:text-base lg:text-lg text-zinc-950 font-medium leading-relaxed mb-3 sm:mb-4 max-w-md mx-auto lg:mx-0">
+              Deposit ₹{ticketPrice.toLocaleString("en-IN")} to enter the verified <strong className="text-zinc-950 font-black">{carName}</strong> draw. 100% returned in Buddh Circuit Drive Credits.
             </p>
 
-            {/* Clean Action Row - Sharp Edges */}
+            {/* Clean Action Row - Sharp Edges & Bigger Responsive Button Font */}
             <div className="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-2 sm:gap-3 mb-2.5 sm:mb-4">
               <button
                 type="button"
                 onClick={handleScrollToAllocation}
-                className="w-full sm:w-auto py-3 px-6 sm:px-7 rounded-none bg-[#ea580c] hover:bg-[#c2410c] text-white text-xs sm:text-sm lg:text-base font-bold uppercase tracking-wider transition-all shadow-[0_4px_16px_rgba(234,88,12,0.35)] hover:shadow-[0_6px_22px_rgba(234,88,12,0.5)] active:scale-[0.99] flex items-center justify-center gap-2 cursor-pointer"
+                className="w-full sm:w-auto py-3.5 px-6 sm:px-8 rounded-none bg-[#ea580c] hover:bg-[#c2410c] text-white text-sm sm:text-base lg:text-lg font-black uppercase tracking-wider transition-all shadow-[0_4px_16px_rgba(234,88,12,0.35)] hover:shadow-[0_6px_22px_rgba(234,88,12,0.5)] active:scale-[0.99] flex items-center justify-center gap-2.5 cursor-pointer"
               >
-                <Ticket size={17} weight="fill" className="shrink-0" />
-                <span>Select Entry Allocation</span>
-                <ArrowDown size={15} weight="bold" className="shrink-0 animate-bounce" />
+                <Ticket size={20} weight="fill" className="shrink-0" />
+                <span className="whitespace-nowrap">Select Entry Allocation</span>
+                <ArrowDown size={18} weight="bold" className="shrink-0 animate-bounce" />
               </button>
 
               <a
                 href="#how-it-works"
-                className="hidden sm:inline-flex py-3 px-4 sm:px-5 rounded-none bg-white/90 hover:bg-white text-zinc-800 border border-zinc-200 text-xs sm:text-sm font-bold uppercase tracking-wider transition-all shadow-2xs items-center justify-center text-center"
+                className="hidden sm:inline-flex py-3.5 px-5 sm:px-6 rounded-none bg-white/90 hover:bg-white text-zinc-950 border border-zinc-200 text-sm sm:text-base font-bold uppercase tracking-wider transition-all shadow-2xs items-center justify-center text-center"
               >
                 How It Works
               </a>
             </div>
 
-            {/* Micro Trust Stats */}
-            <div className="flex items-center justify-center lg:justify-start gap-2.5 sm:gap-3 text-[10px] sm:text-xs text-zinc-600 font-semibold">
-              <span className="flex items-center gap-1">
-                <span className="w-1.5 h-1.5 bg-emerald-500 rotate-45" />
+            {/* Micro Trust Stats - Full Black & Prominent Readability */}
+            <div className="flex items-center justify-center lg:justify-start gap-3 sm:gap-4 text-xs sm:text-sm lg:text-[15px] text-zinc-950 font-black py-1">
+              <span className="flex items-center gap-1.5">
+                <span className="w-2 h-2 bg-emerald-600 rotate-45 shrink-0" />
                 1:1 Credit Parity
               </span>
-              <span className="text-zinc-300">•</span>
+              <span className="text-zinc-400">•</span>
               <span>10,000 Cap Draw</span>
-              <span className="text-zinc-300">•</span>
+              <span className="text-zinc-400">•</span>
               <span>Live Streamed</span>
             </div>
 
@@ -149,31 +149,31 @@ export function HeroSection({
           {/* Right Column: Supercar Studio Stage (Expansive on Web & Perfectly Scaled on Mobile) */}
           <div className="lg:col-span-6 xl:col-span-7 flex flex-col justify-center">
             
-            {/* Specs Strip - Sharp Edged */}
-            <div className="w-full grid grid-cols-3 gap-1.5 sm:gap-2 p-2 sm:p-2.5 rounded-none bg-white/95 backdrop-blur-md border border-zinc-200/90 shadow-2xs mb-1.5 sm:mb-2">
-              <div className="flex flex-col items-start min-w-0 px-1">
-                <span className="text-[9px] sm:text-[10px] uppercase tracking-wider text-zinc-500 font-bold block mb-0.5">
+            {/* Specs Strip - Sharp Edged & High-Readability Font Sizing */}
+            <div className="w-full grid grid-cols-3 gap-2 sm:gap-3 p-3 sm:p-4 rounded-none bg-white/95 backdrop-blur-md border border-zinc-200/90 shadow-2xs mb-2 sm:mb-3">
+              <div className="flex flex-col items-start min-w-0 px-1 sm:px-2">
+                <span className="text-[10px] sm:text-xs uppercase tracking-wider text-zinc-950 font-black block mb-1">
                   Powertrain
                 </span>
-                <span className="text-[11px] sm:text-xs lg:text-sm font-black text-zinc-950 tracking-tight leading-none truncate">
+                <span className="text-sm sm:text-base lg:text-lg font-black text-zinc-950 tracking-tight leading-tight truncate">
                   2.0L Turbo Flat-4
                 </span>
               </div>
 
-              <div className="flex flex-col items-center min-w-0 px-1 border-x border-zinc-200">
-                <span className="text-[9px] sm:text-[10px] uppercase tracking-wider text-zinc-500 font-bold block mb-0.5">
+              <div className="flex flex-col items-center min-w-0 px-1 sm:px-2 border-x border-zinc-300">
+                <span className="text-[10px] sm:text-xs uppercase tracking-wider text-zinc-950 font-black block mb-1">
                   0-100 km/h
                 </span>
-                <span className="text-[11px] sm:text-xs lg:text-sm font-black text-zinc-950 tracking-tight leading-none">
+                <span className="text-sm sm:text-base lg:text-lg font-black text-zinc-950 tracking-tight leading-tight">
                   4.9s
                 </span>
               </div>
 
-              <div className="flex flex-col items-end min-w-0 px-1 text-right">
-                <span className="text-[9px] sm:text-[10px] uppercase tracking-wider text-zinc-500 font-bold block mb-0.5">
+              <div className="flex flex-col items-end min-w-0 px-1 sm:px-2 text-right">
+                <span className="text-[10px] sm:text-xs uppercase tracking-wider text-zinc-950 font-black block mb-1">
                   Market Value
                 </span>
-                <span className="text-[11px] sm:text-xs lg:text-sm font-black text-[#ea580c] tracking-tight leading-none truncate">
+                <span className="text-sm sm:text-base lg:text-lg font-black text-[#ea580c] tracking-tight leading-tight truncate">
                   {cleanWorth}
                 </span>
               </div>
@@ -184,7 +184,7 @@ export function HeroSection({
               initial={reduceMotion ? false : { opacity: 0, scale: 0.98 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
-              className="relative w-full flex flex-col items-center justify-center my-0.5 sm:my-1.5 group"
+              className="relative w-full flex flex-col items-center justify-center my-1 sm:my-2 group"
             >
               <div className="relative w-full max-w-[380px] sm:max-w-[560px] lg:max-w-[760px] xl:max-w-[840px]">
                 <Image
@@ -202,18 +202,18 @@ export function HeroSection({
               </div>
             </motion.div>
 
-            {/* Bottom Delivery & Cash Option Bar - Sharp Edged */}
-            <div className="w-full flex items-center justify-between gap-2 p-2 sm:p-2.5 rounded-none bg-white/95 backdrop-blur-md border border-zinc-200/90 shadow-2xs text-[10px] sm:text-xs">
-              <div className="flex items-center gap-1.5 text-zinc-950 font-bold truncate">
-                <div className="w-5 h-5 rounded-none bg-orange-100 flex items-center justify-center shrink-0">
-                  <Gauge size={13} weight="bold" className="text-[#ea580c]" />
+            {/* Bottom Delivery & Cash Option Bar - Sharp Edged & Prominent */}
+            <div className="w-full flex items-center justify-between gap-2 p-2.5 sm:p-3.5 rounded-none bg-white/95 backdrop-blur-md border border-zinc-200/90 shadow-2xs text-xs sm:text-sm">
+              <div className="flex items-center gap-2 text-zinc-950 font-black truncate">
+                <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-none bg-orange-100 flex items-center justify-center shrink-0">
+                  <Gauge size={16} weight="bold" className="text-[#ea580c]" />
                 </div>
                 <span className="truncate">Buddh Circuit Delivery Included</span>
               </div>
 
-              <div className="flex items-center gap-1.5 shrink-0">
-                <span className="text-zinc-500 hidden sm:inline">Or choose</span>
-                <span className="font-black text-zinc-950 bg-zinc-100 border border-zinc-200 px-2 py-0.5 rounded-none text-[10px] sm:text-xs">
+              <div className="flex items-center gap-2 shrink-0">
+                <span className="text-zinc-950 font-bold hidden sm:inline text-xs">Or choose</span>
+                <span className="font-black text-zinc-950 bg-zinc-100 border border-zinc-300 px-2.5 sm:px-3 py-1 rounded-none text-xs sm:text-sm">
                   ₹75 Lakh Cash Option
                 </span>
               </div>

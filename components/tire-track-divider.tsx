@@ -36,15 +36,15 @@ export function TireTrackDivider() {
         </div>
       </div>
 
-      {/* Racing Circuit Telemetry Speed Label */}
-      <div className="relative z-10 flex items-center justify-center gap-2 mt-2 sm:mt-3">
-        <span className="w-8 sm:w-16 h-px bg-gradient-to-r from-transparent to-[#ea580c]" />
-        <span className="text-[9px] sm:text-[11px] font-mono tracking-widest text-zinc-600 font-black uppercase flex items-center gap-1.5">
-          <span className="w-1.5 h-1.5 bg-[#ea580c] rotate-45 inline-block" />
-          BUDDH INTERNATIONAL CIRCUIT · 4.9S LAUNCH TESTED
-          <span className="w-1.5 h-1.5 bg-[#ea580c] rotate-45 inline-block" />
+      {/* Racing Circuit Telemetry Speed Label - Punchy, Full Black, Never Wraps */}
+      <div className="relative z-10 flex items-center justify-center gap-2 mt-2 sm:mt-3 px-4">
+        <span className="w-4 sm:w-12 h-px bg-gradient-to-r from-transparent to-[#ea580c] shrink" />
+        <span className="text-[10px] sm:text-xs font-mono tracking-wider text-zinc-950 font-black uppercase flex items-center gap-1.5 whitespace-nowrap">
+          <span className="w-1.5 h-1.5 bg-[#ea580c] rotate-45 inline-block shrink-0" />
+          BUDDH CIRCUIT · 4.9S LAUNCH
+          <span className="w-1.5 h-1.5 bg-[#ea580c] rotate-45 inline-block shrink-0" />
         </span>
-        <span className="w-8 sm:w-16 h-px bg-gradient-to-l from-transparent to-[#ea580c]" />
+        <span className="w-4 sm:w-12 h-px bg-gradient-to-l from-transparent to-[#ea580c] shrink" />
       </div>
 
     </div>

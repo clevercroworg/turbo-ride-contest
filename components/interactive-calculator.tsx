@@ -26,10 +26,10 @@ export function InteractiveCalculator({ onBuyTickets }: CalculatorProps) {
         
         {/* Header */}
         <div className="text-center max-w-xl mx-auto mb-12">
-          <h2 className="text-3xl sm:text-4xl font-extrabold tracking-tight text-zinc-950 mb-3">
+          <h2 className="text-3xl sm:text-4xl font-black tracking-tight text-zinc-950 mb-3 uppercase">
             Ticket & Credit Calculator
           </h2>
-          <p className="text-base text-zinc-600 leading-relaxed">
+          <p className="text-base text-zinc-950 font-medium leading-relaxed">
             Slide to see your credit allocation and the exact supercar experiences unlocked.
           </p>
         </div>
@@ -40,7 +40,7 @@ export function InteractiveCalculator({ onBuyTickets }: CalculatorProps) {
             
             {/* Quick Preset Buttons */}
             <div>
-              <span className="block text-xs font-mono uppercase tracking-wider text-zinc-500 font-semibold mb-3">
+              <span className="block text-xs font-mono uppercase tracking-wider text-zinc-950 font-black mb-3">
                 Select Ticket Count
               </span>
               <div className="grid grid-cols-3 sm:grid-cols-6 gap-2.5">
@@ -52,7 +52,7 @@ export function InteractiveCalculator({ onBuyTickets }: CalculatorProps) {
                     className={`py-3 rounded-xl font-mono text-xs font-bold transition-all cursor-pointer ${
                       ticketCount === preset
                         ? "bg-orange-500 text-white font-black shadow-md shadow-orange-500/25 scale-105"
-                        : "bg-zinc-100 hover:bg-zinc-200 text-zinc-800 border border-zinc-200/80"
+                        : "bg-zinc-100 hover:bg-zinc-200 text-zinc-950 border border-zinc-200 font-bold"
                     }`}
                   >
                     {preset} {preset === 1 ? "Ticket" : "Tickets"}
@@ -63,12 +63,12 @@ export function InteractiveCalculator({ onBuyTickets }: CalculatorProps) {
 
             {/* Tactile Range Slider */}
             <div className="flex flex-col gap-3">
-              <div className="flex items-center justify-between text-xs font-mono">
-                <span className="text-zinc-400">1 Ticket</span>
-                <span className="text-orange-600 font-bold text-sm">
+              <div className="flex items-center justify-between text-xs font-mono font-bold">
+                <span className="text-zinc-600">1 Ticket</span>
+                <span className="text-[#ea580c] font-black text-sm">
                   {ticketCount} {ticketCount === 1 ? "Ticket" : "Tickets"}
                 </span>
-                <span className="text-zinc-400">100 Tickets</span>
+                <span className="text-zinc-600">100 Tickets</span>
               </div>
               <input
                 type="range"
@@ -83,7 +83,7 @@ export function InteractiveCalculator({ onBuyTickets }: CalculatorProps) {
             {/* Calculations Breakdown */}
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-6 border-t border-zinc-200/80">
               <div className="p-4 rounded-2xl bg-zinc-50 border border-zinc-200/80">
-                <span className="block text-[11px] font-mono uppercase text-zinc-500 font-semibold mb-1">
+                <span className="block text-xs font-mono uppercase text-zinc-950 font-black mb-1">
                   You Deposit
                 </span>
                 <span className="text-2xl font-black font-mono text-zinc-950">
@@ -92,7 +92,7 @@ export function InteractiveCalculator({ onBuyTickets }: CalculatorProps) {
               </div>
 
               <div className="p-4 rounded-2xl bg-zinc-50 border border-zinc-200/80">
-                <span className="block text-[11px] font-mono uppercase text-zinc-500 font-semibold mb-1">
+                <span className="block text-xs font-mono uppercase text-zinc-950 font-black mb-1">
                   Drive Credits Received
                 </span>
                 <span className="text-2xl font-black font-mono text-emerald-600">
@@ -101,10 +101,10 @@ export function InteractiveCalculator({ onBuyTickets }: CalculatorProps) {
               </div>
 
               <div className="p-4 rounded-2xl bg-zinc-50 border border-zinc-200/80">
-                <span className="block text-[11px] font-mono uppercase text-zinc-500 font-semibold mb-1">
+                <span className="block text-xs font-mono uppercase text-zinc-950 font-black mb-1">
                   Contest Entries
                 </span>
-                <span className="text-2xl font-black font-mono text-orange-600">
+                <span className="text-2xl font-black font-mono text-[#ea580c]">
                   {ticketCount} {ticketCount === 1 ? "Ticket" : "Tickets"}
                 </span>
               </div>
