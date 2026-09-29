@@ -153,10 +153,10 @@ export function HeroSection({
             <div className="w-full grid grid-cols-3 gap-2 sm:gap-3 p-3 sm:p-4 rounded-none bg-white/95 backdrop-blur-md border border-zinc-200/90 shadow-2xs mb-2 sm:mb-3">
               <div className="flex flex-col items-start min-w-0 px-1 sm:px-2">
                 <span className="text-[10px] sm:text-xs uppercase tracking-wider text-zinc-950 font-black block mb-1">
-                  Powertrain
+                  Horsepower
                 </span>
                 <span className="text-sm sm:text-base lg:text-lg font-black text-zinc-950 tracking-tight leading-tight truncate">
-                  2.0L Turbo Flat-4
+                  300 BHP
                 </span>
               </div>
 
