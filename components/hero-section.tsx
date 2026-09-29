@@ -221,18 +221,18 @@ export function HeroSection({
             </motion.div>
 
             {/* Bottom Delivery & Cash Option Bar - Crisp White with Black & Orange Accents */}
-            <div className="w-full flex items-center justify-between gap-1.5 sm:gap-2 md:gap-3 p-2 sm:p-3 md:p-3.5 rounded-none bg-white text-zinc-950 shadow-[0_6px_20px_rgba(0,0,0,0.15)] border border-white text-xs sm:text-sm">
+            <div className="w-full flex items-center justify-between gap-1.5 sm:gap-2 md:gap-3 p-2.5 sm:p-3 md:p-3.5 rounded-none bg-white text-zinc-950 shadow-[0_6px_20px_rgba(0,0,0,0.15)] border border-white">
               <div className="flex items-center gap-1.5 sm:gap-2 md:gap-2.5 text-zinc-950 font-black shrink-0">
-                <div className="w-6 h-6 sm:w-7 sm:h-7 rounded-none bg-orange-100 flex items-center justify-center shrink-0">
-                  <Gauge size={15} weight="bold" className="text-[#ea580c]" />
+                <div className="w-6.5 h-6.5 sm:w-7 sm:h-7 rounded-none bg-orange-100 flex items-center justify-center shrink-0">
+                  <Gauge size={16} weight="bold" className="text-[#ea580c]" />
                 </div>
-                <span className="hidden sm:inline whitespace-nowrap">Buddh Circuit Delivery Included</span>
-                <span className="sm:hidden whitespace-nowrap text-[10px] xs:text-xs">Buddh Circuit Delivery</span>
+                <span className="hidden sm:inline whitespace-nowrap text-xs sm:text-sm font-black">Buddh Circuit Delivery Included</span>
+                <span className="sm:hidden whitespace-nowrap text-xs xs:text-[13px] font-black">Buddh Circuit Delivery</span>
               </div>
 
               <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
                 <span className="text-zinc-600 font-bold hidden md:inline lg:hidden xl:inline text-xs">Or choose</span>
-                <span className="font-black text-white bg-zinc-950 border border-zinc-900 px-2 sm:px-3 py-1 rounded-none text-[10px] xs:text-[11px] sm:text-xs md:text-sm whitespace-nowrap">
+                <span className="font-black text-white bg-zinc-950 border border-zinc-900 px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-none text-xs xs:text-[13px] sm:text-sm whitespace-nowrap shadow-xs">
                   ₹75 Lakh Cash Option
                 </span>
               </div>
