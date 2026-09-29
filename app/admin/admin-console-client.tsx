@@ -147,11 +147,10 @@ function TablePagination({
                 {prev && page - prev > 1 && <span className="px-1 text-zinc-400">…</span>}
                 <button
                   onClick={() => onPageChange(page)}
-                  className={`w-7 h-7 rounded-lg text-xs font-bold transition-colors cursor-pointer flex items-center justify-center ${
-                    currentPage === page
-                      ? "bg-[#ea580c] text-white shadow-2xs"
-                      : "border border-zinc-200 text-zinc-700 hover:bg-zinc-100"
-                  }`}
+                  className={`w-7 h-7 rounded-lg text-xs font-bold transition-colors cursor-pointer flex items-center justify-center ${currentPage === page
+                    ? "bg-[#ea580c] text-white shadow-2xs"
+                    : "border border-zinc-200 text-zinc-700 hover:bg-zinc-100"
+                    }`}
                 >
                   {page}
                 </button>
@@ -404,14 +403,14 @@ export function AdminConsoleClient({
         prev.map((c) =>
           c.id === activeContest.id
             ? {
-                ...c,
-                title: hpTitle,
-                subtitle: hpSubtitle,
-                worthDisplay: hpWorth,
-                ticketPrice: Number(hpPrice),
-                targetTickets: Number(hpTarget),
-                soldTickets: Number(hpSold),
-              }
+              ...c,
+              title: hpTitle,
+              subtitle: hpSubtitle,
+              worthDisplay: hpWorth,
+              ticketPrice: Number(hpPrice),
+              targetTickets: Number(hpTarget),
+              soldTickets: Number(hpSold),
+            }
             : c
         )
       )
@@ -763,15 +762,14 @@ export function AdminConsoleClient({
 
   return (
     <div className="min-h-screen bg-[#fafafa] text-zinc-950 flex flex-col lg:flex-row font-sans">
-      
+
       {/* Toast Notification */}
       {toastMsg && (
         <div
-          className={`fixed top-4 right-4 z-50 px-4 py-3 rounded-xl shadow-lg border text-xs font-medium flex items-center gap-2 animate-in slide-in-from-top-2 ${
-            toastMsg.type === "success"
-              ? "bg-zinc-950 text-white border-zinc-800"
-              : "bg-red-600 text-white border-red-700"
-          }`}
+          className={`fixed top-4 right-4 z-50 px-4 py-3 rounded-xl shadow-lg border text-xs font-medium flex items-center gap-2 animate-in slide-in-from-top-2 ${toastMsg.type === "success"
+            ? "bg-zinc-950 text-white border-zinc-800"
+            : "bg-red-600 text-white border-red-700"
+            }`}
         >
           {toastMsg.type === "success" ? <Check size={16} /> : <X size={16} />}
           <span>{toastMsg.text}</span>
@@ -805,11 +803,10 @@ export function AdminConsoleClient({
             <button
               key={item.id}
               onClick={() => switchTab(item.id as TabType)}
-              className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all whitespace-nowrap shrink-0 flex items-center gap-1.5 cursor-pointer ${
-                isActive
-                  ? "bg-[#ea580c] text-white shadow-2xs"
-                  : "bg-zinc-100 text-zinc-600 hover:bg-zinc-200"
-              }`}
+              className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all whitespace-nowrap shrink-0 flex items-center gap-1.5 cursor-pointer ${isActive
+                ? "bg-[#ea580c] text-white shadow-2xs"
+                : "bg-zinc-100 text-zinc-600 hover:bg-zinc-200"
+                }`}
             >
               <Icon size={14} weight={isActive ? "bold" : "regular"} />
               <span>{item.label}</span>
@@ -830,11 +827,10 @@ export function AdminConsoleClient({
                   <button
                     key={item.id}
                     onClick={() => switchTab(item.id as TabType)}
-                    className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-semibold transition-all cursor-pointer ${
-                      isActive
-                        ? "bg-[#ea580c] text-white shadow-xs font-bold"
-                        : "text-zinc-600 hover:text-zinc-950 hover:bg-zinc-100/70"
-                    }`}
+                    className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-semibold transition-all cursor-pointer ${isActive
+                      ? "bg-[#ea580c] text-white shadow-xs font-bold"
+                      : "text-zinc-600 hover:text-zinc-950 hover:bg-zinc-100/70"
+                      }`}
                   >
                     <Icon size={17} weight={isActive ? "bold" : "regular"} />
                     <span>{item.label}</span>
@@ -887,11 +883,10 @@ export function AdminConsoleClient({
                 <button
                   key={item.id}
                   onClick={() => switchTab(item.id as TabType)}
-                  className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-semibold transition-all cursor-pointer ${
-                    isActive
-                      ? "bg-[#ea580c] text-white shadow-xs font-bold"
-                      : "text-zinc-600 hover:text-zinc-950 hover:bg-zinc-100/70"
-                  }`}
+                  className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-semibold transition-all cursor-pointer ${isActive
+                    ? "bg-[#ea580c] text-white shadow-xs font-bold"
+                    : "text-zinc-600 hover:text-zinc-950 hover:bg-zinc-100/70"
+                    }`}
                 >
                   <Icon size={17} weight={isActive ? "bold" : "regular"} />
                   <span>{item.label}</span>
@@ -923,7 +918,7 @@ export function AdminConsoleClient({
 
       {/* MAIN ADMIN CONTENT BODY */}
       <div className="flex-1 flex flex-col min-w-0">
-        
+
         {/* Live Admin Header Strip inside main */}
         <div className="px-3.5 sm:px-6 lg:px-8 pt-3 sm:pt-6">
           <div className="flex items-center justify-between pb-3 sm:pb-4 border-b border-zinc-200/70 max-w-7xl mx-auto w-full">
@@ -1218,16 +1213,14 @@ export function AdminConsoleClient({
                                 handleSetActiveContest(c.id)
                                 setIsVehicleDropdownOpen(false)
                               }}
-                              className={`w-full flex items-center justify-between p-2.5 rounded-xl text-left transition-all cursor-pointer ${
-                                isSelected
-                                  ? "bg-orange-50/80 border border-orange-200/80 text-zinc-950 font-bold"
-                                  : "hover:bg-zinc-50 text-zinc-700"
-                              }`}
+                              className={`w-full flex items-center justify-between p-2.5 rounded-xl text-left transition-all cursor-pointer ${isSelected
+                                ? "bg-orange-50/80 border border-orange-200/80 text-zinc-950 font-bold"
+                                : "hover:bg-zinc-50 text-zinc-700"
+                                }`}
                             >
                               <div className="flex items-center gap-2.5 truncate">
-                                <div className={`w-4 h-4 rounded-full flex items-center justify-center shrink-0 border ${
-                                  isSelected ? "border-[#ea580c] bg-[#ea580c] text-white" : "border-zinc-300"
-                                }`}>
+                                <div className={`w-4 h-4 rounded-full flex items-center justify-center shrink-0 border ${isSelected ? "border-[#ea580c] bg-[#ea580c] text-white" : "border-zinc-300"
+                                  }`}>
                                   {isSelected && <Check size={10} weight="bold" />}
                                 </div>
                                 <div className="truncate">
@@ -1236,11 +1229,10 @@ export function AdminConsoleClient({
                                 </div>
                               </div>
 
-                              <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold shrink-0 ml-2 ${
-                                c.status === "active"
-                                  ? "bg-emerald-100 text-emerald-800"
-                                  : "bg-zinc-100 text-zinc-600"
-                              }`}>
+                              <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold shrink-0 ml-2 ${c.status === "active"
+                                ? "bg-emerald-100 text-emerald-800"
+                                : "bg-zinc-100 text-zinc-600"
+                                }`}>
                                 {c.status === "active" ? "Active Live" : c.status}
                               </span>
                             </button>
@@ -1274,11 +1266,10 @@ export function AdminConsoleClient({
                           setHpPrice(preset)
                           if (activeContest) handleQuickUpdatePrice(activeContest.id, preset)
                         }}
-                        className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
-                          Number(hpPrice) === preset
-                            ? "bg-[#ea580c] text-white shadow-2xs"
-                            : "bg-white border border-zinc-200 text-zinc-700 hover:bg-zinc-100"
-                        }`}
+                        className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${Number(hpPrice) === preset
+                          ? "bg-[#ea580c] text-white shadow-2xs"
+                          : "bg-white border border-zinc-200 text-zinc-700 hover:bg-zinc-100"
+                          }`}
                       >
                         ₹{preset.toLocaleString("en-IN")}
                       </button>
@@ -1386,11 +1377,10 @@ export function AdminConsoleClient({
                 <button
                   type="button"
                   onClick={() => setContestViewMode("cards")}
-                  className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5 ${
-                    contestViewMode === "cards"
-                      ? "bg-white text-zinc-950 shadow-xs"
-                      : "text-zinc-600 hover:text-zinc-900"
-                  }`}
+                  className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5 ${contestViewMode === "cards"
+                    ? "bg-white text-zinc-950 shadow-xs"
+                    : "text-zinc-600 hover:text-zinc-900"
+                    }`}
                 >
                   <Trophy size={14} weight="bold" />
                   <span>Vehicle Drops ({contests.length})</span>
@@ -1398,11 +1388,10 @@ export function AdminConsoleClient({
                 <button
                   type="button"
                   onClick={() => setContestViewMode("tickets")}
-                  className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5 ${
-                    contestViewMode === "tickets"
-                      ? "bg-white text-zinc-950 shadow-xs"
-                      : "text-zinc-600 hover:text-zinc-900"
-                  }`}
+                  className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5 ${contestViewMode === "tickets"
+                    ? "bg-white text-zinc-950 shadow-xs"
+                    : "text-zinc-600 hover:text-zinc-900"
+                    }`}
                 >
                   <Ticket size={14} weight="bold" />
                   <span>All Issued Tickets ({tickets.length.toLocaleString("en-IN")})</span>
@@ -1454,17 +1443,15 @@ export function AdminConsoleClient({
                   return (
                     <div
                       key={c.id}
-                      className={`rounded-2xl bg-white border p-4 sm:p-5 shadow-2xs transition-all flex flex-col justify-between ${
-                        isActive ? "border-orange-500 ring-2 ring-orange-500/10" : "border-zinc-200/90"
-                      }`}
+                      className={`rounded-2xl bg-white border p-4 sm:p-5 shadow-2xs transition-all flex flex-col justify-between ${isActive ? "border-orange-500 ring-2 ring-orange-500/10" : "border-zinc-200/90"
+                        }`}
                     >
                       <div>
                         <div className="flex items-center justify-between mb-3">
-                          <span className={`px-2.5 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider ${
-                            isActive
-                              ? "bg-emerald-50 text-emerald-700 border border-emerald-200"
-                              : "bg-zinc-100 text-zinc-600 border border-zinc-200"
-                          }`}>
+                          <span className={`px-2.5 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider ${isActive
+                            ? "bg-emerald-50 text-emerald-700 border border-emerald-200"
+                            : "bg-zinc-100 text-zinc-600 border border-zinc-200"
+                            }`}>
                             {isActive ? "LIVE ON SITE" : c.status.toUpperCase()}
                           </span>
                           <span className="text-xs font-bold text-orange-600">
@@ -1737,11 +1724,10 @@ export function AdminConsoleClient({
                         setMemberFilter(filter)
                         setMemberPage(1)
                       }}
-                      className={`px-3 py-1.5 rounded-lg text-xs font-bold capitalize transition-colors whitespace-nowrap cursor-pointer ${
-                        memberFilter === filter
-                          ? "bg-[#ea580c] text-white shadow-2xs"
-                          : "bg-zinc-100 text-zinc-600 hover:bg-zinc-200"
-                      }`}
+                      className={`px-3 py-1.5 rounded-lg text-xs font-bold capitalize transition-colors whitespace-nowrap cursor-pointer ${memberFilter === filter
+                        ? "bg-[#ea580c] text-white shadow-2xs"
+                        : "bg-zinc-100 text-zinc-600 hover:bg-zinc-200"
+                        }`}
                     >
                       {filter === "kyc_pending" ? "KYC Pending" : filter}
                     </button>
@@ -1788,13 +1774,12 @@ export function AdminConsoleClient({
                           <p className="text-[10px] text-zinc-400 mt-0.5">ID: {m.id} · Joined {m.joinedAt.split("T")[0]}</p>
                         </div>
                         <span
-                          className={`px-2.5 py-1 rounded-full text-[10px] font-bold shrink-0 ${
-                            m.status === "active"
-                              ? "bg-emerald-50 text-emerald-700 border border-emerald-200"
-                              : m.status === "kyc_pending"
+                          className={`px-2.5 py-1 rounded-full text-[10px] font-bold shrink-0 ${m.status === "active"
+                            ? "bg-emerald-50 text-emerald-700 border border-emerald-200"
+                            : m.status === "kyc_pending"
                               ? "bg-amber-50 text-amber-700 border border-amber-200"
                               : "bg-red-50 text-red-700 border border-red-200"
-                          }`}
+                            }`}
                         >
                           {m.status === "active" ? "Active" : m.status === "kyc_pending" ? "KYC Pending" : "Flagged"}
                         </span>
@@ -1833,11 +1818,10 @@ export function AdminConsoleClient({
                         {!isCurrentAdmin && (
                           <button
                             onClick={() => handleToggleMemberStatus(m.id, m.status)}
-                            className={`flex-1 py-2 rounded-xl text-xs font-bold cursor-pointer transition-colors ${
-                              m.status === "active"
-                                ? "bg-red-50 hover:bg-red-100 text-red-700 border border-red-200"
-                                : "bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border border-emerald-200"
-                            }`}
+                            className={`flex-1 py-2 rounded-xl text-xs font-bold cursor-pointer transition-colors ${m.status === "active"
+                              ? "bg-red-50 hover:bg-red-100 text-red-700 border border-red-200"
+                              : "bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border border-emerald-200"
+                              }`}
                           >
                             {m.status === "active" ? "Flag Account" : "Activate Account"}
                           </button>
@@ -1889,13 +1873,12 @@ export function AdminConsoleClient({
                           )}
                         </td>
                         <td className="py-3.5 text-center">
-                          <span className={`px-2.5 py-0.5 rounded text-[10px] font-bold ${
-                            m.status === "active"
-                              ? "bg-emerald-50 text-emerald-700"
-                              : m.status === "kyc_pending"
+                          <span className={`px-2.5 py-0.5 rounded text-[10px] font-bold ${m.status === "active"
+                            ? "bg-emerald-50 text-emerald-700"
+                            : m.status === "kyc_pending"
                               ? "bg-amber-50 text-amber-700"
                               : "bg-red-50 text-red-700"
-                          }`}>
+                            }`}>
                             {m.status === "active" ? "Active" : m.status === "kyc_pending" ? "KYC Pending" : "Flagged"}
                           </span>
                         </td>
@@ -1910,11 +1893,10 @@ export function AdminConsoleClient({
                         <td className="py-3.5 text-right">
                           <button
                             onClick={() => handleToggleMemberStatus(m.id, m.status)}
-                            className={`px-2.5 py-1 rounded-lg text-[11px] font-bold cursor-pointer transition-colors ${
-                              m.status === "active"
-                                ? "bg-red-50 hover:bg-red-100 text-red-700"
-                                : "bg-emerald-50 hover:bg-emerald-100 text-emerald-700"
-                            }`}
+                            className={`px-2.5 py-1 rounded-lg text-[11px] font-bold cursor-pointer transition-colors ${m.status === "active"
+                              ? "bg-red-50 hover:bg-red-100 text-red-700"
+                              : "bg-emerald-50 hover:bg-emerald-100 text-emerald-700"
+                              }`}
                           >
                             {m.status === "active" ? "Flag" : "Activate"}
                           </button>
@@ -1980,11 +1962,10 @@ export function AdminConsoleClient({
                         setOrderFilter(filter)
                         setOrderPage(1)
                       }}
-                      className={`px-3 py-1.5 rounded-lg text-xs font-bold capitalize transition-colors whitespace-nowrap cursor-pointer ${
-                        orderFilter === filter
-                          ? "bg-[#ea580c] text-white shadow-2xs"
-                          : "bg-zinc-100 text-zinc-600 hover:bg-zinc-200"
-                      }`}
+                      className={`px-3 py-1.5 rounded-lg text-xs font-bold capitalize transition-colors whitespace-nowrap cursor-pointer ${orderFilter === filter
+                        ? "bg-[#ea580c] text-white shadow-2xs"
+                        : "bg-zinc-100 text-zinc-600 hover:bg-zinc-200"
+                        }`}
                     >
                       {filter === "completed" ? "Paid" : filter}
                     </button>
@@ -2025,13 +2006,12 @@ export function AdminConsoleClient({
                             const nextStatus = o.status === "completed" ? "refunded" : "completed"
                             handleUpdateOrderStatus(o.id, nextStatus)
                           }}
-                          className={`px-2.5 py-1 rounded-md text-[10px] font-bold cursor-pointer transition-colors ${
-                            isPaid
-                              ? "bg-emerald-50 text-emerald-700 border border-emerald-200"
-                              : o.status === "pending"
+                          className={`px-2.5 py-1 rounded-md text-[10px] font-bold cursor-pointer transition-colors ${isPaid
+                            ? "bg-emerald-50 text-emerald-700 border border-emerald-200"
+                            : o.status === "pending"
                               ? "bg-amber-50 text-amber-700 border border-amber-200"
                               : "bg-red-50 text-red-700 border border-red-200"
-                          }`}
+                            }`}
                           title="Tap to toggle status"
                         >
                           {isPaid ? "Paid" : o.status}
@@ -2099,13 +2079,12 @@ export function AdminConsoleClient({
                               const nextStatus = o.status === "completed" ? "refunded" : "completed"
                               handleUpdateOrderStatus(o.id, nextStatus)
                             }}
-                            className={`px-2 py-0.5 rounded text-[10px] font-bold cursor-pointer ${
-                              o.status === "completed" || (o.status as any) === "paid"
-                                ? "bg-emerald-50 text-emerald-700"
-                                : o.status === "pending"
+                            className={`px-2 py-0.5 rounded text-[10px] font-bold cursor-pointer ${o.status === "completed" || (o.status as any) === "paid"
+                              ? "bg-emerald-50 text-emerald-700"
+                              : o.status === "pending"
                                 ? "bg-amber-50 text-amber-700"
                                 : "bg-red-50 text-red-700"
-                            }`}
+                              }`}
                             title="Click to toggle status"
                           >
                             {o.status === "completed" ? "Paid" : o.status}
@@ -2214,9 +2193,8 @@ export function AdminConsoleClient({
                       <span className="text-xs font-bold text-zinc-600 bg-white px-2 py-0.5 rounded border border-zinc-200">
                         {p.id}
                       </span>
-                      <span className={`px-2 py-0.5 rounded text-[11px] font-bold ${
-                        p.status === "due" ? "bg-amber-50 text-amber-700 border border-amber-200" : "bg-zinc-100 text-zinc-700"
-                      }`}>
+                      <span className={`px-2 py-0.5 rounded text-[11px] font-bold ${p.status === "due" ? "bg-amber-50 text-amber-700 border border-amber-200" : "bg-zinc-100 text-zinc-700"
+                        }`}>
                         {p.status.toUpperCase()}
                       </span>
                     </div>
@@ -2286,9 +2264,8 @@ export function AdminConsoleClient({
                           ₹{p.amount.toLocaleString("en-IN")}
                         </td>
                         <td className="py-3.5 text-center">
-                          <span className={`px-2.5 py-0.5 rounded text-[11px] font-bold ${
-                            p.status === "due" ? "bg-amber-50 text-amber-700 border border-amber-200" : "bg-zinc-100 text-zinc-700"
-                          }`}>
+                          <span className={`px-2.5 py-0.5 rounded text-[11px] font-bold ${p.status === "due" ? "bg-amber-50 text-amber-700 border border-amber-200" : "bg-zinc-100 text-zinc-700"
+                            }`}>
                             {p.status.toUpperCase()}
                           </span>
                         </td>
@@ -2513,11 +2490,10 @@ export function AdminConsoleClient({
                           setRedemptionFilter(tab)
                           setRedemptionPage(1)
                         }}
-                        className={`px-2.5 py-1 rounded-lg text-xs font-bold transition-colors cursor-pointer shrink-0 ${
-                          redemptionFilter === tab
-                            ? "bg-[#ea580c] text-white shadow-2xs"
-                            : "bg-zinc-100 text-zinc-600 hover:bg-zinc-200"
-                        }`}
+                        className={`px-2.5 py-1 rounded-lg text-xs font-bold transition-colors cursor-pointer shrink-0 ${redemptionFilter === tab
+                          ? "bg-[#ea580c] text-white shadow-2xs"
+                          : "bg-zinc-100 text-zinc-600 hover:bg-zinc-200"
+                          }`}
                       >
                         {tab}
                       </button>
@@ -2558,13 +2534,12 @@ export function AdminConsoleClient({
                           {r.refCode}
                         </span>
                         <span
-                          className={`px-2.5 py-0.5 rounded-full text-xs font-bold border ${
-                            isScheduled
-                              ? "bg-blue-50 text-blue-700 border-blue-200"
-                              : isFulfilled
+                          className={`px-2.5 py-0.5 rounded-full text-xs font-bold border ${isScheduled
+                            ? "bg-blue-50 text-blue-700 border-blue-200"
+                            : isFulfilled
                               ? "bg-emerald-50 text-emerald-700 border-emerald-200"
                               : "bg-amber-50 text-amber-700 border-amber-200"
-                          }`}
+                            }`}
                         >
                           {r.status}
                         </span>
@@ -2664,13 +2639,12 @@ export function AdminConsoleClient({
                           <td className="py-3.5 text-zinc-700">{r.slot || "—"}</td>
                           <td className="py-3.5 text-center">
                             <span
-                              className={`px-2.5 py-0.5 rounded-full text-xs font-semibold border ${
-                                isScheduled
-                                  ? "bg-[#eff6ff] text-[#2563eb] border-[#bfdbfe]"
-                                  : isFulfilled
+                              className={`px-2.5 py-0.5 rounded-full text-xs font-semibold border ${isScheduled
+                                ? "bg-[#eff6ff] text-[#2563eb] border-[#bfdbfe]"
+                                : isFulfilled
                                   ? "bg-[#ecfdf5] text-[#059669] border-[#a7f3d0]"
                                   : "bg-[#fffbeb] text-[#b45309] border-[#fde68a]"
-                              }`}
+                                }`}
                             >
                               {r.status}
                             </span>
@@ -2753,7 +2727,7 @@ export function AdminConsoleClient({
 
             {/* 4 Cards in 2x2 Grid */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
-              
+
               {/* CARD 1: PRICING & CREDITS */}
               <div className="rounded-2xl bg-white border border-zinc-200/90 p-4 sm:p-6 shadow-xs flex flex-col justify-between">
                 <div>
@@ -2915,11 +2889,10 @@ export function AdminConsoleClient({
                           setSettings({ ...settings, isPaused: !settings.isPaused })
                           showToast(!settings.isPaused ? "Ticket sales paused (Demo preview)." : "Ticket sales resumed.")
                         }}
-                        className={`rounded-xl border px-3.5 py-2 text-xs font-bold cursor-pointer transition-colors ${
-                          settings.isPaused
-                            ? "bg-amber-500 text-white border-amber-600 shadow-2xs"
-                            : "border-zinc-200 text-zinc-700 hover:bg-zinc-100"
-                        }`}
+                        className={`rounded-xl border px-3.5 py-2 text-xs font-bold cursor-pointer transition-colors ${settings.isPaused
+                          ? "bg-amber-500 text-white border-amber-600 shadow-2xs"
+                          : "border-zinc-200 text-zinc-700 hover:bg-zinc-100"
+                          }`}
                       >
                         {settings.isPaused ? "Resume demo" : "Pause demo"}
                       </button>
@@ -2936,11 +2909,10 @@ export function AdminConsoleClient({
                           setSettings({ ...settings, isClosed: !settings.isClosed })
                           showToast(!settings.isClosed ? "Contest locked (Demo preview)." : "Contest reopened.")
                         }}
-                        className={`rounded-xl border px-3.5 py-2 text-xs font-bold cursor-pointer transition-colors ${
-                          settings.isClosed
-                            ? "bg-red-600 text-white border-red-700 shadow-2xs"
-                            : "border-red-200 text-red-600 hover:bg-red-50"
-                        }`}
+                        className={`rounded-xl border px-3.5 py-2 text-xs font-bold cursor-pointer transition-colors ${settings.isClosed
+                          ? "bg-red-600 text-white border-red-700 shadow-2xs"
+                          : "border-red-200 text-red-600 hover:bg-red-50"
+                          }`}
                       >
                         {settings.isClosed ? "Reopen demo" : "Close demo"}
                       </button>
@@ -3004,11 +2976,10 @@ export function AdminConsoleClient({
                     key={preset}
                     type="button"
                     onClick={() => setScheduleSlot(preset)}
-                    className={`px-3 py-1.5 rounded-xl text-[11px] font-bold border cursor-pointer transition-colors ${
-                      scheduleSlot === preset
-                        ? "bg-[#ea580c] text-white border-[#ea580c] shadow-2xs"
-                        : "bg-zinc-50 text-zinc-700 border-zinc-200 hover:bg-zinc-100"
-                    }`}
+                    className={`px-3 py-1.5 rounded-xl text-[11px] font-bold border cursor-pointer transition-colors ${scheduleSlot === preset
+                      ? "bg-[#ea580c] text-white border-[#ea580c] shadow-2xs"
+                      : "bg-zinc-50 text-zinc-700 border-zinc-200 hover:bg-zinc-100"
+                      }`}
                   >
                     {preset}
                   </button>
