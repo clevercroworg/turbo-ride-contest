@@ -92,7 +92,7 @@ export function HeroSection({
             </div>
 
             {/* Sharp, Well-Structured Headline - Clean 2-Line Layout in White & Black on Orange */}
-            <h1 className="text-[28px] xs:text-[31px] sm:text-[40px] lg:text-[46px] xl:text-[52px] font-black tracking-tight uppercase leading-[1.06] text-white mb-3 sm:mb-3.5">
+            <h1 className="text-[32px] xs:text-[35px] min-[390px]:text-[37px] min-[420px]:text-[39px] sm:text-[40px] lg:text-[46px] xl:text-[52px] font-black tracking-tight uppercase leading-[1.04] text-white mb-3 sm:mb-3.5">
               <span className="block whitespace-nowrap">WIN A PORSCHE 718</span>
               <span className="block whitespace-nowrap">
                 <span className="text-white">CAYMAN </span>
