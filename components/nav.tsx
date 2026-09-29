@@ -45,28 +45,33 @@ export function Nav({ onBuyTicketsClick, userCredits = 0, memberEmail }: NavProp
   return (
     <>
       <header
-        className={`fixed top-0 left-0 right-0 z-50 transition-all duration-200 h-20 flex items-center ${
+        className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 h-20 flex items-center ${
           scrolled || mobileMenuOpen
             ? "bg-white/95 backdrop-blur-md border-b border-zinc-200 shadow-xs"
-            : "bg-white/80 backdrop-blur-xs border-b border-zinc-200/50"
+            : "bg-transparent border-none"
         }`}
       >
         <div className="max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 flex items-center justify-between gap-2">
           
-          {/* Brand Logo */}
+          {/* Brand Logo - Adaptive Contrast */}
           <Link href="/" className="flex items-center group py-2 shrink-0">
-            <span className="font-display text-lg sm:text-xl md:text-2xl font-black tracking-tight text-zinc-950 uppercase whitespace-nowrap">
-              WINMY<span className="text-[#ea580c]">PORSCHE</span>
+            <span className="font-display text-lg sm:text-xl md:text-2xl font-black tracking-tight uppercase whitespace-nowrap transition-colors duration-300">
+              <span className={scrolled || mobileMenuOpen ? "text-zinc-950" : "text-white"}>WINMY</span>
+              <span className={scrolled || mobileMenuOpen ? "text-[#ea580c]" : "text-zinc-950"}>PORSCHE</span>
             </span>
           </Link>
 
-          {/* Clean, Spacious Navigation Links */}
+          {/* Clean, Spacious Navigation Links - Adaptive Contrast */}
           <nav className="hidden lg:flex items-center gap-8 xl:gap-10">
             {navLinks.map((link) => (
               <a
                 key={link.label}
                 href={link.href}
-                className="text-sm font-medium text-zinc-600 hover:text-zinc-950 transition-colors py-1"
+                className={`text-sm py-1 transition-colors duration-300 ${
+                  scrolled || mobileMenuOpen
+                    ? "font-medium text-zinc-700 hover:text-zinc-950"
+                    : "font-semibold text-white/90 hover:text-white"
+                }`}
               >
                 {link.label}
               </a>
@@ -78,35 +83,51 @@ export function Nav({ onBuyTicketsClick, userCredits = 0, memberEmail }: NavProp
             {memberEmail ? (
               <Link
                 href="/members"
-                className="hidden sm:inline-flex items-center gap-2 px-3 sm:px-4 py-1.5 sm:py-2 rounded-lg bg-zinc-100 hover:bg-zinc-200 border border-zinc-200 text-zinc-900 text-xs font-semibold transition-colors"
+                className={`hidden sm:inline-flex items-center gap-2 px-3 sm:px-4 py-1.5 sm:py-2 rounded-none text-xs font-semibold transition-all duration-300 ${
+                  scrolled || mobileMenuOpen
+                    ? "bg-zinc-100 hover:bg-zinc-200 border border-zinc-200 text-zinc-900"
+                    : "bg-zinc-950/70 hover:bg-zinc-950 border border-white/20 text-white"
+                }`}
               >
-                <Gauge size={15} weight="bold" className="text-[#ea580c]" />
+                <Gauge size={15} weight="bold" className={scrolled || mobileMenuOpen ? "text-[#ea580c]" : "text-orange-400"} />
                 <span className="truncate">My Garage ({userCredits.toLocaleString("en-IN")})</span>
               </Link>
             ) : (
               <Link
                 href="/login"
-                className="hidden sm:inline-flex items-center text-xs sm:text-sm font-medium text-zinc-600 hover:text-zinc-950 px-2 sm:px-3 py-1.5 transition-colors"
+                className={`hidden sm:inline-flex items-center text-xs sm:text-sm font-semibold px-2 sm:px-3 py-1.5 transition-colors duration-300 ${
+                  scrolled || mobileMenuOpen
+                    ? "text-zinc-700 hover:text-zinc-950"
+                    : "text-white/90 hover:text-white"
+                }`}
               >
                 Member Login
               </Link>
             )}
 
-            {/* Primary Action Button */}
+            {/* Primary Action Button - Adaptive Style */}
             <button
               type="button"
               onClick={onBuyTicketsClick}
-              className="inline-flex items-center gap-1.5 px-3 sm:px-4 py-1.5 sm:py-2 rounded-lg bg-[#ea580c] hover:bg-[#c2410c] text-white text-xs sm:text-sm font-bold uppercase tracking-wider transition-all shadow-sm active:scale-95 cursor-pointer shrink-0"
+              className={`inline-flex items-center gap-1.5 px-3 sm:px-4 py-1.5 sm:py-2 rounded-none text-xs sm:text-sm font-bold uppercase tracking-wider transition-all duration-300 shadow-sm active:scale-95 cursor-pointer shrink-0 ${
+                scrolled || mobileMenuOpen
+                  ? "bg-[#ea580c] hover:bg-[#c2410c] text-white"
+                  : "bg-zinc-950 hover:bg-black text-white border border-zinc-900"
+              }`}
             >
               <Ticket size={15} weight="fill" className="shrink-0" />
               <span className="whitespace-nowrap">Get Tickets</span>
             </button>
 
-            {/* Mobile Menu Button */}
+            {/* Mobile Menu Button - Adaptive Contrast */}
             <button
               type="button"
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="lg:hidden w-8 h-8 sm:w-9 sm:h-9 rounded-lg flex items-center justify-center text-zinc-900 hover:bg-zinc-100 transition-colors cursor-pointer shrink-0"
+              className={`lg:hidden w-8 h-8 sm:w-9 sm:h-9 rounded-none flex items-center justify-center transition-colors duration-300 cursor-pointer shrink-0 ${
+                scrolled || mobileMenuOpen
+                  ? "text-zinc-900 hover:bg-zinc-100"
+                  : "text-white hover:bg-white/10"
+              }`}
               aria-label="Toggle menu"
             >
               {mobileMenuOpen ? <X size={20} weight="bold" /> : <List size={20} weight="bold" />}

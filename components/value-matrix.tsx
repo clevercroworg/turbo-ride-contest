@@ -40,12 +40,9 @@ export function ValueMatrix({
             </span>
             <span className="w-4 sm:w-8 h-px bg-gradient-to-l from-transparent to-[#ea580c] shrink" />
           </div>
-          <h2 className="text-2xl sm:text-3xl lg:text-4xl font-black text-zinc-950 uppercase tracking-tight leading-none mb-3">
+          <h2 className="text-2xl sm:text-3xl lg:text-4xl font-black text-zinc-950 uppercase tracking-tight leading-none">
             100% CREDITS BACK
           </h2>
-          <p className="text-sm sm:text-base lg:text-lg text-zinc-950 font-medium leading-relaxed max-w-2xl mx-auto">
-            Zero capital risk. Every rupee converts to permanent Buddh Circuit Drive Credits for real track drives and reels.
-          </p>
         </div>
 
         {/* 2-Column Bento - Sharp Edges */}

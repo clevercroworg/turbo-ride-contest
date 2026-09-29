@@ -28,9 +28,6 @@ export function PrizePool({
           <h2 className="text-2xl sm:text-3xl lg:text-4xl font-black text-zinc-950 uppercase tracking-tight leading-none mb-3">
             THE 3 PRIZE TIERS
           </h2>
-          <p className="text-sm sm:text-base lg:text-lg text-zinc-950 font-medium leading-relaxed max-w-2xl mx-auto mb-3">
-            Every single ticket enters you into all 3 verified prize tiers automatically.
-          </p>
           <div className="inline-flex items-center gap-2 text-xs sm:text-sm text-zinc-950 font-bold bg-white px-3.5 py-1.5 rounded-none border border-zinc-200 shadow-2xs">
             <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
             <span>Live Draw Triggered When 10,000 Tickets Sell Out</span>

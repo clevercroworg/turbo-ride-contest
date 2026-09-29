@@ -213,13 +213,9 @@ export function EntryAllocation({
             <span className="w-4 sm:w-8 h-px bg-gradient-to-l from-transparent to-[#ea580c] shrink" />
           </div>
           
-          <h2 className="text-2xl sm:text-3xl lg:text-4xl font-black text-zinc-950 uppercase tracking-tight leading-none mb-3">
+          <h2 className="text-2xl sm:text-3xl lg:text-4xl font-black text-zinc-950 uppercase tracking-tight leading-none">
             SELECT ENTRY ALLOCATION
           </h2>
-
-          <p className="text-sm sm:text-base lg:text-lg text-zinc-950 font-bold leading-relaxed max-w-2xl mx-auto">
-            1 Ticket = ₹{ticketPrice.toLocaleString("en-IN")}. 100% of your deposit is credited back in permanent Buddh Circuit Drive Credits.
-          </p>
 
           {/* Web Version Expand / Collapse Interactive Toggle */}
           <div className="hidden lg:flex items-center justify-center mt-4">

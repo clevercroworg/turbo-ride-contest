@@ -59,12 +59,9 @@ export function FaqAccordion() {
             </span>
             <span className="w-4 sm:w-8 h-px bg-gradient-to-l from-transparent to-[#ea580c] shrink" />
           </div>
-          <h2 className="text-2xl sm:text-3xl lg:text-4xl font-black text-zinc-950 uppercase tracking-tight leading-none mb-3">
+          <h2 className="text-2xl sm:text-3xl lg:text-4xl font-black text-zinc-950 uppercase tracking-tight leading-none">
             FAQS & VERIFICATION
           </h2>
-          <p className="text-sm sm:text-base lg:text-lg text-zinc-950 font-medium leading-relaxed max-w-2xl mx-auto">
-            Clear answers on draw mechanics, credit redemption, capital escrow, and supercar delivery.
-          </p>
         </div>
 
         {/* Accordion List with Motion - Sharp Edged */}
