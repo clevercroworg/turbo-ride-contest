@@ -29,18 +29,16 @@ export function ValueMatrix({
     <section className="py-12 sm:py-20 bg-[#fafafa] border-t border-zinc-200">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
-        {/* Header */}
-        <div className="flex flex-col sm:flex-row sm:items-end justify-between pb-4 mb-6 sm:mb-10 border-b border-zinc-200 gap-2 sm:gap-4">
-          <div>
-            <span className="text-xs font-bold uppercase tracking-wider text-[#ea580c] block mb-1">
-              GUARANTEED UTILITY
-            </span>
-            <h2 className="text-2xl sm:text-3xl lg:text-4xl font-black text-zinc-950 uppercase tracking-tight">
-              EVERY TICKET PAYS YOU BACK
-            </h2>
-          </div>
-          <p className="text-xs sm:text-sm text-zinc-600 max-w-md leading-relaxed">
-            Zero capital risk. 100% of your deposit converts to permanent TurboRide Drive Credits for real supercar track drives and media reels.
+        {/* Centralized & Enlarged Section Header - Single line */}
+        <div className="text-center max-w-3xl mx-auto mb-8 sm:mb-12">
+          <span className="inline-block text-[11px] sm:text-xs font-bold uppercase tracking-wider text-[#ea580c] mb-2 px-3 py-1 rounded-full bg-orange-50 border border-orange-200/80 shadow-2xs">
+            GUARANTEED UTILITY
+          </span>
+          <h2 className="text-2xl sm:text-3xl lg:text-4xl font-black text-zinc-950 uppercase tracking-tight leading-none mb-3">
+            100% CREDITS BACK
+          </h2>
+          <p className="text-sm sm:text-base lg:text-lg text-zinc-600 font-medium leading-relaxed max-w-2xl mx-auto">
+            Zero capital risk. Every rupee converts to permanent Buddh Circuit Drive Credits for real track drives and reels.
           </p>
         </div>
 

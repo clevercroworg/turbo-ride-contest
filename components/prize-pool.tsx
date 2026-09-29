@@ -14,19 +14,20 @@ export function PrizePool({
     <section id="the-car" className="py-14 sm:py-20 lg:py-24 bg-[#fafafa] border-t border-zinc-200">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
-        {/* Section Header */}
-        <div className="flex flex-col md:flex-row md:items-end justify-between pb-5 mb-8 sm:mb-10 border-b border-zinc-200 gap-4">
-          <div>
-            <div className="inline-flex items-center gap-2 mb-2 text-xs font-bold uppercase tracking-wider text-[#ea580c]">
-              <span>02 // PRIZES YOU CAN WIN</span>
-            </div>
-            <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black text-zinc-950 uppercase tracking-tight leading-[1.05]">
-              ALL 3 PRIZE TIERS IN ONE TICKET
-            </h2>
+        {/* Centralized & Enlarged Section Header - Single line */}
+        <div className="text-center max-w-3xl mx-auto mb-8 sm:mb-12">
+          <div className="inline-flex items-center gap-1.5 mb-2 px-3 py-1 rounded-full text-[11px] sm:text-xs font-bold uppercase tracking-wider text-[#ea580c] bg-orange-50 border border-orange-200/80 shadow-2xs">
+            <span>02 // PRIZE TIERS</span>
           </div>
-          <div className="flex items-center gap-2 text-xs text-zinc-500 font-medium">
+          <h2 className="text-2xl sm:text-3xl lg:text-4xl font-black text-zinc-950 uppercase tracking-tight leading-none mb-3">
+            THE 3 PRIZE TIERS
+          </h2>
+          <p className="text-sm sm:text-base lg:text-lg text-zinc-600 font-medium leading-relaxed max-w-2xl mx-auto mb-3">
+            Every single ticket enters you into all 3 verified prize tiers automatically.
+          </p>
+          <div className="inline-flex items-center gap-2 text-[11px] sm:text-xs text-zinc-500 font-medium bg-white px-3 py-1 rounded-full border border-zinc-200 shadow-2xs">
             <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-            <span>Streamed live on YouTube & Instagram when tickets sell out</span>
+            <span>Live Draw Triggered When 10,000 Tickets Sell Out</span>
           </div>
         </div>
 

@@ -41,18 +41,16 @@ export function ReferralEngine({ ticketPrice = 1000 }: ReferralEngineProps = {})
     <section id="referrals" className="py-12 sm:py-20 bg-[#fafafa] border-t border-zinc-200">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
-        {/* Section Header */}
-        <div className="flex flex-col md:flex-row md:items-end justify-between pb-4 mb-6 sm:mb-10 border-b border-zinc-200 gap-2 sm:gap-4">
-          <div>
-            <div className="inline-flex items-center gap-2 mb-1 text-xs font-bold uppercase tracking-wider text-[#ea580c]">
-              <span>SYNDICATE PARTNERSHIP</span>
-            </div>
-            <h2 className="text-2xl sm:text-3xl lg:text-4xl font-black text-zinc-950 uppercase tracking-tight">
-              REFER FRIENDS, EARN CREDITS & CASH
-            </h2>
+        {/* Centralized & Enlarged Section Header - Single line */}
+        <div className="text-center max-w-3xl mx-auto mb-8 sm:mb-12">
+          <div className="inline-flex items-center gap-1.5 mb-2 px-3 py-1 rounded-full text-[11px] sm:text-xs font-bold uppercase tracking-wider text-[#ea580c] bg-orange-50 border border-orange-200/80 shadow-2xs">
+            <span>SYNDICATE REWARDS</span>
           </div>
-          <p className="text-xs sm:text-sm text-zinc-600 max-w-md leading-relaxed">
-            Earn 25% in permanent Drive Credits on every referral. Unlock 25% cash commission after 25 personal entries.
+          <h2 className="text-2xl sm:text-3xl lg:text-4xl font-black text-zinc-950 uppercase tracking-tight leading-none mb-3">
+            INVITE & EARN CASH
+          </h2>
+          <p className="text-sm sm:text-base lg:text-lg text-zinc-600 font-medium leading-relaxed max-w-2xl mx-auto">
+            Earn 25% in permanent Drive Credits on every referral, plus 25% direct cash commission.
           </p>
         </div>
 

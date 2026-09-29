@@ -49,16 +49,16 @@ export function PorscheSpecs() {
   return (
     <div className="mt-6 sm:mt-8 rounded-2xl bg-white border border-zinc-200 p-4 sm:p-6 lg:p-8 shadow-xs">
       
-      {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-3.5 mb-5 sm:mb-6 border-b border-zinc-100 gap-1.5 sm:gap-2">
-        <div className="flex items-center gap-2">
+      {/* Header - Single line on mobile */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-3 mb-4 sm:mb-6 border-b border-zinc-100 gap-1 sm:gap-2">
+        <div className="flex items-center gap-2 min-w-0">
           <span className="w-2 h-2 rounded-full bg-emerald-500 shrink-0" />
-          <span className="text-xs uppercase tracking-wider font-bold text-zinc-950">
-            OFFICIAL VEHICLE PASSPORT · 100-POINT INSPECTION
+          <span className="text-xs sm:text-sm uppercase tracking-wider font-extrabold text-zinc-950 truncate">
+            OFFICIAL VEHICLE PASSPORT<span className="hidden sm:inline"> · 100-POINT INSPECTION</span>
           </span>
         </div>
-        <span className="text-[11px] sm:text-xs text-zinc-500 font-medium">
-          Chassis & RTO Verified · Zero Hypothecation
+        <span className="text-[11px] sm:text-xs text-zinc-500 font-medium truncate">
+          RTO Verified · Zero Hypothecation
         </span>
       </div>
 

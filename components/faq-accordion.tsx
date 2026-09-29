@@ -48,19 +48,17 @@ export function FaqAccordion() {
     <section id="faq" className="py-12 sm:py-20 bg-[#fafafa] border-t border-zinc-200">
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
         
-        {/* Section Header */}
-        <div className="flex flex-col md:flex-row md:items-end justify-between pb-4 mb-6 sm:mb-10 border-b border-zinc-200 gap-2 sm:gap-4">
-          <div>
-            <div className="inline-flex items-center gap-2 mb-1 text-xs font-bold uppercase tracking-wider text-[#ea580c]">
-              <span>AUDITING & DISCLOSURES</span>
-            </div>
-            <h2 className="text-2xl sm:text-3xl lg:text-4xl font-black text-zinc-950 uppercase tracking-tight">
-              VERIFICATION & INQUIRIES
-            </h2>
+        {/* Centralized & Enlarged Section Header - Single line */}
+        <div className="text-center max-w-3xl mx-auto mb-8 sm:mb-12">
+          <div className="inline-flex items-center gap-1.5 mb-2 px-3 py-1 rounded-full text-[11px] sm:text-xs font-bold uppercase tracking-wider text-[#ea580c] bg-orange-50 border border-orange-200/80 shadow-2xs">
+            <span>AUDITING & DISCLOSURES</span>
           </div>
-          <span className="text-xs sm:text-sm text-zinc-500 font-medium">
-            Clear Answers on Capital Custody & Draws
-          </span>
+          <h2 className="text-2xl sm:text-3xl lg:text-4xl font-black text-zinc-950 uppercase tracking-tight leading-none mb-3">
+            FAQS & VERIFICATION
+          </h2>
+          <p className="text-sm sm:text-base lg:text-lg text-zinc-600 font-medium leading-relaxed max-w-2xl mx-auto">
+            Clear answers on draw mechanics, credit redemption, capital escrow, and supercar delivery.
+          </p>
         </div>
 
         {/* Accordion List with Motion */}

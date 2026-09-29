@@ -3,6 +3,7 @@
 import { useState } from "react"
 import { Nav } from "@/components/nav"
 import { HeroSection } from "@/components/hero-section"
+import { EntryAllocation } from "@/components/entry-allocation"
 import { HowItWorks } from "@/components/how-it-works"
 import { ValueMatrix } from "@/components/value-matrix"
 import { FleetShowcase } from "@/components/fleet-showcase"
@@ -46,6 +47,15 @@ export function HomeClient({ contest, memberEmail, userCredits = 0 }: HomeClient
           ticketPrice={contest.ticketPrice}
           carName={contest.carName}
           worthDisplay={contest.worthDisplay}
+        />
+
+        {/* 2.5. Dedicated Entry Allocation Terminal */}
+        <EntryAllocation
+          onBuyClick={(count) => handleOpenBuy(count || 10)}
+          soldTickets={contest.soldTickets}
+          targetTickets={contest.targetTickets}
+          ticketPrice={contest.ticketPrice}
+          carName={contest.carName}
         />
 
         {/* 3. The Protocol: 4-Step Telemetry Track */}

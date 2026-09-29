@@ -48,19 +48,17 @@ export function HowItWorks({
     <section id="how-it-works" className="py-14 sm:py-20 bg-white border-t border-zinc-200">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
-        {/* Header */}
-        <div className="flex flex-col sm:flex-row sm:items-end justify-between pb-4 mb-8 sm:mb-10 border-b border-zinc-200 gap-3">
-          <div>
-            <span className="text-xs font-bold uppercase tracking-wider text-[#ea580c] block mb-1">
-              THE ZERO-LOSS PROTOCOL
-            </span>
-            <h2 className="text-2xl sm:text-3xl lg:text-4xl font-black text-zinc-950 uppercase tracking-tight">
-              HOW IT WORKS
-            </h2>
-          </div>
-          <span className="text-xs sm:text-sm text-zinc-500 font-medium">
-            Not a lottery · 100% drive credit backing
+        {/* Centralized & Enlarged Section Header - Single line */}
+        <div className="text-center max-w-3xl mx-auto mb-8 sm:mb-12">
+          <span className="inline-block text-[11px] sm:text-xs font-bold uppercase tracking-wider text-[#ea580c] mb-2 px-3 py-1 rounded-full bg-orange-50 border border-orange-200/80 shadow-2xs">
+            ZERO-LOSS PROTOCOL
           </span>
+          <h2 className="text-2xl sm:text-3xl lg:text-4xl font-black text-zinc-950 uppercase tracking-tight leading-none mb-3">
+            HOW IT WORKS
+          </h2>
+          <p className="text-sm sm:text-base lg:text-lg text-zinc-600 font-medium leading-relaxed max-w-2xl mx-auto">
+            100% of your deposit returns as permanent Buddh Circuit Drive Credits. Win a supercar or hit the track.
+          </p>
         </div>
 
         {/* 4-Step Connected Telemetry Track */}
