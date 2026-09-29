@@ -107,9 +107,14 @@ export function HeroSection({
               <span className="text-[#ea580c]">100% CREDITS BACK.</span>
             </h1>
 
-            {/* Well-Sized Subtext in Full Black */}
-            <p className="text-sm sm:text-base lg:text-lg text-zinc-950 font-medium leading-relaxed mb-3 sm:mb-4 max-w-md mx-auto lg:mx-0">
-              Deposit ₹{ticketPrice.toLocaleString("en-IN")} to enter the verified <strong className="text-zinc-950 font-black">{carName}</strong> draw. 100% returned in Buddh Circuit Drive Credits.
+            {/* Well-Sized Subtext in Full Black - 2 Lines Max in Any Display */}
+            <p className="text-[13px] xs:text-sm sm:text-base lg:text-lg text-zinc-950 font-bold leading-snug sm:leading-relaxed mb-3 sm:mb-4 max-w-md mx-auto lg:mx-0">
+              <span className="hidden sm:inline">
+                Deposit ₹{ticketPrice.toLocaleString("en-IN")} to enter the verified <strong className="text-zinc-950 font-black">{carName}</strong> draw. 100% back in Drive Credits.
+              </span>
+              <span className="sm:hidden">
+                Deposit ₹{ticketPrice.toLocaleString("en-IN")} for the <strong className="text-zinc-950 font-black">{carName.includes("Porsche") ? "Porsche 718" : carName}</strong> draw.<br />100% back in Drive Credits.
+              </span>
             </p>
 
             {/* Clean Action Row - Sharp Edges & Bigger Responsive Button Font */}
@@ -202,18 +207,19 @@ export function HeroSection({
               </div>
             </motion.div>
 
-            {/* Bottom Delivery & Cash Option Bar - Sharp Edged & Prominent */}
-            <div className="w-full flex items-center justify-between gap-2 p-2.5 sm:p-3.5 rounded-none bg-white/95 backdrop-blur-md border border-zinc-200/90 shadow-2xs text-xs sm:text-sm">
-              <div className="flex items-center gap-2 text-zinc-950 font-black truncate">
-                <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-none bg-orange-100 flex items-center justify-center shrink-0">
-                  <Gauge size={16} weight="bold" className="text-[#ea580c]" />
+            {/* Bottom Delivery & Cash Option Bar - Sharp Edged & Prominent (No mobile truncation) */}
+            <div className="w-full flex items-center justify-between gap-2 p-2 sm:p-3.5 rounded-none bg-white/95 backdrop-blur-md border border-zinc-200/90 shadow-2xs text-xs sm:text-sm">
+              <div className="flex items-center gap-1.5 sm:gap-2 text-zinc-950 font-black shrink-0">
+                <div className="w-6 h-6 sm:w-8 sm:h-8 rounded-none bg-orange-100 flex items-center justify-center shrink-0">
+                  <Gauge size={15} weight="bold" className="text-[#ea580c]" />
                 </div>
-                <span className="truncate">Buddh Circuit Delivery Included</span>
+                <span className="hidden md:inline whitespace-nowrap">Buddh Circuit Delivery Included</span>
+                <span className="md:hidden whitespace-nowrap text-[11px] sm:text-xs">Buddh Circuit Delivery</span>
               </div>
 
-              <div className="flex items-center gap-2 shrink-0">
-                <span className="text-zinc-950 font-bold hidden sm:inline text-xs">Or choose</span>
-                <span className="font-black text-zinc-950 bg-zinc-100 border border-zinc-300 px-2.5 sm:px-3 py-1 rounded-none text-xs sm:text-sm">
+              <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
+                <span className="text-zinc-950 font-bold hidden md:inline text-xs">Or choose</span>
+                <span className="font-black text-zinc-950 bg-zinc-100 border border-zinc-300 px-2 sm:px-3 py-1 rounded-none text-[11px] sm:text-xs md:text-sm whitespace-nowrap">
                   ₹75 Lakh Cash Option
                 </span>
               </div>

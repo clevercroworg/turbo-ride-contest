@@ -162,7 +162,7 @@ export function EntryAllocation({
               className="w-full py-3.5 sm:py-4 px-5 rounded-none bg-[#ea580c] hover:bg-[#c2410c] text-white text-sm sm:text-base font-bold uppercase tracking-wider transition-all shadow-[0_6px_20px_rgba(234,88,12,0.35)] hover:shadow-[0_8px_28px_rgba(234,88,12,0.5)] active:scale-[0.99] flex items-center justify-center gap-2.5 cursor-pointer mb-4"
             >
               <Ticket size={18} weight="fill" className="shrink-0" />
-              <span className="truncate">
+              <span>
                 Get {selectedTickets} {selectedTickets === 1 ? "Ticket" : "Tickets"} · ₹{totalCost.toLocaleString("en-IN")}
               </span>
               <ArrowRight size={16} weight="bold" className="shrink-0" />
@@ -170,8 +170,8 @@ export function EntryAllocation({
 
             {/* Real-time Allocation Progress Bar - Sharp */}
             <div className="pt-3 border-t border-zinc-100 text-xs sm:text-sm">
-              <div className="flex items-center justify-between gap-1 text-zinc-600 mb-2">
-                <span className="tracking-tight truncate font-medium">
+              <div className="flex items-center justify-between gap-1 text-zinc-950 mb-2">
+                <span className="tracking-tight font-medium">
                   Live Allocation: <strong className="text-zinc-950 font-bold">{ticketsSold.toLocaleString("en-IN")}</strong> / {totalCap.toLocaleString("en-IN")} Entries
                 </span>
                 <span className="text-[#ea580c] font-black shrink-0">

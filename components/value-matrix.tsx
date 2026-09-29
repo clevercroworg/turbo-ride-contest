@@ -80,8 +80,8 @@ export function ValueMatrix({
                     <Gauge size={20} weight="bold" />
                   </div>
                   <div className="min-w-0">
-                    <span className="text-sm sm:text-base font-black text-zinc-950 block truncate">Real Supercar Laps</span>
-                    <span className="text-xs sm:text-sm text-zinc-950 font-medium block truncate">Redeem for Buddh Circuit seat time</span>
+                    <span className="text-sm sm:text-base font-black text-zinc-950 block">Real Supercar Laps</span>
+                    <span className="text-xs sm:text-sm text-zinc-950 font-bold block">Redeem for Buddh Circuit seat time</span>
                   </div>
                 </div>
 
@@ -90,8 +90,8 @@ export function ValueMatrix({
                     <VideoCamera size={20} weight="bold" />
                   </div>
                   <div className="min-w-0">
-                    <span className="text-sm sm:text-base font-black text-zinc-950 block truncate">4K FPV Media Shoots</span>
-                    <span className="text-xs sm:text-sm text-zinc-950 font-medium block truncate">Professional reels & track photos</span>
+                    <span className="text-sm sm:text-base font-black text-zinc-950 block">4K FPV Media Shoots</span>
+                    <span className="text-xs sm:text-sm text-zinc-950 font-bold block">Professional reels & track photos</span>
                   </div>
                 </div>
 
@@ -100,8 +100,8 @@ export function ValueMatrix({
                     <ClockCounterClockwise size={20} weight="bold" />
                   </div>
                   <div className="min-w-0">
-                    <span className="text-sm sm:text-base font-black text-zinc-950 block truncate">Credits Never Expire</span>
-                    <span className="text-xs sm:text-sm text-zinc-950 font-medium block truncate">Use your credits whenever you wish</span>
+                    <span className="text-sm sm:text-base font-black text-zinc-950 block">Credits Never Expire</span>
+                    <span className="text-xs sm:text-sm text-zinc-950 font-bold block">Use your credits whenever you wish</span>
                   </div>
                 </div>
               </div>
@@ -125,31 +125,38 @@ export function ValueMatrix({
                 {tiers.map((tier) => (
                   <div
                     key={tier.count}
-                    className="p-3 sm:p-4 rounded-none bg-zinc-50 hover:bg-zinc-100/90 border border-zinc-200/80 transition-colors flex items-center justify-between gap-3"
+                    className="p-2.5 sm:p-4 rounded-none bg-zinc-50 hover:bg-zinc-100/90 border border-zinc-200/80 transition-colors flex items-center justify-between gap-2 sm:gap-3"
                   >
-                    {/* Left: Ticket count + Badge + Cost */}
+                    {/* Left: Ticket count + Badge + Cost (Responsive single-line on mobile) */}
                     <div className="min-w-0 flex-1">
                       <div className="flex items-center gap-2">
-                        <span className="text-base sm:text-lg font-black text-zinc-950 tracking-tight">
+                        <span className="text-base sm:text-lg lg:text-xl font-black text-zinc-950 tracking-tight whitespace-nowrap">
                           {tier.count === 1 ? "1 Ticket" : `${tier.count} Tickets`}
                         </span>
                         {tier.badge && (
-                          <span className="text-[10px] sm:text-[11px] font-black uppercase px-2 py-0.5 rounded-none bg-orange-100 text-[#ea580c] border border-orange-200 tracking-tight">
+                          <span className="hidden sm:inline-flex text-[11px] font-black uppercase px-2 py-0.5 rounded-none bg-orange-100 text-[#ea580c] border border-orange-200 tracking-tight whitespace-nowrap shrink-0">
                             {tier.badge}
                           </span>
                         )}
                       </div>
-                      <span className="text-xs sm:text-sm text-zinc-950 font-bold block mt-0.5">
-                        {tier.cost}
-                      </span>
+                      <div className="flex items-center gap-2 mt-0.5">
+                        <span className="text-xs sm:text-sm text-zinc-950 font-black whitespace-nowrap">
+                          {tier.cost}
+                        </span>
+                        {tier.badge && (
+                          <span className="sm:hidden inline-flex text-[10px] font-black uppercase px-1.5 py-0.5 rounded-none bg-orange-100 text-[#ea580c] border border-orange-200 tracking-tight whitespace-nowrap shrink-0">
+                            {tier.badge}
+                          </span>
+                        )}
+                      </div>
                     </div>
 
                     {/* Right: Credits + Entries */}
                     <div className="text-right shrink-0">
-                      <span className="text-base sm:text-lg font-black text-emerald-600 block tabular-nums">
+                      <span className="text-base sm:text-lg lg:text-xl font-black text-emerald-600 block tabular-nums whitespace-nowrap">
                         +{tier.credits} Credits
                       </span>
-                      <span className="text-xs sm:text-sm font-black text-[#ea580c] block mt-0.5">
+                      <span className="text-xs sm:text-sm font-black text-[#ea580c] block mt-0.5 whitespace-nowrap">
                         {tier.entries}
                       </span>
                     </div>
@@ -158,9 +165,10 @@ export function ValueMatrix({
               </div>
             </div>
 
-            <div className="mt-4 pt-3.5 border-t border-zinc-100 flex items-center justify-between text-xs sm:text-sm text-zinc-950 font-bold">
-              <span className="truncate">100% usable on track laps & media</span>
-              <span className="text-emerald-700 font-black shrink-0 ml-2">Buddh Circuit Ready</span>
+            <div className="mt-4 pt-3.5 border-t border-zinc-100 flex items-center justify-between gap-2 text-xs sm:text-sm text-zinc-950 font-black">
+              <span className="hidden sm:inline whitespace-nowrap">100% usable on track laps & media</span>
+              <span className="sm:hidden whitespace-nowrap text-zinc-950 font-black">100% usable on track laps</span>
+              <span className="text-emerald-700 font-black shrink-0 ml-2 whitespace-nowrap">Buddh Circuit Ready</span>
             </div>
           </div>
 

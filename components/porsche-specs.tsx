@@ -144,9 +144,9 @@ export function PorscheSpecs() {
 
       {/* Bottom Legal Verification Guarantee */}
       <div className="mt-4 sm:mt-5 pt-3.5 border-t border-zinc-100 flex flex-col sm:flex-row sm:items-center justify-between gap-1.5 text-xs sm:text-sm text-zinc-950 font-semibold">
-        <span className="flex items-center gap-1.5 text-zinc-950 truncate">
+        <span className="flex items-center gap-1.5 text-zinc-950">
           <CheckCircle size={16} weight="fill" className="text-emerald-600 shrink-0" />
-          <span className="truncate">RTO transfer fees, Karnataka road taxes, and handover covered</span>
+          <span>RTO transfer fees, Karnataka road taxes, and handover covered</span>
         </span>
         <span className="text-[#ea580c] font-black shrink-0">100% Turnkey Handover</span>
       </div>
