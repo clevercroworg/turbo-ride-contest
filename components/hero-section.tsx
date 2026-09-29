@@ -41,16 +41,15 @@ export function HeroSection({
   const cleanWorth = worthDisplay ? worthDisplay.replace(/^Worth\s+(over\s+)?/i, "").trim() : "₹1.6 Crore"
 
   return (
-    <section className="relative pt-20 sm:pt-24 lg:pt-28 pb-4 sm:pb-8 lg:pb-10 min-h-[100dvh] lg:min-h-[calc(100dvh-80px)] flex flex-col justify-center overflow-hidden border-b border-zinc-200">
+    <section className="relative pt-20 sm:pt-24 lg:pt-28 pb-6 sm:pb-8 lg:pb-10 min-h-[75dvh] flex flex-col justify-center overflow-hidden border-b border-zinc-200">
       
       {/* Automotive Studio Backdrop - Balanced Lighting */}
       <div 
         className="absolute inset-0 pointer-events-none"
         style={{
           background: `
-            radial-gradient(ellipse 85% 60% at 70% 55%, rgba(249, 115, 22, 0.28) 0%, rgba(254, 215, 170, 0.12) 45%, transparent 75%),
-            radial-gradient(ellipse 65% 50% at 30% 60%, rgba(234, 88, 12, 0.18) 0%, transparent 60%),
-            linear-gradient(180deg, #ffffff 0%, #fffbf5 35%, #fff1df 65%, #fed7aa 88%, #f97316 97%, #ffffff 100%)
+            radial-gradient(ellipse 75% 50% at 50% 55%, rgba(249, 115, 22, 0.18) 0%, rgba(254, 215, 170, 0.08) 50%, transparent 80%),
+            linear-gradient(180deg, #ffffff 0%, #fffcf8 40%, #fff6ec 75%, #ffffff 100%)
           `,
         }}
       />
@@ -64,7 +63,7 @@ export function HeroSection({
         }}
       />
 
-      <div className="max-w-7xl 2xl:max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 relative z-10 w-full my-auto">
+      <div className="max-w-7xl 2xl:max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 relative z-10 w-full">
         
         {/* Sleek Minimalist Studio Strip (Desktop Only to maximize mobile viewport) */}
         <div className="hidden lg:flex items-center justify-between gap-2 pb-2 mb-4 border-b border-zinc-200/80 text-xs">

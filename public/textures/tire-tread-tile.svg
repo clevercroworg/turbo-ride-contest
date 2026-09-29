@@ -1,0 +1,47 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="120" height="48" viewBox="0 0 120 48">
+  <g fill="#18181b">
+    <!-- Top shoulder lug blocks -->
+    <rect x="2" y="2" width="10" height="8" rx="1" />
+    <rect x="16" y="2" width="10" height="8" rx="1" />
+    <rect x="30" y="2" width="10" height="8" rx="1" />
+    <rect x="44" y="2" width="10" height="8" rx="1" />
+    <rect x="58" y="2" width="10" height="8" rx="1" />
+    <rect x="72" y="2" width="10" height="8" rx="1" />
+    <rect x="86" y="2" width="10" height="8" rx="1" />
+    <rect x="100" y="2" width="10" height="8" rx="1" />
+    <rect x="114" y="2" width="10" height="8" rx="1" />
+
+    <!-- Top directional angled sipes -->
+    <path d="M 4 12 L 20 22 L 20 24 L 4 14 Z" />
+    <path d="M 18 12 L 34 22 L 34 24 L 18 14 Z" />
+    <path d="M 32 12 L 48 22 L 48 24 L 32 14 Z" />
+    <path d="M 46 12 L 62 22 L 62 24 L 46 14 Z" />
+    <path d="M 60 12 L 76 22 L 76 24 L 60 14 Z" />
+    <path d="M 74 12 L 90 22 L 90 24 L 74 14 Z" />
+    <path d="M 88 12 L 104 22 L 104 24 L 88 14 Z" />
+    <path d="M 102 12 L 118 22 L 118 24 L 102 14 Z" />
+    <path d="M 116 12 L 132 22 L 132 24 L 116 14 Z" />
+
+    <!-- Bottom directional angled sipes (mirrored chevron V-shape) -->
+    <path d="M 20 24 L 4 34 L 4 36 L 20 26 Z" />
+    <path d="M 34 24 L 18 34 L 18 36 L 34 26 Z" />
+    <path d="M 48 24 L 32 34 L 32 36 L 48 26 Z" />
+    <path d="M 62 24 L 46 34 L 46 36 L 62 26 Z" />
+    <path d="M 76 24 L 60 34 L 60 36 L 76 26 Z" />
+    <path d="M 90 24 L 74 34 L 74 36 L 90 26 Z" />
+    <path d="M 104 24 L 88 34 L 88 36 L 104 26 Z" />
+    <path d="M 118 24 L 102 34 L 102 36 L 118 26 Z" />
+    <path d="M 132 24 L 116 34 L 116 36 L 132 26 Z" />
+
+    <!-- Bottom shoulder lug blocks -->
+    <rect x="2" y="38" width="10" height="8" rx="1" />
+    <rect x="16" y="38" width="10" height="8" rx="1" />
+    <rect x="30" y="38" width="10" height="8" rx="1" />
+    <rect x="44" y="38" width="10" height="8" rx="1" />
+    <rect x="58" y="38" width="10" height="8" rx="1" />
+    <rect x="72" y="38" width="10" height="8" rx="1" />
+    <rect x="86" y="38" width="10" height="8" rx="1" />
+    <rect x="100" y="38" width="10" height="8" rx="1" />
+    <rect x="114" y="38" width="10" height="8" rx="1" />
+  </g>
+</svg>
