@@ -1,6 +1,6 @@
 "use client"
 
-import { Wallet, Hash, Broadcast, Gauge, ArrowRight } from "@phosphor-icons/react"
+import { Wallet, Hash, Broadcast, Gauge } from "@phosphor-icons/react"
 
 interface HowItWorksProps {
   ticketPrice?: number
@@ -39,66 +39,59 @@ export function HowItWorks({
       num: "04",
       icon: Gauge,
       action: "Zero Capital Loss",
-      detail: `Win the ${carName} or use credits for Buddh Circuit drives.`,
+      detail: `Win the ${carName} or use credits for real circuit track drives.`,
       badge: "Permanent Credits",
     },
   ]
 
   return (
-    <section id="how-it-works" className="py-16 sm:py-20 bg-white border-t border-zinc-200">
+    <section id="how-it-works" className="py-14 sm:py-20 bg-white border-t border-zinc-200">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
         {/* Header */}
-        <div className="flex flex-col sm:flex-row sm:items-end justify-between pb-4 mb-10 border-b border-zinc-200 gap-3">
+        <div className="flex flex-col sm:flex-row sm:items-end justify-between pb-4 mb-8 sm:mb-10 border-b border-zinc-200 gap-3">
           <div>
-            <span className="font-mono text-[11px] font-bold uppercase tracking-widest text-[#ea580c] block mb-1">
+            <span className="text-xs font-bold uppercase tracking-wider text-[#ea580c] block mb-1">
               THE ZERO-LOSS PROTOCOL
             </span>
-            <h2 className="font-display text-2xl sm:text-3xl lg:text-4xl font-black text-zinc-950 uppercase tracking-tight">
+            <h2 className="text-2xl sm:text-3xl lg:text-4xl font-black text-zinc-950 uppercase tracking-tight">
               HOW IT WORKS
             </h2>
           </div>
-          <span className="font-mono text-xs text-zinc-500 font-medium">
+          <span className="text-xs sm:text-sm text-zinc-500 font-medium">
             Not a lottery · 100% drive credit backing
           </span>
         </div>
 
         {/* 4-Step Connected Telemetry Track */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 relative">
-          {steps.map((step, idx) => {
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5">
+          {steps.map((step) => {
             const Icon = step.icon
             return (
               <div
                 key={step.num}
-                className="relative rounded-xl bg-zinc-50 border border-zinc-200/90 p-5 flex flex-col justify-between hover:bg-white hover:border-zinc-300 hover:shadow-xs transition-all"
+                className="relative rounded-2xl bg-zinc-50 border border-zinc-200 p-5 sm:p-6 flex flex-col justify-between hover:bg-white hover:border-zinc-300 hover:shadow-xs transition-all"
               >
                 <div>
-                  <div className="flex items-center justify-between pb-3 mb-3 border-b border-zinc-200/60 font-mono">
-                    <span className="text-2xl font-black text-zinc-300">
+                  <div className="flex items-center justify-between pb-3 mb-3 border-b border-zinc-200/60">
+                    <span className="text-2xl font-black text-zinc-300 tabular-nums">
                       {step.num}
                     </span>
-                    <span className="text-[10px] uppercase font-bold text-[#ea580c] bg-orange-50 border border-orange-200 px-2 py-0.5 rounded-full">
+                    <span className="text-[11px] uppercase font-bold text-[#ea580c] bg-orange-50 border border-orange-200 px-2.5 py-0.5 rounded-full">
                       {step.badge}
                     </span>
                   </div>
 
-                  <div className="flex items-center gap-2 mb-1.5">
-                    <Icon size={18} weight="bold" className="text-zinc-950 shrink-0" />
-                    <h3 className="font-display text-base font-black text-zinc-950 uppercase tracking-tight">
+                  <div className="flex items-center gap-2 mb-2">
+                    <Icon size={20} weight="bold" className="text-zinc-950 shrink-0" />
+                    <h3 className="text-base sm:text-lg font-bold text-zinc-950 uppercase tracking-tight">
                       {step.action}
                     </h3>
                   </div>
 
-                  <p className="text-xs text-zinc-600 leading-relaxed font-normal">
+                  <p className="text-xs sm:text-sm text-zinc-600 leading-relaxed font-normal">
                     {step.detail}
                   </p>
-                </div>
-
-                <div className="pt-3 mt-4 border-t border-zinc-200/60 flex items-center justify-between font-mono text-[10px] text-zinc-400">
-                  <span>STAGE {idx + 1} OF 4</span>
-                  {idx < steps.length - 1 && (
-                    <ArrowRight size={12} weight="bold" className="hidden lg:block text-zinc-300" />
-                  )}
                 </div>
               </div>
             )

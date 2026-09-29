@@ -93,8 +93,8 @@ export function RewardsClient({ session, credits: initialCredits, catalog, initi
     <div className="min-h-[100dvh] bg-[#fafafa] text-zinc-950 flex flex-col justify-between">
       
       {/* Top Header */}
-      <header className="border-b border-zinc-200/80 bg-white py-3.5 px-4 sm:px-8 shadow-xs sticky top-0 z-40">
-        <div className="max-w-7xl mx-auto flex items-center justify-between">
+      <header className="border-b border-zinc-200/80 bg-white py-3 sm:py-3.5 px-4 sm:px-8 shadow-xs sticky top-0 z-40">
+        <div className="max-w-7xl mx-auto flex items-center justify-between gap-2">
           <div className="flex items-center gap-3">
             <Link
               href="/members"
@@ -104,20 +104,20 @@ export function RewardsClient({ session, credits: initialCredits, catalog, initi
               <ArrowLeft size={16} />
             </Link>
             <div className="flex flex-col">
-              <span className="text-zinc-950 font-extrabold text-sm uppercase tracking-tight">
+              <span className="text-zinc-950 font-black text-sm uppercase tracking-tight">
                 Redeem Drive Credits
               </span>
-              <span className="text-[10px] font-mono text-zinc-500">
+              <span className="text-[11px] text-zinc-500 font-medium">
                 TurboRide Supercar Fleet
               </span>
             </div>
           </div>
 
           {/* Current Credit Pill */}
-          <div className="flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-zinc-100 border border-zinc-200 font-mono text-xs">
-            <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-            <span className="text-zinc-600">Available:</span>
-            <span className="font-bold text-emerald-600">₹{credits.toLocaleString("en-IN")}</span>
+          <div className="flex items-center gap-1.5 sm:gap-2 px-3 sm:px-3.5 py-1.5 rounded-full bg-zinc-100 border border-zinc-200 text-xs">
+            <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse shrink-0" />
+            <span className="text-zinc-500 hidden sm:inline">Available:</span>
+            <span className="font-black text-emerald-600 tabular-nums">₹{credits.toLocaleString("en-IN")}</span>
           </div>
         </div>
       </header>
@@ -219,7 +219,7 @@ export function RewardsClient({ session, credits: initialCredits, catalog, initi
         )}
 
         {/* Catalog Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
           {catalog.map((item) => {
             const hasEnough = credits >= item.creditsRequired
             const isLoading = loadingRewardId === item.id
@@ -227,50 +227,50 @@ export function RewardsClient({ session, credits: initialCredits, catalog, initi
             return (
               <div
                 key={item.id}
-                className="rounded-2xl bg-white border border-zinc-200 p-6 flex flex-col justify-between shadow-xs hover:border-zinc-300 transition-all group"
+                className="rounded-2xl bg-white border border-zinc-200 p-4 sm:p-6 flex flex-col justify-between shadow-2xs hover:border-zinc-300 transition-all group"
               >
                 <div>
                   {/* Category & Badge */}
-                  <div className="flex items-center justify-between mb-3">
-                    <span className="text-[10px] font-mono uppercase tracking-wider text-zinc-400 font-semibold">
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="text-[11px] uppercase tracking-wider text-zinc-500 font-bold">
                       {item.category}
                     </span>
-                    <span className="px-2.5 py-0.5 rounded-full bg-zinc-100 border border-zinc-200 text-xs font-mono font-bold text-zinc-900">
+                    <span className="px-2.5 py-0.5 rounded-full bg-zinc-100 border border-zinc-200 text-xs font-bold text-zinc-900 tabular-nums">
                       {item.creditsRequired.toLocaleString("en-IN")} Credits
                     </span>
                   </div>
 
-                  <h2 className="text-xl font-bold text-zinc-950 tracking-tight group-hover:text-orange-600 transition-colors">
+                  <h2 className="text-lg sm:text-xl font-black text-zinc-950 uppercase tracking-tight group-hover:text-[#ea580c] transition-colors">
                     {item.title}
                   </h2>
-                  <p className="text-xs text-zinc-500 font-mono mt-1">
+                  <p className="text-xs text-zinc-500 font-medium mt-0.5">
                     {item.specs}
                   </p>
 
-                  {/* Image */}
-                  <div className="relative w-full h-44 my-4 flex items-center justify-center overflow-hidden rounded-xl bg-zinc-50 border border-zinc-100 p-4">
+                  {/* Image - Fully Zoomed In, Prominent & Overflow Protected */}
+                  <div className="relative w-full h-44 sm:h-48 my-3 flex items-center justify-center overflow-hidden rounded-2xl bg-zinc-50 border border-zinc-100/80 p-3">
                     <Image
                       src={item.imageUrl}
                       alt={item.title}
-                      width={380}
+                      width={500}
                       height={200}
-                      className="object-contain max-h-full group-hover:scale-105 transition-transform duration-500"
+                      className="w-full h-full object-contain group-hover:scale-105 transition-transform duration-300 select-none drop-shadow-sm"
                     />
                   </div>
                 </div>
 
                 {/* Actions & Balance Check */}
-                <div className="pt-4 border-t border-zinc-100">
+                <div className="pt-3.5 border-t border-zinc-100">
                   {hasEnough ? (
                     <button
                       type="button"
                       onClick={() => handleRedeem(item)}
                       disabled={isLoading}
-                      className="w-full py-3.5 rounded-xl bg-orange-500 hover:bg-orange-600 text-white font-extrabold text-xs uppercase tracking-wider transition-all shadow-md shadow-orange-500/20 active:scale-98 disabled:opacity-50 flex items-center justify-center gap-2 cursor-pointer"
+                      className="w-full py-3 sm:py-3.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs uppercase tracking-wider transition-all shadow-xs active:scale-98 disabled:opacity-50 flex items-center justify-center gap-2 cursor-pointer"
                     >
-                      <Sparkle size={16} weight="fill" />
+                      <Sparkle size={15} weight="fill" />
                       <span>
-                        {isLoading ? "Verifying & Redirecting..." : "Redeem & Schedule Drive"}
+                        {isLoading ? "Verifying..." : "Redeem Experience"}
                       </span>
                       {!isLoading && <ArrowRight size={14} weight="bold" />}
                     </button>
@@ -285,7 +285,7 @@ export function RewardsClient({ session, credits: initialCredits, catalog, initi
                       </button>
                       <Link
                         href="/members"
-                        className="text-[11px] font-mono text-center text-orange-600 hover:underline font-semibold"
+                        className="text-xs text-center text-[#ea580c] hover:underline font-semibold"
                       >
                         Deposit in Garage to Get Credits
                       </Link>

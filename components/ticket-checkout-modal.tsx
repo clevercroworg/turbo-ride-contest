@@ -106,19 +106,19 @@ export function TicketCheckoutModal({
               Tickets & Credits Locked In!
             </h3>
             <p className="text-sm text-zinc-600 max-w-sm mb-6">
-              Your order <span className="font-mono text-zinc-900 font-bold">{successOrder.orderId}</span> is confirmed. <span className="text-emerald-600 font-bold font-mono">+{successOrder.credits.toLocaleString("en-IN")} Drive Credits</span> have been added to your wallet.
+              Your order <span className="text-zinc-950 font-bold">{successOrder.orderId}</span> is confirmed. <span className="text-emerald-600 font-bold">+{successOrder.credits.toLocaleString("en-IN")} Drive Credits</span> have been added to your wallet.
             </p>
 
-            <div className="w-full p-4 rounded-2xl bg-zinc-50 border border-zinc-200 mb-6 text-left text-xs font-mono">
-              <div className="flex justify-between py-1 text-zinc-500">
+            <div className="w-full p-4 rounded-2xl bg-zinc-50 border border-zinc-200 mb-6 text-left text-xs">
+              <div className="flex justify-between py-1 text-zinc-500 font-medium">
                 <span>Tickets Allocated:</span>
                 <span className="text-zinc-950 font-bold">{ticketCount} Tickets</span>
               </div>
-              <div className="flex justify-between py-1 text-zinc-500">
+              <div className="flex justify-between py-1 text-zinc-500 font-medium">
                 <span>Draw Active:</span>
-                <span className="text-orange-600 font-bold">{carName}</span>
+                <span className="text-[#ea580c] font-bold">{carName}</span>
               </div>
-              <div className="flex justify-between py-1 text-zinc-500">
+              <div className="flex justify-between py-1 text-zinc-500 font-medium">
                 <span>Wallet Balance:</span>
                 <span className="text-emerald-600 font-bold">+{successOrder.credits.toLocaleString("en-IN")} Credits</span>
               </div>
@@ -127,7 +127,7 @@ export function TicketCheckoutModal({
             <div className="flex flex-col sm:flex-row gap-3 w-full">
               <a
                 href="/members"
-                className="flex-1 py-3.5 rounded-xl bg-orange-500 hover:bg-orange-600 text-white font-extrabold text-xs uppercase tracking-wider flex items-center justify-center gap-2 transition-colors shadow-md shadow-orange-500/25"
+                className="flex-1 py-3.5 rounded-xl bg-[#ea580c] hover:bg-[#c2410c] text-white font-bold text-xs uppercase tracking-wider flex items-center justify-center gap-2 transition-colors shadow-sm cursor-pointer"
               >
                 <span>Go To Garage</span>
                 <ArrowRight size={16} weight="bold" />
@@ -143,14 +143,14 @@ export function TicketCheckoutModal({
         ) : (
           /* Checkout Form */
           <div>
-            <div className="mb-6">
-              <span className="text-xs font-mono font-bold uppercase tracking-wider text-orange-600 block mb-1">
+            <div className="mb-5 sm:mb-6">
+              <span className="text-xs font-bold uppercase tracking-wider text-[#ea580c] block mb-1">
                 Official Entry
               </span>
-              <h3 className="text-2xl font-black text-zinc-950 tracking-tight">
+              <h3 className="text-xl sm:text-2xl font-black text-zinc-950 tracking-tight">
                 Deposit & Claim Tickets
               </h3>
-              <p className="text-xs text-zinc-500 mt-1">
+              <p className="text-xs text-zinc-500 mt-0.5">
                 100% of your deposit is credited as TurboRide Drive Credits.
               </p>
             </div>
@@ -159,7 +159,7 @@ export function TicketCheckoutModal({
               
               {/* Ticket Quantity Stepper */}
               <div>
-                <label className="block text-xs font-mono uppercase text-zinc-600 font-semibold mb-2">
+                <label className="block text-xs uppercase text-zinc-600 font-bold mb-2">
                   Select Tickets (₹{ticketPrice.toLocaleString("en-IN")} each)
                 </label>
                 <div className="grid grid-cols-6 gap-1.5 mb-2">
@@ -168,9 +168,9 @@ export function TicketCheckoutModal({
                       key={p}
                       type="button"
                       onClick={() => setTicketCount(p)}
-                      className={`py-2 rounded-lg font-mono text-xs font-bold transition-all cursor-pointer ${
+                      className={`py-2 rounded-lg text-xs font-bold transition-all cursor-pointer ${
                         ticketCount === p
-                          ? "bg-orange-500 text-white font-black shadow-xs"
+                          ? "bg-[#ea580c] text-white font-black shadow-xs"
                           : "bg-zinc-100 text-zinc-700 hover:bg-zinc-200 border border-zinc-200"
                       }`}
                     >
@@ -181,21 +181,21 @@ export function TicketCheckoutModal({
               </div>
 
               {/* Total Summary Strip */}
-              <div className="p-3.5 rounded-xl bg-zinc-50 border border-zinc-200 flex items-center justify-between text-xs font-mono">
+              <div className="p-3.5 rounded-xl bg-zinc-50 border border-zinc-200 flex items-center justify-between text-xs">
                 <div>
-                  <span className="text-zinc-500 block">Total Due</span>
-                  <span className="text-lg font-bold text-zinc-950">₹{(ticketCount * ticketPrice).toLocaleString("en-IN")}</span>
+                  <span className="text-zinc-500 font-semibold block">Total Due</span>
+                  <span className="text-lg font-black text-zinc-950 tabular-nums">₹{(ticketCount * ticketPrice).toLocaleString("en-IN")}</span>
                 </div>
                 <div className="text-right">
-                  <span className="text-zinc-500 block">Credits Received</span>
-                  <span className="text-base font-bold text-emerald-600">+{(ticketCount * ticketPrice).toLocaleString("en-IN")} Pts</span>
+                  <span className="text-zinc-500 font-semibold block">Credits Received</span>
+                  <span className="text-base font-black text-emerald-600 tabular-nums">+{(ticketCount * ticketPrice).toLocaleString("en-IN")} Credits</span>
                 </div>
               </div>
 
               {/* Contact Fields */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-[11px] font-mono uppercase text-zinc-600 font-semibold mb-1">
+                  <label className="block text-xs uppercase text-zinc-600 font-bold mb-1">
                     Your Name
                   </label>
                   <input
@@ -204,12 +204,12 @@ export function TicketCheckoutModal({
                     placeholder="Raghav Sharma"
                     value={userName}
                     onChange={(e) => setUserName(e.target.value)}
-                    className="w-full px-3.5 py-2.5 rounded-xl bg-white border border-zinc-300 text-zinc-900 text-xs placeholder:text-zinc-400 focus:outline-none focus:border-orange-500"
+                    className="w-full px-3.5 py-2.5 rounded-xl bg-white border border-zinc-300 text-zinc-900 text-sm placeholder:text-zinc-400 focus:outline-none focus:border-[#ea580c]"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-[11px] font-mono uppercase text-zinc-600 font-semibold mb-1">
+                  <label className="block text-xs uppercase text-zinc-600 font-bold mb-1">
                     WhatsApp Phone
                   </label>
                   <input
@@ -218,14 +218,14 @@ export function TicketCheckoutModal({
                     placeholder="9876543210"
                     value={userPhone}
                     onChange={(e) => setUserPhone(e.target.value)}
-                    className="w-full px-3.5 py-2.5 rounded-xl bg-white border border-zinc-300 text-zinc-900 text-xs placeholder:text-zinc-400 focus:outline-none focus:border-orange-500"
+                    className="w-full px-3.5 py-2.5 rounded-xl bg-white border border-zinc-300 text-zinc-900 text-sm placeholder:text-zinc-400 focus:outline-none focus:border-[#ea580c]"
                   />
                 </div>
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-[11px] font-mono uppercase text-zinc-600 font-semibold mb-1">
+                  <label className="block text-xs uppercase text-zinc-600 font-bold mb-1">
                     Email Address
                   </label>
                   <input
@@ -234,12 +234,12 @@ export function TicketCheckoutModal({
                     placeholder="raghav@gmail.com"
                     value={userEmail}
                     onChange={(e) => setUserEmail(e.target.value)}
-                    className="w-full px-3.5 py-2.5 rounded-xl bg-white border border-zinc-300 text-zinc-900 text-xs placeholder:text-zinc-400 focus:outline-none focus:border-orange-500"
+                    className="w-full px-3.5 py-2.5 rounded-xl bg-white border border-zinc-300 text-zinc-900 text-sm placeholder:text-zinc-400 focus:outline-none focus:border-[#ea580c]"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-[11px] font-mono uppercase text-zinc-600 font-semibold mb-1">
+                  <label className="block text-xs uppercase text-zinc-600 font-bold mb-1">
                     Referral Code (Optional)
                   </label>
                   <input
@@ -247,7 +247,7 @@ export function TicketCheckoutModal({
                     placeholder="TRB100"
                     value={referralCode}
                     onChange={(e) => setReferralCode(e.target.value.toUpperCase())}
-                    className="w-full px-3.5 py-2.5 rounded-xl bg-white border border-zinc-300 text-zinc-900 text-xs placeholder:text-zinc-400 focus:outline-none focus:border-orange-500 font-mono uppercase"
+                    className="w-full px-3.5 py-2.5 rounded-xl bg-white border border-zinc-300 text-zinc-900 text-sm placeholder:text-zinc-400 focus:outline-none focus:border-[#ea580c] uppercase font-semibold"
                   />
                 </div>
               </div>
@@ -262,19 +262,19 @@ export function TicketCheckoutModal({
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full py-4 rounded-xl bg-orange-500 hover:bg-orange-600 text-white font-extrabold text-xs uppercase tracking-wider transition-all shadow-lg shadow-orange-500/25 active:scale-98 disabled:opacity-50 flex items-center justify-center gap-2 cursor-pointer"
+                className="w-full py-3.5 sm:py-4 rounded-xl bg-[#ea580c] hover:bg-[#c2410c] text-white font-bold text-xs sm:text-sm uppercase tracking-wider transition-all shadow-md active:scale-98 disabled:opacity-50 flex items-center justify-center gap-2 cursor-pointer"
               >
                 <Ticket size={18} weight="fill" />
                 <span>
                   {loading
                     ? "Locking In Your Tickets..."
-                    : `Pay ₹${(ticketCount * ticketPrice).toLocaleString("en-IN")} & Get ${ticketCount} ${ticketCount === 1 ? "Ticket" : "Tickets"}`}
+                    : `Deposit ₹${(ticketCount * ticketPrice).toLocaleString("en-IN")} & Get ${ticketCount} ${ticketCount === 1 ? "Ticket" : "Tickets"}`}
                 </span>
               </button>
 
-              <div className="flex items-center justify-center gap-2 text-[11px] text-zinc-500 font-mono">
-                <ShieldCheck size={14} className="text-emerald-600" />
-                <span>100% Value Guarantee · ₹{ticketPrice.toLocaleString("en-IN")} = {ticketPrice.toLocaleString("en-IN")} Permanent Credits</span>
+              <div className="flex items-center justify-center gap-2 text-xs text-zinc-500 font-medium">
+                <ShieldCheck size={15} className="text-emerald-600 shrink-0" weight="fill" />
+                <span>100% Capital Protected · ₹{ticketPrice.toLocaleString("en-IN")} = {ticketPrice.toLocaleString("en-IN")} Drive Credits</span>
               </div>
 
             </form>

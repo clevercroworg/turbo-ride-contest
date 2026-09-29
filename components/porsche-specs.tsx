@@ -8,7 +8,6 @@ import {
   MapPin,
   GearSix,
   Lightning,
-  Users,
   Palette,
   ShieldCheck,
   Timer,
@@ -48,42 +47,42 @@ export function PorscheSpecs() {
   ]
 
   return (
-    <div className="mt-8 rounded-2xl bg-white border border-zinc-200 p-6 sm:p-8 shadow-xs">
+    <div className="mt-6 sm:mt-8 rounded-2xl bg-white border border-zinc-200 p-4 sm:p-6 lg:p-8 shadow-xs">
       
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-4 mb-6 border-b border-zinc-100 gap-2">
-        <div className="flex items-center gap-2 font-mono">
-          <span className="w-2 h-2 rounded-full bg-emerald-500" />
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-3.5 mb-5 sm:mb-6 border-b border-zinc-100 gap-1.5 sm:gap-2">
+        <div className="flex items-center gap-2">
+          <span className="w-2 h-2 rounded-full bg-emerald-500 shrink-0" />
           <span className="text-xs uppercase tracking-wider font-bold text-zinc-950">
-            OFFICIAL VEHICLE PASSPORT // 100-POINT INSPECTION
+            OFFICIAL VEHICLE PASSPORT · 100-POINT INSPECTION
           </span>
         </div>
-        <span className="font-mono text-[11px] text-zinc-500">
+        <span className="text-[11px] sm:text-xs text-zinc-500 font-medium">
           Chassis & RTO Verified · Zero Hypothecation
         </span>
       </div>
 
-      {/* 3 Grouped Clusters (No 12-cell boring grid) */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 lg:gap-8">
+      {/* 3 Grouped Clusters */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-5 lg:gap-8">
         {specClusters.map((cluster) => (
-          <div key={cluster.category} className="space-y-3">
-            <span className="font-mono text-[10px] uppercase font-bold tracking-widest text-[#ea580c] block pb-1 border-b border-zinc-100">
+          <div key={cluster.category} className="space-y-2.5 sm:space-y-3">
+            <span className="text-[11px] uppercase font-bold tracking-wider text-[#ea580c] block pb-1 border-b border-zinc-100">
               {cluster.category}
             </span>
 
-            <div className="space-y-2.5">
+            <div className="space-y-2">
               {cluster.specs.map((item) => {
                 const Icon = item.icon
                 return (
                   <div
                     key={item.label}
-                    className="p-3 rounded-xl bg-zinc-50 border border-zinc-200/70 hover:bg-zinc-100/60 transition-colors flex items-start gap-3"
+                    className="p-2.5 sm:p-3 rounded-xl bg-zinc-50 border border-zinc-200/70 hover:bg-zinc-100/60 transition-colors flex items-start gap-3"
                   >
                     <div className="w-7 h-7 rounded-lg bg-white border border-zinc-200 flex items-center justify-center text-zinc-800 shrink-0 mt-0.5">
                       <Icon size={15} weight="bold" />
                     </div>
                     <div className="min-w-0 flex-1">
-                      <span className="text-[10px] uppercase tracking-wider text-zinc-400 font-bold block mb-0.5 font-mono">
+                      <span className="text-[10px] uppercase tracking-wider text-zinc-400 font-bold block mb-0.5">
                         {item.label}
                       </span>
                       <span className="text-xs font-bold text-zinc-900 block truncate">
@@ -99,14 +98,15 @@ export function PorscheSpecs() {
       </div>
 
       {/* Bottom Legal Verification Guarantee */}
-      <div className="mt-6 pt-4 border-t border-zinc-100 flex flex-col sm:flex-row sm:items-center justify-between gap-2 font-mono text-[11px] text-zinc-500">
-        <span className="flex items-center gap-1.5 text-zinc-900 font-medium">
-          <CheckCircle size={14} weight="fill" className="text-emerald-600" />
-          RTO transfer fees, Karnataka road taxes, and physical handover covered by TurboRide
+      <div className="mt-5 pt-3.5 border-t border-zinc-100 flex flex-col sm:flex-row sm:items-center justify-between gap-1.5 text-[11px] sm:text-xs text-zinc-500 font-medium">
+        <span className="flex items-center gap-1.5 text-zinc-900">
+          <CheckCircle size={14} weight="fill" className="text-emerald-600 shrink-0" />
+          <span>RTO transfer fees, Karnataka road taxes, and handover covered</span>
         </span>
-        <span className="text-[#ea580c] font-bold">100% Turnkey Handover</span>
+        <span className="text-[#ea580c] font-bold shrink-0">100% Turnkey Handover</span>
       </div>
 
     </div>
   )
 }
+

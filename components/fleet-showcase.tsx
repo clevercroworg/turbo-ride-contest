@@ -2,7 +2,7 @@
 
 import Image from "next/image"
 import Link from "next/link"
-import { ArrowUpRight, Gauge, Camera, VideoCamera } from "@phosphor-icons/react"
+import { ArrowUpRight } from "@phosphor-icons/react"
 
 interface FleetItem {
   id: string
@@ -73,30 +73,30 @@ export function FleetShowcase() {
   ]
 
   return (
-    <section id="the-fleet" className="py-20 md:py-28 bg-[#fafafa] border-t border-zinc-200">
+    <section id="the-fleet" className="py-12 sm:py-20 bg-[#fafafa] border-t border-zinc-200">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
         {/* Section Header */}
-        <div className="flex flex-col md:flex-row md:items-end justify-between pb-6 mb-12 border-b border-zinc-200 gap-4">
+        <div className="flex flex-col md:flex-row md:items-end justify-between pb-4 mb-6 sm:mb-10 border-b border-zinc-200 gap-2 sm:gap-4">
           <div>
-            <div className="inline-flex items-center gap-2 mb-2 font-mono text-xs font-bold uppercase tracking-widest text-[#ea580c]">
-              <span>03 // EXPERIMENTAL COMMERCE</span>
+            <div className="inline-flex items-center gap-2 mb-1 text-xs font-bold uppercase tracking-wider text-[#ea580c]">
+              <span>FLEET EXPERIENCES</span>
             </div>
-            <h2 className="font-display text-3xl sm:text-5xl font-black text-zinc-950 uppercase tracking-tight leading-[1.02]">
+            <h2 className="text-2xl sm:text-3xl lg:text-4xl font-black text-zinc-950 uppercase tracking-tight">
               SPEND CREDITS ON REAL SEAT TIME
             </h2>
           </div>
-          <p className="text-sm font-mono text-zinc-500 max-w-md">
-            1 Credit = ₹1. Your ticket deposits can be converted into track laps or media sessions immediately.
+          <p className="text-xs sm:text-sm text-zinc-600 max-w-md leading-relaxed">
+            1 Credit = ₹1. Your ticket deposits can be converted into supercar track laps or media sessions immediately.
           </p>
         </div>
 
         {/* 6-Card Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
           {fleetItems.map((item) => (
             <div
               key={item.id}
-              className="group rounded-xl bg-white border border-zinc-200 overflow-hidden shadow-xs hover:shadow-md hover:border-zinc-300 transition-all flex flex-col justify-between"
+              className="group rounded-2xl bg-white border border-zinc-200 overflow-hidden shadow-2xs hover:border-zinc-300 transition-all flex flex-col justify-between"
             >
               {/* Image Container with Badge */}
               <div className="relative w-full aspect-[16/10] bg-zinc-950 overflow-hidden">
@@ -109,31 +109,31 @@ export function FleetShowcase() {
                 />
                 
                 {/* Technical Badge Overlay */}
-                <div className="absolute top-3 left-3 font-mono text-[10px] font-bold text-white bg-zinc-950/80 backdrop-blur-md px-2.5 py-1 rounded uppercase tracking-wider">
+                <div className="absolute top-3 left-3 text-[10px] font-bold text-white bg-zinc-950/85 backdrop-blur-md px-2.5 py-1 rounded-md uppercase tracking-wider">
                   {item.badge}
                 </div>
 
-                <div className="absolute top-3 right-3 font-mono text-[10px] font-bold text-zinc-900 bg-white/90 backdrop-blur-md px-2.5 py-1 rounded uppercase">
+                <div className="absolute top-3 right-3 text-[10px] font-bold text-zinc-900 bg-white/95 backdrop-blur-md px-2.5 py-1 rounded-md uppercase">
                   {item.category}
                 </div>
               </div>
 
               {/* Bottom Card Content */}
-              <div className="p-5 sm:p-6 flex items-center justify-between gap-4">
-                <div>
-                  <h3 className="font-display text-lg sm:text-xl font-black text-zinc-950 uppercase tracking-tight">
+              <div className="p-4 sm:p-5 flex items-center justify-between gap-3">
+                <div className="min-w-0">
+                  <h3 className="text-base sm:text-lg font-black text-zinc-950 uppercase tracking-tight truncate">
                     {item.name}
                   </h3>
-                  <p className="text-xs text-zinc-500 font-mono mt-1">
+                  <p className="text-xs text-zinc-500 font-medium mt-0.5 truncate">
                     {item.subtitle}
                   </p>
                 </div>
 
                 <div className="text-right shrink-0">
-                  <span className="text-xl sm:text-2xl font-black text-[#ea580c] font-mono block leading-none">
+                  <span className="text-lg sm:text-xl font-black text-[#ea580c] block leading-none tabular-nums">
                     {item.credits.toLocaleString("en-IN")}
                   </span>
-                  <span className="text-[10px] text-zinc-400 font-mono block uppercase tracking-wider mt-1">
+                  <span className="text-[10px] text-zinc-400 font-semibold block uppercase tracking-wider mt-1">
                     Credits
                   </span>
                 </div>
@@ -143,13 +143,13 @@ export function FleetShowcase() {
         </div>
 
         {/* Sub-footer catalog link */}
-        <div className="mt-12 text-center">
+        <div className="mt-8 sm:mt-10 text-center">
           <Link
             href="/members/rewards"
-            className="inline-flex items-center gap-2 px-6 py-3 rounded-lg bg-zinc-100 hover:bg-zinc-200/80 text-zinc-900 font-mono text-xs font-bold uppercase tracking-wider transition-all border border-zinc-200"
+            className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-zinc-100 hover:bg-zinc-200/80 text-zinc-900 text-xs font-bold uppercase tracking-wider transition-all border border-zinc-200 cursor-pointer"
           >
             <span>Browse Full Rewards Garage & Booking Engine</span>
-            <ArrowUpRight size={16} weight="bold" />
+            <ArrowUpRight size={15} weight="bold" />
           </Link>
         </div>
 
@@ -157,3 +157,4 @@ export function FleetShowcase() {
     </section>
   )
 }
+

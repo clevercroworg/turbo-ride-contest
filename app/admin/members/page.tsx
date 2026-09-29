@@ -1,9 +1,16 @@
+import { redirect } from "next/navigation"
+import { getAdminSession } from "@/lib/auth"
 import { loadAdminFullProps } from "@/lib/admin"
 import { AdminConsoleClient } from "../admin-console-client"
 
 export const dynamic = "force-dynamic"
 
 export default async function AdminMembersPage() {
+  const adminSession = await getAdminSession()
+  if (!adminSession) {
+    redirect("/admin")
+  }
+
   const props = await loadAdminFullProps()
-  return <AdminConsoleClient {...props} initialTab="members" />
+  return <AdminConsoleClient {...props} adminSession={adminSession} initialTab="members" />
 }

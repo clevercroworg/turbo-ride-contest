@@ -24,9 +24,11 @@ import {
   Clock,
   DownloadSimple,
   CaretRight,
+  CaretDown,
   Calendar,
   Ticket,
   List,
+  SignOut,
 } from "@phosphor-icons/react"
 import {
   type AdminContest,
@@ -44,6 +46,7 @@ import {
   updateRedemptionStatusAction,
   saveAdminSettingsAction,
 } from "@/lib/admin"
+import { logoutAdminAction, type AdminSession } from "@/lib/auth"
 import type { AdminPlatformSettings } from "@/lib/types"
 
 interface AdminConsoleProps {
@@ -60,6 +63,7 @@ interface AdminConsoleProps {
   initialTickets?: AdminTicket[]
   initialSettings?: AdminPlatformSettings
   initialTab?: TabType
+  adminSession?: AdminSession
 }
 
 type TabType = "overview" | "contests" | "members" | "orders" | "referrals" | "redemptions" | "settings"
@@ -95,17 +99,16 @@ function TablePagination({
   const endItem = Math.min(currentPage * pageSize, totalItems)
 
   return (
-    <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-4 border-t border-zinc-100 text-xs font-mono">
+    <div className="flex flex-col sm:flex-row items-center justify-between gap-3 pt-4 border-t border-zinc-100 text-xs">
       {/* Range indicator */}
-      <div className="flex flex-wrap items-center gap-3 text-zinc-500">
+      <div className="flex flex-wrap items-center justify-between sm:justify-start w-full sm:w-auto gap-2 text-zinc-500">
         <span>
-          Showing <strong className="text-zinc-900 font-bold">{startItem}</strong> to{" "}
-          <strong className="text-zinc-900 font-bold">{endItem}</strong> of{" "}
-          <strong className="text-zinc-900 font-bold">{totalItems.toLocaleString("en-IN")}</strong> entries
+          Showing <strong className="text-zinc-900 font-bold">{startItem}</strong>–<strong className="text-zinc-900 font-bold">{endItem}</strong> of{" "}
+          <strong className="text-zinc-900 font-bold">{totalItems.toLocaleString("en-IN")}</strong>
         </span>
 
         {onPageSizeChange && (
-          <div className="flex items-center gap-1.5 pl-3 border-l border-zinc-200">
+          <div className="flex items-center gap-1.5 pl-2 sm:pl-3 border-l border-zinc-200">
             <span className="text-[11px] text-zinc-400">Rows:</span>
             <select
               value={pageSize}
@@ -126,13 +129,13 @@ function TablePagination({
       </div>
 
       {/* Page navigation controls */}
-      <div className="flex items-center gap-1">
+      <div className="flex items-center justify-center gap-1 w-full sm:w-auto">
         <button
           onClick={() => onPageChange(Math.max(1, currentPage - 1))}
           disabled={currentPage <= 1}
           className="px-2.5 py-1 rounded-lg border border-zinc-200 text-zinc-600 hover:bg-zinc-100 disabled:opacity-40 disabled:pointer-events-none cursor-pointer text-xs font-bold transition-colors"
         >
-          Previous
+          Prev
         </button>
 
         {Array.from({ length: totalPages }, (_, i) => i + 1)
@@ -168,6 +171,11 @@ function TablePagination({
   )
 }
 
+function formatMemberName(name?: string) {
+  if (!name || name === "TurboAdmin!2026" || name.includes("Admin!")) return "TurboRide Admin"
+  return name
+}
+
 export function AdminConsoleClient({
   initialOverview,
   initialContests,
@@ -178,8 +186,14 @@ export function AdminConsoleClient({
   initialTickets = [],
   initialSettings,
   initialTab = "overview",
+  adminSession,
 }: AdminConsoleProps) {
   const router = useRouter()
+
+  const handleLogout = async () => {
+    await logoutAdminAction()
+    router.refresh()
+  }
 
   // Navigation
   const [activeTab, setActiveTab] = useState<TabType>(initialTab)
@@ -242,6 +256,7 @@ export function AdminConsoleClient({
   const [hpPrice, setHpPrice] = useState(activeContest?.ticketPrice || 1000)
   const [hpTarget, setHpTarget] = useState(activeContest?.targetTickets || 10000)
   const [hpSold, setHpSold] = useState(activeContest?.soldTickets || 6362)
+  const [isVehicleDropdownOpen, setIsVehicleDropdownOpen] = useState(false)
 
   useEffect(() => {
     if (activeContest) {
@@ -752,7 +767,7 @@ export function AdminConsoleClient({
       {/* Toast Notification */}
       {toastMsg && (
         <div
-          className={`fixed top-4 right-4 z-50 px-4 py-3 rounded-xl shadow-lg border text-xs font-mono flex items-center gap-2 animate-in slide-in-from-top-2 ${
+          className={`fixed top-4 right-4 z-50 px-4 py-3 rounded-xl shadow-lg border text-xs font-medium flex items-center gap-2 animate-in slide-in-from-top-2 ${
             toastMsg.type === "success"
               ? "bg-zinc-950 text-white border-zinc-800"
               : "bg-red-600 text-white border-red-700"
@@ -764,26 +779,48 @@ export function AdminConsoleClient({
       )}
 
       {/* MOBILE TOP BAR (visible on screens < lg) */}
-      <div className="lg:hidden h-16 border-b border-zinc-200 bg-white px-4 flex items-center justify-between sticky top-0 z-40">
+      <div className="lg:hidden h-14 sm:h-16 border-b border-zinc-200 bg-white px-3.5 sm:px-4 flex items-center justify-between sticky top-0 z-40">
         <Link href="/" className="flex items-center">
-          <span className="text-lg font-black tracking-tight text-zinc-950 uppercase font-sans">
+          <span className="text-base sm:text-lg font-black tracking-tight text-zinc-950 uppercase font-sans">
             WINMY<span className="text-[#ea580c]">PORSCHE</span>
           </span>
-          <span className="ml-2 text-[10px] font-mono uppercase bg-zinc-100 text-zinc-600 px-1.5 py-0.5 rounded font-bold">
+          <span className="ml-2 text-[10px] uppercase bg-zinc-100 text-zinc-600 px-1.5 py-0.5 rounded font-bold">
             Admin
           </span>
         </Link>
         <button
           onClick={() => setMobileSidebarOpen(!mobileSidebarOpen)}
-          className="w-10 h-10 rounded-xl flex items-center justify-center text-zinc-800 hover:bg-zinc-100 cursor-pointer"
+          className="w-9 h-9 rounded-xl flex items-center justify-center text-zinc-800 hover:bg-zinc-100 cursor-pointer"
         >
           {mobileSidebarOpen ? <X size={20} weight="bold" /> : <List size={20} weight="bold" />}
         </button>
       </div>
 
+      {/* MOBILE QUICK TABS SCROLLER */}
+      <div className="lg:hidden border-b border-zinc-200 bg-white/95 backdrop-blur-md px-3 py-2 flex items-center gap-1.5 overflow-x-auto sticky top-14 sm:top-16 z-30 shadow-2xs">
+        {navItems.map((item) => {
+          const Icon = item.icon
+          const isActive = activeTab === item.id
+          return (
+            <button
+              key={item.id}
+              onClick={() => switchTab(item.id as TabType)}
+              className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all whitespace-nowrap shrink-0 flex items-center gap-1.5 cursor-pointer ${
+                isActive
+                  ? "bg-[#ea580c] text-white shadow-2xs"
+                  : "bg-zinc-100 text-zinc-600 hover:bg-zinc-200"
+              }`}
+            >
+              <Icon size={14} weight={isActive ? "bold" : "regular"} />
+              <span>{item.label}</span>
+            </button>
+          )
+        })}
+      </div>
+
       {/* MOBILE DRAWER */}
       {mobileSidebarOpen && (
-        <div className="fixed inset-0 top-16 z-50 bg-black/40 lg:hidden flex flex-col" onClick={() => setMobileSidebarOpen(false)}>
+        <div className="fixed inset-0 top-14 sm:top-16 z-50 bg-black/40 lg:hidden flex flex-col" onClick={() => setMobileSidebarOpen(false)}>
           <div className="bg-white w-64 h-full p-4 space-y-2 shadow-2xl flex flex-col justify-between" onClick={(e) => e.stopPropagation()}>
             <nav className="space-y-1">
               {navItems.map((item) => {
@@ -805,15 +842,22 @@ export function AdminConsoleClient({
                 )
               })}
             </nav>
-            <div className="pt-4 border-t border-zinc-100">
+            <div className="pt-4 border-t border-zinc-100 space-y-1">
               <Link
                 href="/"
                 target="_blank"
-                className="flex items-center gap-2 text-xs font-mono text-zinc-500 hover:text-zinc-950 p-2 rounded-lg"
+                className="flex items-center gap-2 text-xs font-medium text-zinc-500 hover:text-zinc-950 p-2 rounded-lg"
               >
                 <ArrowSquareOut size={15} />
                 <span>View public site</span>
               </Link>
+              <button
+                onClick={handleLogout}
+                className="w-full flex items-center gap-2 text-xs font-medium text-zinc-500 hover:text-red-600 p-2 rounded-lg hover:bg-red-50 cursor-pointer"
+              >
+                <SignOut size={15} weight="bold" />
+                <span>Sign Out</span>
+              </button>
             </div>
           </div>
         </div>
@@ -828,7 +872,7 @@ export function AdminConsoleClient({
               <span className="text-xl font-black tracking-tight text-zinc-950 uppercase font-sans">
                 WINMY<span className="text-[#ea580c]">PORSCHE</span>
               </span>
-              <span className="text-[10px] font-mono tracking-widest text-zinc-400 uppercase block font-semibold">
+              <span className="text-[10px] tracking-widest text-zinc-400 uppercase block font-bold">
                 ADMIN CONSOLE
               </span>
             </Link>
@@ -858,189 +902,229 @@ export function AdminConsoleClient({
         </div>
 
         {/* View Public Site Footer */}
-        <div className="p-4 border-t border-zinc-100">
+        <div className="p-4 border-t border-zinc-100 space-y-1">
           <Link
             href="/"
             target="_blank"
-            className="flex items-center gap-2 text-xs font-mono text-zinc-500 hover:text-zinc-950 transition-colors p-2 rounded-lg hover:bg-zinc-50"
+            className="flex items-center gap-2 text-xs font-medium text-zinc-500 hover:text-zinc-950 transition-colors p-2 rounded-lg hover:bg-zinc-50"
           >
             <ArrowSquareOut size={15} />
             <span>View public site</span>
           </Link>
+          <button
+            onClick={handleLogout}
+            className="w-full flex items-center gap-2 text-xs font-medium text-zinc-500 hover:text-red-600 transition-colors p-2 rounded-lg hover:bg-red-50 cursor-pointer"
+          >
+            <SignOut size={15} weight="bold" />
+            <span>Sign Out</span>
+          </button>
         </div>
       </aside>
 
       {/* MAIN ADMIN CONTENT BODY */}
       <div className="flex-1 flex flex-col min-w-0">
         
-        {/* Prototype Header Strip inside main matching Screenshot 1 & 2 */}
-        <div className="px-6 sm:px-8 lg:px-10 pt-6">
-          <div className="flex items-center justify-between pb-4 border-b border-zinc-200/70 max-w-7xl mx-auto w-full">
-            <div className="flex items-center gap-2.5">
-              <span className="px-2 py-0.5 rounded text-[11px] font-bold bg-[#fef3c7] text-[#92400e]">
-                Prototype
+        {/* Live Admin Header Strip inside main */}
+        <div className="px-3.5 sm:px-6 lg:px-8 pt-3 sm:pt-6">
+          <div className="flex items-center justify-between pb-3 sm:pb-4 border-b border-zinc-200/70 max-w-7xl mx-auto w-full">
+            <div className="flex items-center gap-2 sm:gap-2.5">
+              <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[11px] font-bold bg-emerald-50 text-emerald-800 border border-emerald-200">
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                Live Database Connected
               </span>
-              <span className="text-xs text-zinc-500 font-mono">
-                Mock data — no live actions
+              <span className="hidden sm:inline text-xs text-zinc-500">
+                Neon PostgreSQL · {adminSession?.email || "admin@turboride.com"}
               </span>
             </div>
 
-            <div className="w-8 h-8 rounded-full bg-[#ea580c] text-white font-bold text-xs flex items-center justify-center font-mono tracking-wider">
-              AD
+            <div className="flex items-center gap-2 sm:gap-3">
+              <div className="flex items-center gap-2">
+                <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-[#ea580c] text-white font-bold text-xs flex items-center justify-center tracking-wider shadow-2xs">
+                  {(adminSession?.email?.slice(0, 2) || "AD").toUpperCase()}
+                </div>
+                <span className="hidden md:inline text-xs font-semibold text-zinc-800">
+                  {adminSession?.email || "admin@turboride.com"}
+                </span>
+              </div>
+
+              <button
+                onClick={handleLogout}
+                title="Sign Out of Admin Console"
+                className="inline-flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-lg border border-zinc-200 text-xs font-semibold text-zinc-600 hover:text-red-700 hover:bg-red-50 hover:border-red-200 transition-colors cursor-pointer"
+              >
+                <SignOut size={14} weight="bold" />
+                <span className="hidden xs:inline">Sign Out</span>
+              </button>
             </div>
           </div>
         </div>
 
         {/* TAB 1: OVERVIEW */}
         {activeTab === "overview" && (
-          <main className="p-6 sm:p-8 lg:p-10 max-w-7xl w-full mx-auto space-y-8">
+          <main className="p-3.5 sm:p-6 lg:p-8 max-w-7xl w-full mx-auto space-y-5 sm:space-y-6">
             <div>
-              <h1 className="text-2xl sm:text-3xl font-black text-zinc-950 uppercase tracking-tight">
+              <h1 className="text-xl sm:text-2xl lg:text-3xl font-black text-zinc-950 uppercase tracking-tight">
                 OVERVIEW
               </h1>
-              <p className="text-xs text-zinc-500 mt-0.5">
-                Live snapshot of ticket sales, members, credits, and payouts.
+              <p className="text-xs text-zinc-500 mt-1">
+                Real-time snapshot of ticket entries, members, credits, and payouts.
               </p>
             </div>
 
             {/* 8 Metric KPI Cards Grid */}
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-              <div className="p-5 rounded-2xl bg-white border border-zinc-200/90 shadow-2xs">
-                <div className="flex items-center gap-1.5 text-zinc-400 text-xs font-medium mb-1">
-                  <Receipt size={14} />
-                  <span>Tickets sold</span>
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-2.5 sm:gap-4">
+              <div className="p-3.5 sm:p-5 rounded-2xl bg-white border border-zinc-200/90 shadow-2xs flex flex-col justify-between">
+                <div>
+                  <div className="flex items-center gap-1.5 text-zinc-500 text-xs font-semibold mb-1.5">
+                    <Receipt size={14} className="shrink-0 text-zinc-400" />
+                    <span className="truncate">Tickets sold</span>
+                  </div>
+                  <span className="text-xl sm:text-2xl lg:text-3xl font-black text-zinc-950 block tracking-tight">
+                    {initialOverview.stats.ticketsSold.toLocaleString("en-IN")}
+                  </span>
                 </div>
-                <span className="text-2xl sm:text-3xl font-black font-mono text-zinc-950 block">
-                  {initialOverview.stats.ticketsSold.toLocaleString("en-IN")}
-                </span>
-                <span className="text-[11px] text-zinc-400 font-mono">Across all contests</span>
+                <span className="text-[11px] text-zinc-400 font-medium mt-2 block">Across all contests</span>
               </div>
 
-              <div className="p-5 rounded-2xl bg-white border border-zinc-200/90 shadow-2xs">
-                <div className="flex items-center gap-1.5 text-zinc-400 text-xs font-medium mb-1">
-                  <Receipt size={14} />
-                  <span>Gross ticket revenue</span>
+              <div className="p-3.5 sm:p-5 rounded-2xl bg-white border border-zinc-200/90 shadow-2xs flex flex-col justify-between">
+                <div>
+                  <div className="flex items-center gap-1.5 text-zinc-500 text-xs font-semibold mb-1.5">
+                    <Receipt size={14} className="shrink-0 text-zinc-400" />
+                    <span className="truncate">Gross revenue</span>
+                  </div>
+                  <span className="text-xl sm:text-2xl lg:text-3xl font-black text-zinc-950 block tracking-tight">
+                    ₹{initialOverview.stats.grossRevenue.toLocaleString("en-IN")}
+                  </span>
                 </div>
-                <span className="text-2xl sm:text-3xl font-black font-mono text-zinc-950 block">
-                  ₹{initialOverview.stats.grossRevenue.toLocaleString("en-IN")}
-                </span>
-                <span className="text-[11px] text-emerald-600 font-mono font-bold">100% credit backed</span>
+                <span className="text-[11px] text-emerald-600 font-bold mt-2 block">1:1 Drive Credits backed</span>
               </div>
 
-              <div className="p-5 rounded-2xl bg-white border border-zinc-200/90 shadow-2xs">
-                <div className="flex items-center gap-1.5 text-zinc-400 text-xs font-medium mb-1">
-                  <Users size={14} />
-                  <span>Active members</span>
+              <div className="p-3.5 sm:p-5 rounded-2xl bg-white border border-zinc-200/90 shadow-2xs flex flex-col justify-between">
+                <div>
+                  <div className="flex items-center gap-1.5 text-zinc-500 text-xs font-semibold mb-1.5">
+                    <Users size={14} className="shrink-0 text-zinc-400" />
+                    <span className="truncate">Active members</span>
+                  </div>
+                  <span className="text-xl sm:text-2xl lg:text-3xl font-black text-zinc-950 block tracking-tight">
+                    {(initialOverview?.stats?.activeMembersCount ?? initialOverview?.stats?.activeMembers ?? 2184).toLocaleString("en-IN")}
+                  </span>
                 </div>
-                <span className="text-2xl sm:text-3xl font-black font-mono text-zinc-950 block">
-                  {(initialOverview?.stats?.activeMembersCount ?? initialOverview?.stats?.activeMembers ?? 2184).toLocaleString("en-IN")}
-                </span>
-                <span className="text-[11px] text-zinc-400 font-mono">Registered garages</span>
+                <span className="text-[11px] text-zinc-400 font-medium mt-2 block">Registered garages</span>
               </div>
 
-              <div className="p-5 rounded-2xl bg-white border border-zinc-200/90 shadow-2xs">
-                <div className="flex items-center gap-1.5 text-zinc-400 text-xs font-medium mb-1">
-                  <ArrowsClockwise size={14} />
-                  <span>Cash commission owed</span>
+              <div className="p-3.5 sm:p-5 rounded-2xl bg-white border border-zinc-200/90 shadow-2xs flex flex-col justify-between">
+                <div>
+                  <div className="flex items-center gap-1.5 text-zinc-500 text-xs font-semibold mb-1.5">
+                    <ArrowsClockwise size={14} className="shrink-0 text-zinc-400" />
+                    <span className="truncate">Commission owed</span>
+                  </div>
+                  <span className="text-xl sm:text-2xl lg:text-3xl font-black text-[#ea580c] block tracking-tight">
+                    ₹{(initialOverview?.stats?.cashCommissionOwed ?? 0).toLocaleString("en-IN")}
+                  </span>
                 </div>
-                <span className="text-2xl sm:text-3xl font-black font-mono text-[#ea580c] block">
-                  ₹{(initialOverview?.stats?.cashCommissionOwed ?? 0).toLocaleString("en-IN")}
-                </span>
-                <span className="text-[11px] text-zinc-400 font-mono">Ready for payout</span>
+                <span className="text-[11px] text-orange-600 font-bold mt-2 block">Ready for payout</span>
               </div>
 
-              <div className="p-5 rounded-2xl bg-white border border-zinc-200/90 shadow-2xs">
-                <div className="flex items-center gap-1.5 text-zinc-400 text-xs font-medium mb-1">
-                  <Gift size={14} />
-                  <span>Drive credits issued</span>
+              <div className="p-3.5 sm:p-5 rounded-2xl bg-white border border-zinc-200/90 shadow-2xs flex flex-col justify-between">
+                <div>
+                  <div className="flex items-center gap-1.5 text-zinc-500 text-xs font-semibold mb-1.5">
+                    <Gift size={14} className="shrink-0 text-zinc-400" />
+                    <span className="truncate">Credits issued</span>
+                  </div>
+                  <span className="text-xl sm:text-2xl lg:text-3xl font-black text-zinc-950 block tracking-tight">
+                    {(initialOverview?.stats?.totalCreditsIssued ?? initialOverview?.stats?.creditsIssued ?? 0).toLocaleString("en-IN")}
+                  </span>
                 </div>
-                <span className="text-2xl sm:text-3xl font-black font-mono text-zinc-950 block">
-                  {(initialOverview?.stats?.totalCreditsIssued ?? initialOverview?.stats?.creditsIssued ?? 0).toLocaleString("en-IN")}
-                </span>
-                <span className="text-[11px] text-zinc-400 font-mono">Permanent ledger</span>
+                <span className="text-[11px] text-zinc-400 font-medium mt-2 block">In member wallets</span>
               </div>
 
-              <div className="p-5 rounded-2xl bg-white border border-zinc-200/90 shadow-2xs">
-                <div className="flex items-center gap-1.5 text-zinc-400 text-xs font-medium mb-1">
-                  <Gift size={14} />
-                  <span>Credits redeemed</span>
+              <div className="p-3.5 sm:p-5 rounded-2xl bg-white border border-zinc-200/90 shadow-2xs flex flex-col justify-between">
+                <div>
+                  <div className="flex items-center gap-1.5 text-zinc-500 text-xs font-semibold mb-1.5">
+                    <Gift size={14} className="shrink-0 text-zinc-400" />
+                    <span className="truncate">Credits redeemed</span>
+                  </div>
+                  <span className="text-xl sm:text-2xl lg:text-3xl font-black text-zinc-950 block tracking-tight">
+                    {(initialOverview?.stats?.totalCreditsRedeemed ?? initialOverview?.stats?.creditsRedeemed ?? 0).toLocaleString("en-IN")}
+                  </span>
                 </div>
-                <span className="text-2xl sm:text-3xl font-black font-mono text-zinc-950 block">
-                  {(initialOverview?.stats?.totalCreditsRedeemed ?? initialOverview?.stats?.creditsRedeemed ?? 0).toLocaleString("en-IN")}
-                </span>
-                <span className="text-[11px] text-zinc-400 font-mono">Track laps & rentals</span>
+                <span className="text-[11px] text-zinc-400 font-medium mt-2 block">Track laps & rentals</span>
               </div>
 
-              <div className="p-5 rounded-2xl bg-white border border-zinc-200/90 shadow-2xs">
-                <div className="flex items-center gap-1.5 text-zinc-400 text-xs font-medium mb-1">
-                  <Trophy size={14} />
-                  <span>Active contest fill</span>
+              <div className="p-3.5 sm:p-5 rounded-2xl bg-white border border-zinc-200/90 shadow-2xs flex flex-col justify-between">
+                <div>
+                  <div className="flex items-center gap-1.5 text-zinc-500 text-xs font-semibold mb-1.5">
+                    <Trophy size={14} className="shrink-0 text-zinc-400" />
+                    <span className="truncate">Contest fill</span>
+                  </div>
+                  <span className="text-xl sm:text-2xl lg:text-3xl font-black text-zinc-950 block tracking-tight">
+                    {initialOverview.stats.contestFill}%
+                  </span>
                 </div>
-                <span className="text-2xl sm:text-3xl font-black font-mono text-zinc-950 block">
-                  {initialOverview.stats.contestFill}%
-                </span>
-                <span className="text-[11px] text-zinc-400 font-mono">{activeContest?.carName || "Porsche 718"}</span>
+                <span className="text-[11px] text-zinc-400 font-medium mt-2 block truncate">{activeContest?.carName || "Porsche 718"}</span>
               </div>
 
-              <div className="p-5 rounded-2xl bg-white border border-zinc-200/90 shadow-2xs">
-                <div className="flex items-center gap-1.5 text-zinc-400 text-xs font-medium mb-1">
-                  <Trophy size={14} />
-                  <span>Active contests</span>
+              <div className="p-3.5 sm:p-5 rounded-2xl bg-white border border-zinc-200/90 shadow-2xs flex flex-col justify-between">
+                <div>
+                  <div className="flex items-center gap-1.5 text-zinc-500 text-xs font-semibold mb-1.5">
+                    <Trophy size={14} className="shrink-0 text-zinc-400" />
+                    <span className="truncate">Active drop</span>
+                  </div>
+                  <span className="text-xl sm:text-2xl lg:text-3xl font-black text-zinc-950 block tracking-tight">
+                    {initialOverview.stats.liveContestsCount || 1}
+                  </span>
                 </div>
-                <span className="text-2xl sm:text-3xl font-black font-mono text-zinc-950 block">
-                  {initialOverview.stats.liveContestsCount}
-                </span>
-                <span className="text-[11px] text-emerald-600 font-mono font-bold">Live grand draw</span>
+                <span className="text-[11px] text-emerald-600 font-bold mt-2 block">Live grand draw</span>
               </div>
             </div>
 
             {/* Quick Actions & Live Activity */}
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-              <div className="lg:col-span-2 rounded-2xl bg-white border border-zinc-200/90 p-6 shadow-2xs space-y-4">
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6">
+              <div className="lg:col-span-2 rounded-2xl bg-white border border-zinc-200/90 p-4 sm:p-6 shadow-2xs space-y-3 sm:space-y-4">
                 <div className="flex items-center justify-between border-b border-zinc-100 pb-3">
-                  <h3 className="text-sm font-bold text-zinc-950 uppercase tracking-wider font-mono">
+                  <h3 className="text-xs sm:text-sm font-bold text-zinc-950 uppercase tracking-wider">
                     Recent Activity Feed
                   </h3>
-                  <span className="text-[11px] text-zinc-400 font-mono">Live updates</span>
+                  <span className="text-[11px] text-zinc-400 font-medium">Live updates</span>
                 </div>
-                <div className="space-y-3">
+                <div className="space-y-2.5">
                   {(initialOverview.activities || initialOverview.activity || []).map((act: any) => (
-                    <div key={act.id} className="flex items-center justify-between text-xs py-1.5 border-b border-zinc-50 font-mono">
-                      <div className="flex items-center gap-2">
-                        <span className="w-1.5 h-1.5 rounded-full bg-orange-500" />
-                        <span className="text-zinc-800">{act.title}</span>
+                    <div key={act.id} className="flex items-center justify-between text-xs py-2 border-b border-zinc-50 last:border-b-0 gap-3">
+                      <div className="flex items-center gap-2 min-w-0">
+                        <span className="w-1.5 h-1.5 rounded-full bg-orange-500 shrink-0" />
+                        <span className="text-zinc-800 font-medium truncate">{act.title}</span>
                       </div>
-                      <span className="text-zinc-400 text-[11px]">{act.time}</span>
+                      <span className="text-zinc-400 text-[11px] shrink-0 font-medium">{act.time}</span>
                     </div>
                   ))}
                 </div>
               </div>
 
-              <div className="rounded-2xl bg-white border border-zinc-200/90 p-6 shadow-2xs space-y-4">
-                <div className="border-b border-zinc-100 pb-3">
-                  <h3 className="text-sm font-bold text-zinc-950 uppercase tracking-wider font-mono">
+              <div className="rounded-2xl bg-white border border-zinc-200/90 p-4 sm:p-6 shadow-2xs space-y-3 sm:space-y-4">
+                <div className="flex items-center justify-between border-b border-zinc-100 pb-3">
+                  <h3 className="text-xs sm:text-sm font-bold text-zinc-950 uppercase tracking-wider">
                     Admin Shortlinks
                   </h3>
-                  <span className="text-[11px] text-zinc-400 font-mono">Instant jump</span>
+                  <span className="text-[11px] text-zinc-400 font-medium">Quick navigation</span>
                 </div>
                 <div className="space-y-2">
                   <button
                     onClick={() => switchTab("contests")}
-                    className="w-full text-left p-3 rounded-xl border border-zinc-100 hover:bg-zinc-50 transition-colors flex items-center justify-between text-xs font-mono cursor-pointer"
+                    className="w-full text-left p-3 rounded-xl border border-zinc-100 hover:bg-zinc-50 hover:border-zinc-200 transition-colors flex items-center justify-between text-xs font-semibold text-zinc-800 cursor-pointer"
                   >
                     <span>Manage Car Drops</span>
                     <CaretRight size={14} className="text-zinc-400" />
                   </button>
                   <button
                     onClick={() => switchTab("redemptions")}
-                    className="w-full text-left p-3 rounded-xl border border-zinc-100 hover:bg-zinc-50 transition-colors flex items-center justify-between text-xs font-mono cursor-pointer"
+                    className="w-full text-left p-3 rounded-xl border border-zinc-100 hover:bg-zinc-50 hover:border-zinc-200 transition-colors flex items-center justify-between text-xs font-semibold text-zinc-800 cursor-pointer"
                   >
                     <span>Fulfill Drive Redemptions</span>
                     <CaretRight size={14} className="text-zinc-400" />
                   </button>
                   <button
                     onClick={() => switchTab("referrals")}
-                    className="w-full text-left p-3 rounded-xl border border-zinc-100 hover:bg-zinc-50 transition-colors flex items-center justify-between text-xs font-mono cursor-pointer"
+                    className="w-full text-left p-3 rounded-xl border border-zinc-100 hover:bg-zinc-50 hover:border-zinc-200 transition-colors flex items-center justify-between text-xs font-semibold text-zinc-800 cursor-pointer"
                   >
                     <span>Process Due Cash Payouts</span>
                     <CaretRight size={14} className="text-zinc-400" />
@@ -1053,21 +1137,21 @@ export function AdminConsoleClient({
 
         {/* TAB 2: CONTESTS */}
         {activeTab === "contests" && (
-          <main className="p-6 sm:p-8 lg:p-10 max-w-7xl w-full mx-auto space-y-6">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <main className="p-3.5 sm:p-6 lg:p-8 max-w-7xl w-full mx-auto space-y-5 sm:space-y-6">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4">
               <div>
-                <h1 className="text-2xl sm:text-3xl font-black text-zinc-950 uppercase tracking-tight">
+                <h1 className="text-xl sm:text-2xl lg:text-3xl font-black text-zinc-950 uppercase tracking-tight">
                   SUPERCAR DROPS & CONTESTS
                 </h1>
-                <p className="text-xs text-zinc-500 mt-0.5">
-                  Control live active vehicle, adjust pool sizes, target tickets, ticket pricing, and homepage displays.
+                <p className="text-xs text-zinc-500 mt-1">
+                  Control active vehicle drops, ticket pools, pricing, and live homepage displays.
                 </p>
               </div>
 
               <div className="flex items-center gap-2">
                 <button
                   onClick={() => setIsNewContestOpen(true)}
-                  className="px-4 py-2.5 rounded-xl bg-[#ea580c] hover:bg-[#c2410c] text-white font-bold text-xs flex items-center gap-1.5 cursor-pointer shadow-xs transition-colors font-mono"
+                  className="w-full sm:w-auto px-4 py-2.5 rounded-xl bg-[#ea580c] hover:bg-[#c2410c] text-white font-bold text-xs flex items-center justify-center gap-1.5 cursor-pointer shadow-xs transition-colors"
                 >
                   <Plus size={16} weight="bold" />
                   <span>New Contest Drop</span>
@@ -1076,12 +1160,12 @@ export function AdminConsoleClient({
             </div>
 
             {/* HOMEPAGE DISPLAY & LIVE PRICING CONTROL CENTER */}
-            <div className="rounded-2xl bg-white border border-zinc-200 p-5 sm:p-6 shadow-2xs space-y-5">
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-zinc-100">
+            <div className="rounded-2xl bg-white border border-zinc-200 p-4 sm:p-6 shadow-2xs space-y-4 sm:space-y-5">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 sm:pb-4 border-b border-zinc-100">
                 <div>
                   <div className="flex items-center gap-2">
-                    <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-                    <h2 className="text-sm font-mono font-bold uppercase tracking-wider text-zinc-950">
+                    <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse shrink-0" />
+                    <h2 className="text-xs sm:text-sm font-bold uppercase tracking-wider text-zinc-950">
                       Live Homepage Showcase & Pricing Control
                     </h2>
                   </div>
@@ -1090,26 +1174,87 @@ export function AdminConsoleClient({
                   </p>
                 </div>
 
-                <div className="flex items-center gap-2">
-                  <span className="text-[11px] font-mono text-zinc-400">Live Vehicle:</span>
-                  <select
-                    value={activeContest?.id || ""}
-                    onChange={(e) => handleSetActiveContest(e.target.value)}
-                    disabled={actionLoading}
-                    className="bg-zinc-100 hover:bg-zinc-200 border border-zinc-200 rounded-lg px-2.5 py-1 text-xs font-mono font-bold text-zinc-900 cursor-pointer focus:outline-none"
-                  >
-                    {contests.map((c) => (
-                      <option key={c.id} value={c.id}>
-                        {c.carName} {c.status === "active" ? "(Active Live)" : `(${c.status})`}
-                      </option>
-                    ))}
-                  </select>
+                <div className="relative w-full sm:w-auto">
+                  <div className="flex items-center justify-between sm:justify-start gap-2">
+                    <span className="text-[11px] font-bold text-zinc-400 uppercase tracking-wider shrink-0">
+                      Live Vehicle:
+                    </span>
+                    <button
+                      type="button"
+                      onClick={() => setIsVehicleDropdownOpen(!isVehicleDropdownOpen)}
+                      disabled={actionLoading}
+                      className="flex-1 sm:flex-initial flex items-center justify-between gap-2.5 bg-zinc-100 hover:bg-zinc-200/80 border border-zinc-200 rounded-xl px-3 py-2 text-xs font-bold text-zinc-900 transition-all cursor-pointer shadow-2xs focus:outline-none focus:ring-2 focus:ring-[#ea580c]"
+                    >
+                      <div className="flex items-center gap-2 truncate">
+                        <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse shrink-0" />
+                        <span className="truncate">{activeContest?.carName || "Select Vehicle"}</span>
+                        <span className="text-[10px] font-bold bg-emerald-100 text-emerald-800 px-1.5 py-0.5 rounded-full shrink-0">
+                          Active Live
+                        </span>
+                      </div>
+                      <CaretDown size={14} className={`text-zinc-500 transition-transform shrink-0 ${isVehicleDropdownOpen ? "rotate-180" : ""}`} />
+                    </button>
+                  </div>
+
+                  {/* Custom Dropdown Popover */}
+                  {isVehicleDropdownOpen && (
+                    <>
+                      {/* Transparent backdrop to close on outside tap */}
+                      <div
+                        className="fixed inset-0 z-40"
+                        onClick={() => setIsVehicleDropdownOpen(false)}
+                      />
+                      <div className="absolute right-0 top-full mt-2 w-full sm:w-80 bg-white rounded-2xl border border-zinc-200/90 shadow-2xl p-1.5 z-50 space-y-1 animate-in fade-in zoom-in-95">
+                        <div className="px-3 py-1.5 border-b border-zinc-100 text-[10px] font-bold text-zinc-400 uppercase tracking-wider">
+                          Select Homepage Showcase Vehicle
+                        </div>
+                        {contests.map((c) => {
+                          const isSelected = activeContest?.id === c.id
+                          return (
+                            <button
+                              key={c.id}
+                              type="button"
+                              onClick={() => {
+                                handleSetActiveContest(c.id)
+                                setIsVehicleDropdownOpen(false)
+                              }}
+                              className={`w-full flex items-center justify-between p-2.5 rounded-xl text-left transition-all cursor-pointer ${
+                                isSelected
+                                  ? "bg-orange-50/80 border border-orange-200/80 text-zinc-950 font-bold"
+                                  : "hover:bg-zinc-50 text-zinc-700"
+                              }`}
+                            >
+                              <div className="flex items-center gap-2.5 truncate">
+                                <div className={`w-4 h-4 rounded-full flex items-center justify-center shrink-0 border ${
+                                  isSelected ? "border-[#ea580c] bg-[#ea580c] text-white" : "border-zinc-300"
+                                }`}>
+                                  {isSelected && <Check size={10} weight="bold" />}
+                                </div>
+                                <div className="truncate">
+                                  <div className="text-xs font-bold text-zinc-900 truncate">{c.carName}</div>
+                                  <div className="text-[11px] text-zinc-400">{c.worthDisplay} · ₹{c.ticketPrice.toLocaleString("en-IN")}/tkt</div>
+                                </div>
+                              </div>
+
+                              <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold shrink-0 ml-2 ${
+                                c.status === "active"
+                                  ? "bg-emerald-100 text-emerald-800"
+                                  : "bg-zinc-100 text-zinc-600"
+                              }`}>
+                                {c.status === "active" ? "Active Live" : c.status}
+                              </span>
+                            </button>
+                          )
+                        })}
+                      </div>
+                    </>
+                  )}
                 </div>
               </div>
 
               {/* Quick Pricing Control Strip */}
-              <div className="p-4 rounded-xl bg-zinc-50 border border-zinc-200/80 space-y-3 font-mono">
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+              <div className="p-3.5 sm:p-4 rounded-xl bg-zinc-50 border border-zinc-200/80 space-y-3">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
                   <div>
                     <span className="text-xs font-bold text-zinc-900 block">
                       Ticket Price & Credit Multiplier
@@ -1120,7 +1265,7 @@ export function AdminConsoleClient({
                   </div>
 
                   {/* 1-Click Price Presets */}
-                  <div className="flex flex-wrap items-center gap-1.5">
+                  <div className="flex flex-wrap items-center gap-1.5 pt-1 sm:pt-0">
                     {[500, 1000, 1500, 2000, 2500].map((preset) => (
                       <button
                         key={preset}
@@ -1129,7 +1274,7 @@ export function AdminConsoleClient({
                           setHpPrice(preset)
                           if (activeContest) handleQuickUpdatePrice(activeContest.id, preset)
                         }}
-                        className={`px-2.5 py-1 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+                        className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
                           Number(hpPrice) === preset
                             ? "bg-[#ea580c] text-white shadow-2xs"
                             : "bg-white border border-zinc-200 text-zinc-700 hover:bg-zinc-100"
@@ -1141,49 +1286,49 @@ export function AdminConsoleClient({
                   </div>
                 </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-2 border-t border-zinc-200/60">
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-3 border-t border-zinc-200/60">
                   <div>
-                    <label className="text-[10px] uppercase font-bold text-zinc-400 block mb-1">
+                    <label className="text-[10px] uppercase font-bold text-zinc-500 block mb-1">
                       Custom Ticket Price (₹)
                     </label>
                     <input
                       type="number"
                       value={hpPrice}
                       onChange={(e) => setHpPrice(Number(e.target.value))}
-                      className="w-full h-9 px-3 rounded-lg border border-zinc-300 bg-white text-xs font-bold text-zinc-900 focus:outline-none focus:ring-1 focus:ring-orange-500"
+                      className="w-full h-10 px-3 rounded-lg border border-zinc-300 bg-white text-xs font-bold text-zinc-900 focus:outline-none focus:ring-1 focus:ring-orange-500"
                     />
                   </div>
 
                   <div>
-                    <label className="text-[10px] uppercase font-bold text-zinc-400 block mb-1">
+                    <label className="text-[10px] uppercase font-bold text-zinc-500 block mb-1">
                       Target Pool Tickets
                     </label>
                     <input
                       type="number"
                       value={hpTarget}
                       onChange={(e) => setHpTarget(Number(e.target.value))}
-                      className="w-full h-9 px-3 rounded-lg border border-zinc-300 bg-white text-xs font-bold text-zinc-900 focus:outline-none focus:ring-1 focus:ring-orange-500"
+                      className="w-full h-10 px-3 rounded-lg border border-zinc-300 bg-white text-xs font-bold text-zinc-900 focus:outline-none focus:ring-1 focus:ring-orange-500"
                     />
                   </div>
 
                   <div>
-                    <label className="text-[10px] uppercase font-bold text-zinc-400 block mb-1">
+                    <label className="text-[10px] uppercase font-bold text-zinc-500 block mb-1">
                       Sold Tickets Counter
                     </label>
                     <input
                       type="number"
                       value={hpSold}
                       onChange={(e) => setHpSold(Number(e.target.value))}
-                      className="w-full h-9 px-3 rounded-lg border border-zinc-300 bg-white text-xs font-bold text-zinc-900 focus:outline-none focus:ring-1 focus:ring-orange-500"
+                      className="w-full h-10 px-3 rounded-lg border border-zinc-300 bg-white text-xs font-bold text-zinc-900 focus:outline-none focus:ring-1 focus:ring-orange-500"
                     />
                   </div>
                 </div>
               </div>
 
               {/* Homepage Hero Texts Form */}
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 font-mono">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                 <div>
-                  <label className="text-[10px] uppercase font-bold text-zinc-400 block mb-1">
+                  <label className="text-[10px] uppercase font-bold text-zinc-500 block mb-1">
                     Homepage Title / Headline
                   </label>
                   <input
@@ -1191,12 +1336,12 @@ export function AdminConsoleClient({
                     value={hpTitle}
                     onChange={(e) => setHpTitle(e.target.value)}
                     placeholder="e.g. PORSCHE 718 CAYMAN"
-                    className="w-full h-9 px-3 rounded-lg border border-zinc-300 bg-white text-xs font-bold text-zinc-900 focus:outline-none focus:ring-1 focus:ring-orange-500"
+                    className="w-full h-10 px-3 rounded-lg border border-zinc-300 bg-white text-xs font-bold text-zinc-900 focus:outline-none focus:ring-1 focus:ring-orange-500"
                   />
                 </div>
 
                 <div>
-                  <label className="text-[10px] uppercase font-bold text-zinc-400 block mb-1">
+                  <label className="text-[10px] uppercase font-bold text-zinc-500 block mb-1">
                     Homepage Tagline / Subtitle
                   </label>
                   <input
@@ -1204,12 +1349,12 @@ export function AdminConsoleClient({
                     value={hpSubtitle}
                     onChange={(e) => setHpSubtitle(e.target.value)}
                     placeholder="e.g. The yellow mid-engine legend..."
-                    className="w-full h-9 px-3 rounded-lg border border-zinc-300 bg-white text-xs text-zinc-900 focus:outline-none focus:ring-1 focus:ring-orange-500"
+                    className="w-full h-10 px-3 rounded-lg border border-zinc-300 bg-white text-xs text-zinc-900 focus:outline-none focus:ring-1 focus:ring-orange-500"
                   />
                 </div>
 
                 <div>
-                  <label className="text-[10px] uppercase font-bold text-zinc-400 block mb-1">
+                  <label className="text-[10px] uppercase font-bold text-zinc-500 block mb-1">
                     Market Valuation Text
                   </label>
                   <input
@@ -1217,7 +1362,7 @@ export function AdminConsoleClient({
                     value={hpWorth}
                     onChange={(e) => setHpWorth(e.target.value)}
                     placeholder="e.g. Worth over ₹1.6 Crore"
-                    className="w-full h-9 px-3 rounded-lg border border-zinc-300 bg-white text-xs font-bold text-orange-600 focus:outline-none focus:ring-1 focus:ring-orange-500"
+                    className="w-full h-10 px-3 rounded-lg border border-zinc-300 bg-white text-xs font-bold text-orange-600 focus:outline-none focus:ring-1 focus:ring-orange-500"
                   />
                 </div>
               </div>
@@ -1227,7 +1372,7 @@ export function AdminConsoleClient({
                   type="button"
                   onClick={handleSaveHomepageSettings}
                   disabled={actionLoading}
-                  className="px-5 py-2.5 rounded-xl bg-zinc-950 hover:bg-zinc-800 disabled:opacity-50 text-white font-mono text-xs font-bold flex items-center gap-1.5 cursor-pointer transition-colors shadow-2xs"
+                  className="w-full sm:w-auto px-5 py-2.5 rounded-xl bg-zinc-950 hover:bg-zinc-800 disabled:opacity-50 text-white text-xs font-bold flex items-center justify-center gap-1.5 cursor-pointer transition-colors shadow-2xs"
                 >
                   <Check size={16} weight="bold" />
                   <span>{actionLoading ? "Updating..." : "Save Homepage & Price Settings"}</span>
@@ -1236,12 +1381,12 @@ export function AdminConsoleClient({
             </div>
 
             {/* VIEW MODE SELECTOR: Vehicle Drops vs Tickets Ledger */}
-            <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 pt-2">
-              <div className="flex items-center gap-2 p-1 rounded-xl bg-zinc-100 w-fit">
+            <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 pt-1">
+              <div className="flex items-center gap-1.5 p-1 rounded-xl bg-zinc-100 w-fit">
                 <button
                   type="button"
                   onClick={() => setContestViewMode("cards")}
-                  className={`px-3.5 py-1.5 rounded-lg text-xs font-mono font-bold transition-all cursor-pointer flex items-center gap-1.5 ${
+                  className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5 ${
                     contestViewMode === "cards"
                       ? "bg-white text-zinc-950 shadow-xs"
                       : "text-zinc-600 hover:text-zinc-900"
@@ -1253,7 +1398,7 @@ export function AdminConsoleClient({
                 <button
                   type="button"
                   onClick={() => setContestViewMode("tickets")}
-                  className={`px-3.5 py-1.5 rounded-lg text-xs font-mono font-bold transition-all cursor-pointer flex items-center gap-1.5 ${
+                  className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5 ${
                     contestViewMode === "tickets"
                       ? "bg-white text-zinc-950 shadow-xs"
                       : "text-zinc-600 hover:text-zinc-900"
@@ -1265,7 +1410,7 @@ export function AdminConsoleClient({
               </div>
 
               {contestViewMode === "tickets" && (
-                <div className="flex flex-wrap items-center gap-2">
+                <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
                   <div className="relative w-full sm:w-64">
                     <MagnifyingGlass size={15} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-zinc-400" />
                     <input
@@ -1276,7 +1421,7 @@ export function AdminConsoleClient({
                         setAdminTicketPage(1)
                       }}
                       placeholder="Search ticket #, email, phone..."
-                      className="w-full h-9 pl-9 pr-3 rounded-lg border border-zinc-200 text-xs font-mono bg-white focus:outline-none focus:ring-1 focus:ring-[#ea580c]"
+                      className="w-full h-9 pl-9 pr-3 rounded-lg border border-zinc-200 text-xs bg-white focus:outline-none focus:ring-1 focus:ring-[#ea580c]"
                     />
                   </div>
 
@@ -1286,7 +1431,7 @@ export function AdminConsoleClient({
                       setTicketContestFilter(e.target.value)
                       setAdminTicketPage(1)
                     }}
-                    className="h-9 px-3 rounded-lg border border-zinc-200 text-xs font-mono bg-white text-zinc-700 cursor-pointer focus:outline-none"
+                    className="h-9 px-3 rounded-lg border border-zinc-200 text-xs bg-white text-zinc-700 cursor-pointer focus:outline-none"
                   >
                     <option value="all">All Contests</option>
                     {contests.map((c) => (
@@ -1301,7 +1446,7 @@ export function AdminConsoleClient({
 
             {/* MODE 1: CONTEST DROPS CARDS */}
             {contestViewMode === "cards" && (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
                 {contests.map((c) => {
                   const fill = Math.round((c.soldTickets / c.targetTickets) * 100)
                   const isActive = c.status === "active"
@@ -1309,20 +1454,20 @@ export function AdminConsoleClient({
                   return (
                     <div
                       key={c.id}
-                      className={`rounded-2xl bg-white border p-5 shadow-2xs transition-all flex flex-col justify-between ${
+                      className={`rounded-2xl bg-white border p-4 sm:p-5 shadow-2xs transition-all flex flex-col justify-between ${
                         isActive ? "border-orange-500 ring-2 ring-orange-500/10" : "border-zinc-200/90"
                       }`}
                     >
                       <div>
                         <div className="flex items-center justify-between mb-3">
-                          <span className={`px-2.5 py-0.5 rounded text-[10px] font-mono font-bold uppercase tracking-wider ${
+                          <span className={`px-2.5 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider ${
                             isActive
                               ? "bg-emerald-50 text-emerald-700 border border-emerald-200"
                               : "bg-zinc-100 text-zinc-600 border border-zinc-200"
                           }`}>
                             {isActive ? "LIVE ON SITE" : c.status.toUpperCase()}
                           </span>
-                          <span className="text-xs font-mono font-bold text-orange-600">
+                          <span className="text-xs font-bold text-orange-600">
                             {c.worthDisplay}
                           </span>
                         </div>
@@ -1340,12 +1485,12 @@ export function AdminConsoleClient({
                         <h3 className="text-lg font-black text-zinc-950 uppercase tracking-tight">
                           {c.carName}
                         </h3>
-                        <p className="text-xs text-zinc-400 font-mono mb-4">
+                        <p className="text-xs text-zinc-400 mb-4">
                           Slug: {c.id} · Draw: {c.drawDate || "30 Sep 2026"}
                         </p>
 
                         <div className="space-y-1.5 mb-4">
-                          <div className="flex justify-between text-xs font-mono">
+                          <div className="flex justify-between text-xs">
                             <span className="text-zinc-500">Allocation</span>
                             <span className="font-bold text-zinc-900">{fill}% ({c.soldTickets.toLocaleString("en-IN")} / {c.targetTickets.toLocaleString("en-IN")})</span>
                           </div>
@@ -1357,7 +1502,7 @@ export function AdminConsoleClient({
                           </div>
                         </div>
 
-                        <div className="p-3 rounded-xl bg-zinc-50 border border-zinc-100 text-xs font-mono space-y-1 mb-4">
+                        <div className="p-3 rounded-xl bg-zinc-50 border border-zinc-100 text-xs space-y-1 mb-4">
                           <div className="flex justify-between text-zinc-500">
                             <span>Ticket Price:</span>
                             <span className="font-bold text-zinc-950">₹{c.ticketPrice.toLocaleString("en-IN")}</span>
@@ -1372,7 +1517,7 @@ export function AdminConsoleClient({
                       <div className="pt-3 border-t border-zinc-100 flex items-center gap-2">
                         <button
                           onClick={() => setEditingContest(c)}
-                          className="flex-1 py-2 rounded-xl border border-zinc-200 hover:bg-zinc-50 text-xs font-bold font-mono text-zinc-700 transition-colors flex items-center justify-center gap-1 cursor-pointer"
+                          className="flex-1 py-2 rounded-xl border border-zinc-200 hover:bg-zinc-50 text-xs font-bold text-zinc-700 transition-colors flex items-center justify-center gap-1 cursor-pointer"
                         >
                           <PencilSimple size={14} />
                           <span>Edit Details</span>
@@ -1382,7 +1527,7 @@ export function AdminConsoleClient({
                           <button
                             onClick={() => handleSetActiveContest(c.id)}
                             disabled={actionLoading}
-                            className="flex-1 py-2 rounded-xl bg-zinc-950 hover:bg-zinc-800 text-white text-xs font-bold font-mono transition-colors cursor-pointer"
+                            className="flex-1 py-2 rounded-xl bg-zinc-950 hover:bg-zinc-800 text-white text-xs font-bold transition-colors cursor-pointer"
                           >
                             Make Active
                           </button>
@@ -1394,16 +1539,16 @@ export function AdminConsoleClient({
               </div>
             )}
 
-            {/* MODE 2: TICKETS LEDGER TABLE WITH PAGINATION */}
+            {/* MODE 2: TICKETS LEDGER - DUAL REPRESENTATION (MOBILE CARDS + DESKTOP TABLE) */}
             {contestViewMode === "tickets" && (
-              <div className="rounded-2xl bg-white border border-zinc-200/90 p-5 shadow-2xs space-y-4">
-                <div className="flex items-center justify-between border-b border-zinc-100 pb-3 font-mono">
+              <div className="rounded-2xl bg-white border border-zinc-200/90 p-4 sm:p-5 shadow-2xs space-y-4">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1 border-b border-zinc-100 pb-3">
                   <div>
                     <h3 className="text-xs font-bold uppercase tracking-wider text-zinc-900">
                       Issued Tickets Ledger
                     </h3>
                     <p className="text-[11px] text-zinc-400">
-                      Complete cryptographic record of every draw entry sold across all supercar drops.
+                      Official ledger of every verified ticket entry issued across active and past draws.
                     </p>
                   </div>
                   <span className="text-xs font-bold text-[#ea580c]">
@@ -1411,16 +1556,81 @@ export function AdminConsoleClient({
                   </span>
                 </div>
 
-                <div className="overflow-x-auto">
-                  <table className="w-full text-left font-mono text-xs">
+                {/* MOBILE CARD VIEW (Visible on mobile only < md) */}
+                <div className="md:hidden space-y-2.5">
+                  {paginatedAdminTickets.map((t) => {
+                    const contest = contests.find((c) => c.id === t.contestId)
+                    const isWon = t.isWinner || (contest?.winnerTicketNumber === t.ticketNumber)
+                    const isConcluded = contest?.status === "completed"
+
+                    return (
+                      <div
+                        key={t.id}
+                        className="p-3.5 rounded-xl border border-zinc-200/90 bg-white space-y-2.5 shadow-2xs"
+                      >
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center gap-1.5">
+                            <span className="text-[11px] font-semibold text-zinc-400 uppercase tracking-wider">Ticket</span>
+                            <span className="text-base font-black text-zinc-950">#{t.ticketNumber}</span>
+                          </div>
+                          {isWon ? (
+                            <span className="px-2 py-0.5 rounded-md text-[10px] font-bold bg-amber-100 text-amber-800 border border-amber-300">
+                              ★ WINNER
+                            </span>
+                          ) : isConcluded ? (
+                            <span className="px-2 py-0.5 rounded-md text-[10px] font-bold bg-zinc-100 text-zinc-600">
+                              CONCLUDED
+                            </span>
+                          ) : (
+                            <span className="px-2 py-0.5 rounded-md text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
+                              IN DRAW
+                            </span>
+                          )}
+                        </div>
+
+                        <div className="pt-1.5 border-t border-zinc-100 space-y-1.5 text-xs">
+                          <div className="flex items-center justify-between">
+                            <span className="text-zinc-500 font-medium">Contest</span>
+                            <span className="font-bold text-zinc-900">{contest?.carName || t.contestId}</span>
+                          </div>
+                          <div className="flex items-center justify-between">
+                            <span className="text-zinc-500 font-medium">Owner</span>
+                            <span className="font-semibold text-zinc-900">{formatMemberName(t.userName)}</span>
+                          </div>
+                          <div className="flex items-center justify-between">
+                            <span className="text-zinc-500 font-medium">Email</span>
+                            <span className="text-zinc-600 truncate max-w-[200px]">{t.userEmail}</span>
+                          </div>
+                          <div className="flex items-center justify-between">
+                            <span className="text-zinc-500 font-medium">Phone</span>
+                            <span className="text-zinc-700 font-semibold">{t.userPhone || "—"}</span>
+                          </div>
+                          <div className="flex items-center justify-between pt-1 border-t border-zinc-100/60 text-[11px]">
+                            <span className="text-zinc-400">Date Issued</span>
+                            <span className="text-zinc-500">{t.createdAt ? t.createdAt.split("T")[0] : "2026-09-24"}</span>
+                          </div>
+                        </div>
+                      </div>
+                    )
+                  })}
+                  {paginatedAdminTickets.length === 0 && (
+                    <div className="py-8 text-center text-zinc-400 italic text-xs">
+                      No tickets found matching your query.
+                    </div>
+                  )}
+                </div>
+
+                {/* DESKTOP TABLE VIEW (Visible on md and above) */}
+                <div className="hidden md:block overflow-x-auto">
+                  <table className="w-full min-w-[700px] text-left text-xs">
                     <thead>
-                      <tr className="border-b border-zinc-100 text-zinc-400 text-[10px] uppercase">
-                        <th className="pb-3 font-medium">Ticket #</th>
-                        <th className="pb-3 font-medium">Contest / Drop</th>
-                        <th className="pb-3 font-medium">Owner</th>
-                        <th className="pb-3 font-medium">Phone</th>
-                        <th className="pb-3 font-medium">Issued Date</th>
-                        <th className="pb-3 font-medium text-center">Status</th>
+                      <tr className="border-b border-zinc-100 text-zinc-400 text-[10px] uppercase font-bold tracking-wider">
+                        <th className="pb-3 font-semibold">Ticket #</th>
+                        <th className="pb-3 font-semibold">Contest / Drop</th>
+                        <th className="pb-3 font-semibold">Owner</th>
+                        <th className="pb-3 font-semibold">Phone</th>
+                        <th className="pb-3 font-semibold">Issued Date</th>
+                        <th className="pb-3 font-semibold text-center">Status</th>
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-zinc-50">
@@ -1432,7 +1642,7 @@ export function AdminConsoleClient({
                         return (
                           <tr key={t.id} className="hover:bg-zinc-50/50">
                             <td className="py-3 font-black text-zinc-950 tracking-tight">
-                              {t.ticketNumber}
+                              #{t.ticketNumber}
                             </td>
                             <td className="py-3">
                               <span className="font-bold text-zinc-900 block">
@@ -1443,10 +1653,10 @@ export function AdminConsoleClient({
                               </span>
                             </td>
                             <td className="py-3">
-                              <span className="font-medium text-zinc-900 block">{t.userName || "TurboRide Member"}</span>
+                              <span className="font-semibold text-zinc-900 block">{formatMemberName(t.userName)}</span>
                               <span className="text-[11px] text-zinc-400 block">{t.userEmail}</span>
                             </td>
-                            <td className="py-3 text-zinc-600">{t.userPhone || "—"}</td>
+                            <td className="py-3 text-zinc-600 font-medium">{t.userPhone || "—"}</td>
                             <td className="py-3 text-zinc-500 text-[11px]">
                               {t.createdAt ? t.createdAt.split("T")[0] : "2026-09-24"}
                             </td>
@@ -1470,7 +1680,7 @@ export function AdminConsoleClient({
                       })}
                       {paginatedAdminTickets.length === 0 && (
                         <tr>
-                          <td colSpan={6} className="py-8 text-center text-zinc-400 font-mono italic">
+                          <td colSpan={6} className="py-8 text-center text-zinc-400 italic">
                             No tickets found matching your query.
                           </td>
                         </tr>
@@ -1495,31 +1705,31 @@ export function AdminConsoleClient({
 
         {/* TAB 3: MEMBERS */}
         {activeTab === "members" && (
-          <main className="p-6 sm:p-8 lg:p-10 max-w-7xl w-full mx-auto space-y-6">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <main className="p-3.5 sm:p-6 lg:p-8 max-w-7xl w-full mx-auto space-y-5 sm:space-y-6">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4">
               <div>
-                <h1 className="text-2xl sm:text-3xl font-black text-zinc-950 uppercase tracking-tight">
+                <h1 className="text-xl sm:text-2xl lg:text-3xl font-black text-zinc-950 uppercase tracking-tight">
                   MEMBERS
                 </h1>
-                <p className="text-xs text-zinc-500 mt-0.5">
+                <p className="text-xs text-zinc-500 mt-1">
                   {members.length.toLocaleString("en-IN")} registered members · search, inspect wallets, and manage profiles.
                 </p>
               </div>
 
               <button
                 onClick={handleExportCsv}
-                className="px-4 py-2.5 rounded-xl border border-zinc-300 bg-white hover:bg-zinc-50 text-zinc-800 font-bold text-xs flex items-center gap-1.5 cursor-pointer shadow-2xs transition-colors self-start sm:self-auto font-mono"
+                className="w-full sm:w-auto px-4 py-2.5 rounded-xl border border-zinc-300 bg-white hover:bg-zinc-50 text-zinc-800 font-bold text-xs flex items-center justify-center gap-1.5 cursor-pointer shadow-2xs transition-colors"
               >
                 <DownloadSimple size={16} />
                 <span>Export CSV</span>
               </button>
             </div>
 
-            {/* Table Container */}
-            <div className="rounded-2xl bg-white border border-zinc-200/90 p-5 shadow-2xs space-y-4">
+            {/* Container */}
+            <div className="rounded-2xl bg-white border border-zinc-200/90 p-4 sm:p-5 shadow-2xs space-y-4">
               <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
                 {/* Status Tabs */}
-                <div className="flex items-center gap-1.5">
+                <div className="flex items-center gap-1.5 overflow-x-auto pb-1 sm:pb-0">
                   {(["all", "active", "kyc_pending", "flagged"] as const).map((filter) => (
                     <button
                       key={filter}
@@ -1527,9 +1737,9 @@ export function AdminConsoleClient({
                         setMemberFilter(filter)
                         setMemberPage(1)
                       }}
-                      className={`px-3 py-1 rounded-lg text-xs font-mono font-bold capitalize transition-colors cursor-pointer ${
+                      className={`px-3 py-1.5 rounded-lg text-xs font-bold capitalize transition-colors whitespace-nowrap cursor-pointer ${
                         memberFilter === filter
-                          ? "bg-[#ea580c] text-white"
+                          ? "bg-[#ea580c] text-white shadow-2xs"
                           : "bg-zinc-100 text-zinc-600 hover:bg-zinc-200"
                       }`}
                     >
@@ -1548,46 +1758,137 @@ export function AdminConsoleClient({
                       setMemberPage(1)
                     }}
                     placeholder="Search members..."
-                    className="w-full h-9 pl-9 pr-3 rounded-xl border border-zinc-200 text-xs font-mono focus:outline-none focus:border-orange-500"
+                    className="w-full h-9 pl-9 pr-3 rounded-xl border border-zinc-200 text-xs bg-white focus:outline-none focus:border-orange-500"
                   />
                 </div>
               </div>
 
-              <div className="overflow-x-auto">
-                <table className="w-full text-left font-mono text-xs">
+              {/* MOBILE CARD VIEW (Visible on mobile only < md) */}
+              <div className="md:hidden space-y-3">
+                {paginatedMembers.map((m) => {
+                  const displayName = formatMemberName(m.name)
+                  const isCurrentAdmin = m.name === "TurboAdmin!2026" || m.email === "admin@turboride.com"
+                  return (
+                    <div
+                      key={m.id}
+                      className="p-4 rounded-2xl border border-zinc-200/90 bg-white space-y-3 shadow-2xs"
+                    >
+                      {/* Top: Name, Status Pill */}
+                      <div className="flex items-start justify-between gap-2">
+                        <div className="min-w-0">
+                          <div className="flex items-center gap-1.5">
+                            <h4 className="font-bold text-zinc-950 text-sm truncate">{displayName}</h4>
+                            {isCurrentAdmin && (
+                              <span className="px-1.5 py-0.5 rounded bg-orange-100 text-orange-800 text-[10px] font-bold">
+                                ADMIN
+                              </span>
+                            )}
+                          </div>
+                          <p className="text-xs text-zinc-500 truncate mt-0.5">{m.email}</p>
+                          <p className="text-[10px] text-zinc-400 mt-0.5">ID: {m.id} · Joined {m.joinedAt.split("T")[0]}</p>
+                        </div>
+                        <span
+                          className={`px-2.5 py-1 rounded-full text-[10px] font-bold shrink-0 ${
+                            m.status === "active"
+                              ? "bg-emerald-50 text-emerald-700 border border-emerald-200"
+                              : m.status === "kyc_pending"
+                              ? "bg-amber-50 text-amber-700 border border-amber-200"
+                              : "bg-red-50 text-red-700 border border-red-200"
+                          }`}
+                        >
+                          {m.status === "active" ? "Active" : m.status === "kyc_pending" ? "KYC Pending" : "Flagged"}
+                        </span>
+                      </div>
+
+                      {/* 2x2 Stats Grid Inside Card */}
+                      <div className="grid grid-cols-2 gap-2 p-2.5 rounded-xl bg-zinc-50 border border-zinc-100 text-xs">
+                        <div>
+                          <span className="text-[11px] text-zinc-500 block font-medium">Tickets</span>
+                          <span className="font-bold text-zinc-950 text-sm">{m.ticketsBought}</span>
+                        </div>
+                        <div>
+                          <span className="text-[11px] text-zinc-500 block font-medium">Drive Credits</span>
+                          <span className="font-bold text-emerald-600 text-sm">{m.creditsBalance.toLocaleString("en-IN")}</span>
+                        </div>
+                        <div>
+                          <span className="text-[11px] text-zinc-500 block font-medium">Referrals</span>
+                          <span className="font-bold text-zinc-900 text-sm">{m.referralsCount}</span>
+                        </div>
+                        <div>
+                          <span className="text-[11px] text-zinc-500 block font-medium">Cash Commission</span>
+                          <span className="font-bold text-orange-600 text-sm">
+                            {m.cashEarned > 0 ? `₹${m.cashEarned.toLocaleString("en-IN")}` : "₹0"}
+                          </span>
+                        </div>
+                      </div>
+
+                      {/* Action Buttons */}
+                      <div className="flex items-center gap-2 pt-1 border-t border-zinc-100">
+                        <button
+                          onClick={() => setSelectedMember(m)}
+                          className="flex-1 py-2 rounded-xl border border-zinc-200 hover:bg-zinc-50 text-xs font-semibold text-zinc-700 transition-colors flex items-center justify-center cursor-pointer"
+                        >
+                          View Profile
+                        </button>
+                        {!isCurrentAdmin && (
+                          <button
+                            onClick={() => handleToggleMemberStatus(m.id, m.status)}
+                            className={`flex-1 py-2 rounded-xl text-xs font-bold cursor-pointer transition-colors ${
+                              m.status === "active"
+                                ? "bg-red-50 hover:bg-red-100 text-red-700 border border-red-200"
+                                : "bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border border-emerald-200"
+                            }`}
+                          >
+                            {m.status === "active" ? "Flag Account" : "Activate Account"}
+                          </button>
+                        )}
+                      </div>
+                    </div>
+                  )
+                })}
+                {paginatedMembers.length === 0 && (
+                  <div className="py-8 text-center text-zinc-400 italic text-xs">
+                    No members found matching your search.
+                  </div>
+                )}
+              </div>
+
+              {/* DESKTOP TABLE VIEW (Visible on md and above) */}
+              <div className="hidden md:block overflow-x-auto">
+                <table className="w-full min-w-[850px] text-left text-xs">
                   <thead>
-                    <tr className="border-b border-zinc-100 text-zinc-400 text-[10px] uppercase">
-                      <th className="pb-3 font-medium">Member</th>
-                      <th className="pb-3 font-medium">Joined</th>
-                      <th className="pb-3 font-medium text-right">Tickets</th>
-                      <th className="pb-3 font-medium text-right">Credits</th>
-                      <th className="pb-3 font-medium text-right">Referrals</th>
-                      <th className="pb-3 font-medium text-right">Cash Earned</th>
-                      <th className="pb-3 font-medium text-center">Status</th>
-                      <th className="pb-3 font-medium text-center">Profile</th>
-                      <th className="pb-3 font-medium text-right">Action</th>
+                    <tr className="border-b border-zinc-100 text-zinc-400 text-[10px] uppercase font-bold tracking-wider">
+                      <th className="pb-3 font-semibold">Member</th>
+                      <th className="pb-3 font-semibold">Joined</th>
+                      <th className="pb-3 font-semibold text-right">Tickets</th>
+                      <th className="pb-3 font-semibold text-right">Credits</th>
+                      <th className="pb-3 font-semibold text-right">Referrals</th>
+                      <th className="pb-3 font-semibold text-right">Cash Earned</th>
+                      <th className="pb-3 font-semibold text-center">Status</th>
+                      <th className="pb-3 font-semibold text-center">Profile</th>
+                      <th className="pb-3 font-semibold text-right">Action</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-zinc-50">
                     {paginatedMembers.map((m) => (
                       <tr key={m.id} className="hover:bg-zinc-50/50">
-                        <td className="py-3">
-                          <span className="font-bold text-zinc-950 block">{m.name}</span>
+                        <td className="py-3.5">
+                          <span className="font-bold text-zinc-950 block">{formatMemberName(m.name)}</span>
                           <span className="text-[11px] text-zinc-400 block">{m.email}</span>
                           <span className="text-[10px] text-zinc-300 block">{m.id}</span>
                         </td>
-                        <td className="py-3 text-zinc-500">{m.joinedAt.split("T")[0]}</td>
-                        <td className="py-3 text-right font-bold text-zinc-950">{m.ticketsBought}</td>
-                        <td className="py-3 text-right text-zinc-700">{m.creditsBalance.toLocaleString("en-IN")}</td>
-                        <td className="py-3 text-right text-zinc-700">{m.referralsCount}</td>
-                        <td className="py-3 text-right">
+                        <td className="py-3.5 text-zinc-500">{m.joinedAt.split("T")[0]}</td>
+                        <td className="py-3.5 text-right font-bold text-zinc-950">{m.ticketsBought}</td>
+                        <td className="py-3.5 text-right font-semibold text-emerald-600">{m.creditsBalance.toLocaleString("en-IN")}</td>
+                        <td className="py-3.5 text-right text-zinc-700 font-medium">{m.referralsCount}</td>
+                        <td className="py-3.5 text-right">
                           {m.cashEarned > 0 ? (
                             <span className="text-[#ea580c] font-black">₹{m.cashEarned.toLocaleString("en-IN")}</span>
                           ) : (
-                            <span className="text-zinc-400">locked</span>
+                            <span className="text-zinc-400">₹0</span>
                           )}
                         </td>
-                        <td className="py-3 text-center">
+                        <td className="py-3.5 text-center">
                           <span className={`px-2.5 py-0.5 rounded text-[10px] font-bold ${
                             m.status === "active"
                               ? "bg-emerald-50 text-emerald-700"
@@ -1595,18 +1896,18 @@ export function AdminConsoleClient({
                               ? "bg-amber-50 text-amber-700"
                               : "bg-red-50 text-red-700"
                           }`}>
-                            {m.status === "active" ? "Active" : m.status === "kyc_pending" ? "Kyc Pending" : "Flagged"}
+                            {m.status === "active" ? "Active" : m.status === "kyc_pending" ? "KYC Pending" : "Flagged"}
                           </span>
                         </td>
-                        <td className="py-3 text-center">
+                        <td className="py-3.5 text-center">
                           <button
                             onClick={() => setSelectedMember(m)}
-                            className="px-2.5 py-1 rounded-lg border border-zinc-200 hover:bg-zinc-100 text-[11px] font-mono text-zinc-700 transition-colors cursor-pointer"
+                            className="px-2.5 py-1 rounded-lg border border-zinc-200 hover:bg-zinc-100 text-[11px] text-zinc-700 transition-colors cursor-pointer"
                           >
                             View profile
                           </button>
                         </td>
-                        <td className="py-3 text-right">
+                        <td className="py-3.5 text-right">
                           <button
                             onClick={() => handleToggleMemberStatus(m.id, m.status)}
                             className={`px-2.5 py-1 rounded-lg text-[11px] font-bold cursor-pointer transition-colors ${
@@ -1622,7 +1923,7 @@ export function AdminConsoleClient({
                     ))}
                     {paginatedMembers.length === 0 && (
                       <tr>
-                        <td colSpan={9} className="py-8 text-center text-zinc-400 font-mono italic">
+                        <td colSpan={9} className="py-8 text-center text-zinc-400 italic">
                           No members found matching your search.
                         </td>
                       </tr>
@@ -1646,32 +1947,32 @@ export function AdminConsoleClient({
 
         {/* TAB 4: ORDERS */}
         {activeTab === "orders" && (
-          <main className="p-6 sm:p-8 lg:p-10 max-w-7xl w-full mx-auto space-y-6">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <main className="p-3.5 sm:p-6 lg:p-8 max-w-7xl w-full mx-auto space-y-5 sm:space-y-6">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4">
               <div>
-                <h1 className="text-2xl sm:text-3xl font-black text-zinc-950 uppercase tracking-tight">
+                <h1 className="text-xl sm:text-2xl lg:text-3xl font-black text-zinc-950 uppercase tracking-tight">
                   ORDERS
                 </h1>
-                <p className="text-xs text-zinc-500 mt-0.5">
-                  Complete ledger of contest ticket orders and deposit payments.
+                <p className="text-xs text-zinc-500 mt-1">
+                  Complete ledger of contest ticket orders and payment transactions.
                 </p>
               </div>
 
-              <div className="flex items-center gap-2 text-xs font-mono">
+              <div className="flex items-center gap-2 text-xs">
                 <span className="px-3 py-1.5 rounded-xl bg-zinc-100 text-zinc-700 font-bold">
                   Total Orders: {orders.length}
                 </span>
-                <span className="px-3 py-1.5 rounded-xl bg-emerald-50 text-emerald-700 font-bold">
+                <span className="px-3 py-1.5 rounded-xl bg-emerald-50 text-emerald-700 font-bold border border-emerald-200">
                   Paid: {orders.filter((o) => o.status === "completed" || (o.status as any) === "paid").length}
                 </span>
               </div>
             </div>
 
-            {/* Table Container */}
-            <div className="rounded-2xl bg-white border border-zinc-200/90 p-5 shadow-2xs space-y-4">
+            {/* Container */}
+            <div className="rounded-2xl bg-white border border-zinc-200/90 p-4 sm:p-5 shadow-2xs space-y-4">
               <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
                 {/* Filter Tabs */}
-                <div className="flex items-center gap-1.5">
+                <div className="flex items-center gap-1.5 overflow-x-auto pb-1 sm:pb-0">
                   {(["all", "completed", "pending", "refunded"] as const).map((filter) => (
                     <button
                       key={filter}
@@ -1679,9 +1980,9 @@ export function AdminConsoleClient({
                         setOrderFilter(filter)
                         setOrderPage(1)
                       }}
-                      className={`px-3 py-1 rounded-lg text-xs font-mono font-bold capitalize transition-colors cursor-pointer ${
+                      className={`px-3 py-1.5 rounded-lg text-xs font-bold capitalize transition-colors whitespace-nowrap cursor-pointer ${
                         orderFilter === filter
-                          ? "bg-[#ea580c] text-white"
+                          ? "bg-[#ea580c] text-white shadow-2xs"
                           : "bg-zinc-100 text-zinc-600 hover:bg-zinc-200"
                       }`}
                     >
@@ -1700,33 +2001,99 @@ export function AdminConsoleClient({
                       setOrderPage(1)
                     }}
                     placeholder="Search orders..."
-                    className="w-full h-9 pl-9 pr-3 rounded-xl border border-zinc-200 text-xs font-mono focus:outline-none focus:border-orange-500"
+                    className="w-full h-9 pl-9 pr-3 rounded-xl border border-zinc-200 text-xs bg-white focus:outline-none focus:border-orange-500"
                   />
                 </div>
               </div>
 
-              <div className="overflow-x-auto">
-                <table className="w-full text-left font-mono text-xs">
+              {/* MOBILE CARD VIEW (Visible on mobile only < md) */}
+              <div className="md:hidden space-y-2.5">
+                {paginatedOrders.map((o) => {
+                  const isPaid = o.status === "completed" || (o.status as any) === "paid"
+                  return (
+                    <div
+                      key={o.id}
+                      className="p-3.5 rounded-xl border border-zinc-200/90 bg-white space-y-2.5 shadow-2xs"
+                    >
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <span className="text-[11px] font-semibold text-zinc-400 uppercase tracking-wider block">Order ID</span>
+                          <span className="text-xs font-bold text-zinc-700">{o.id}</span>
+                        </div>
+                        <button
+                          onClick={() => {
+                            const nextStatus = o.status === "completed" ? "refunded" : "completed"
+                            handleUpdateOrderStatus(o.id, nextStatus)
+                          }}
+                          className={`px-2.5 py-1 rounded-md text-[10px] font-bold cursor-pointer transition-colors ${
+                            isPaid
+                              ? "bg-emerald-50 text-emerald-700 border border-emerald-200"
+                              : o.status === "pending"
+                              ? "bg-amber-50 text-amber-700 border border-amber-200"
+                              : "bg-red-50 text-red-700 border border-red-200"
+                          }`}
+                          title="Tap to toggle status"
+                        >
+                          {isPaid ? "Paid" : o.status}
+                        </button>
+                      </div>
+
+                      <div className="pt-2 border-t border-zinc-100 grid grid-cols-2 gap-2 text-xs">
+                        <div>
+                          <span className="text-zinc-400 text-[11px] block">Buyer</span>
+                          <span className="font-bold text-zinc-950 truncate block">{formatMemberName(o.userName)}</span>
+                        </div>
+                        <div>
+                          <span className="text-zinc-400 text-[11px] block">Amount</span>
+                          <span className="font-black text-zinc-950 block">₹{o.amountPaid.toLocaleString("en-IN")}</span>
+                        </div>
+                        <div>
+                          <span className="text-zinc-400 text-[11px] block">Tickets</span>
+                          <span className="font-bold text-zinc-900 block">{o.ticketCount} entries</span>
+                        </div>
+                        <div>
+                          <span className="text-zinc-400 text-[11px] block">Gateway</span>
+                          <span className="font-medium text-zinc-700 block">{o.paymentGateway || "UPI / Razorpay"}</span>
+                        </div>
+                      </div>
+
+                      <div className="pt-1 border-t border-zinc-100/60 flex items-center justify-between text-[11px] text-zinc-400">
+                        <span>Date & Time</span>
+                        <span>{o.createdAt.replace("T", " ").slice(5, 16)}</span>
+                      </div>
+                    </div>
+                  )
+                })}
+                {paginatedOrders.length === 0 && (
+                  <div className="py-8 text-center text-zinc-400 italic text-xs">
+                    No orders found matching your search.
+                  </div>
+                )}
+              </div>
+
+              {/* DESKTOP TABLE VIEW (Visible on md and above) */}
+              <div className="hidden md:block overflow-x-auto">
+                <table className="w-full min-w-[700px] text-left text-xs">
                   <thead>
-                    <tr className="border-b border-zinc-100 text-zinc-400 text-[10px] uppercase">
-                      <th className="pb-3 font-medium">Order</th>
-                      <th className="pb-3 font-medium">Member</th>
-                      <th className="pb-3 font-medium text-right">Tickets</th>
-                      <th className="pb-3 font-medium text-right">Amount</th>
-                      <th className="pb-3 font-medium">Method</th>
-                      <th className="pb-3 font-medium text-center">Status</th>
-                      <th className="pb-3 font-medium text-right">Time</th>
+                    <tr className="border-b border-zinc-100 text-zinc-400 text-[10px] uppercase font-bold tracking-wider">
+                      <th className="pb-3 font-semibold">Order</th>
+                      <th className="pb-3 font-semibold">Member</th>
+                      <th className="pb-3 font-semibold text-right">Tickets</th>
+                      <th className="pb-3 font-semibold text-right">Amount</th>
+                      <th className="pb-3 font-semibold">Method</th>
+                      <th className="pb-3 font-semibold text-center">Status</th>
+                      <th className="pb-3 font-semibold text-right">Time</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-zinc-50">
                     {paginatedOrders.map((o) => (
                       <tr key={o.id} className="hover:bg-zinc-50/50">
-                        <td className="py-3 text-zinc-400 text-[11px]">{o.id}</td>
-                        <td className="py-3 text-zinc-950 font-bold">{o.userName}</td>
-                        <td className="py-3 text-right font-black text-zinc-950">{o.ticketCount}</td>
-                        <td className="py-3 text-right font-bold">₹{o.amountPaid.toLocaleString("en-IN")}</td>
-                        <td className="py-3 text-zinc-500">{o.paymentGateway || "UPI"}</td>
-                        <td className="py-3 text-center">
+                        <td className="py-3.5 text-zinc-500 text-[11px]">{o.id}</td>
+                        <td className="py-3.5 text-zinc-950 font-bold">{formatMemberName(o.userName)}</td>
+                        <td className="py-3.5 text-right font-black text-zinc-950">{o.ticketCount}</td>
+                        <td className="py-3.5 text-right font-bold text-zinc-900">₹{o.amountPaid.toLocaleString("en-IN")}</td>
+                        <td className="py-3.5 text-zinc-600 font-medium">{o.paymentGateway || "UPI"}</td>
+                        <td className="py-3.5 text-center">
                           <button
                             onClick={() => {
                               const nextStatus = o.status === "completed" ? "refunded" : "completed"
@@ -1744,14 +2111,14 @@ export function AdminConsoleClient({
                             {o.status === "completed" ? "Paid" : o.status}
                           </button>
                         </td>
-                        <td className="py-3 text-right text-zinc-400 text-[11px]">
+                        <td className="py-3.5 text-right text-zinc-400 text-[11px]">
                           {o.createdAt.replace("T", " ").slice(5, 16)}
                         </td>
                       </tr>
                     ))}
                     {paginatedOrders.length === 0 && (
                       <tr>
-                        <td colSpan={7} className="py-8 text-center text-zinc-400 font-mono italic">
+                        <td colSpan={7} className="py-8 text-center text-zinc-400 italic">
                           No orders found matching your search.
                         </td>
                       </tr>
@@ -1775,51 +2142,51 @@ export function AdminConsoleClient({
 
         {/* TAB 5: REFERRAL PAYOUTS */}
         {activeTab === "referrals" && (
-          <main className="p-6 sm:p-8 lg:p-10 max-w-7xl w-full mx-auto space-y-6">
+          <main className="p-3.5 sm:p-6 lg:p-8 max-w-7xl w-full mx-auto space-y-5 sm:space-y-6">
             <div>
-              <h1 className="text-2xl sm:text-3xl font-black text-zinc-950 uppercase tracking-tight">
+              <h1 className="text-2xl sm:text-3xl lg:text-4xl font-black text-zinc-950 uppercase tracking-tight">
                 REFERRAL PAYOUTS
               </h1>
-              <p className="text-xs text-zinc-500 mt-0.5">
+              <p className="text-xs sm:text-sm text-zinc-500 mt-1">
                 Members earn 25% cash commission after buying 25 tickets. Process live payouts.
               </p>
             </div>
 
             {/* Top Stat Cards */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <div className="p-5 rounded-2xl bg-white border border-zinc-200/90 shadow-2xs">
-                <span className="text-zinc-400 text-xs font-mono font-medium block mb-1">Due Now</span>
-                <span className="text-3xl font-black font-mono text-[#ea580c] block">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4">
+              <div className="p-4 sm:p-5 rounded-2xl bg-white border border-zinc-200/90 shadow-2xs">
+                <span className="text-zinc-500 text-xs font-semibold block mb-1">Due Now</span>
+                <span className="text-2xl sm:text-3xl font-black text-[#ea580c] block">
                   ₹{payoutsData.stats.dueNow.toLocaleString("en-IN")}
                 </span>
-                <span className="text-[11px] text-zinc-400 font-mono">Awaiting settlement</span>
+                <span className="text-xs text-zinc-400 mt-1 block">Awaiting settlement</span>
               </div>
 
-              <div className="p-5 rounded-2xl bg-white border border-zinc-200/90 shadow-2xs">
-                <span className="text-zinc-400 text-xs font-mono font-medium block mb-1">Paid to Date</span>
-                <span className="text-3xl font-black font-mono text-emerald-600 block">
+              <div className="p-4 sm:p-5 rounded-2xl bg-white border border-zinc-200/90 shadow-2xs">
+                <span className="text-zinc-500 text-xs font-semibold block mb-1">Paid to Date</span>
+                <span className="text-2xl sm:text-3xl font-black text-emerald-600 block">
                   ₹{payoutsData.stats.paidToDate.toLocaleString("en-IN")}
                 </span>
-                <span className="text-[11px] text-zinc-400 font-mono">Completed transfers</span>
+                <span className="text-xs text-zinc-400 mt-1 block">Completed transfers</span>
               </div>
 
-              <div className="p-5 rounded-2xl bg-white border border-zinc-200/90 shadow-2xs">
-                <span className="text-zinc-400 text-xs font-mono font-medium block mb-1">On Hold</span>
-                <span className="text-3xl font-black font-mono text-zinc-950 block">
+              <div className="p-4 sm:p-5 rounded-2xl bg-white border border-zinc-200/90 shadow-2xs">
+                <span className="text-zinc-500 text-xs font-semibold block mb-1">On Hold</span>
+                <span className="text-2xl sm:text-3xl font-black text-zinc-950 block">
                   {payoutsData.stats.onHold}
                 </span>
-                <span className="text-[11px] text-zinc-400 font-mono">KYC / details needed</span>
+                <span className="text-xs text-zinc-400 mt-1 block">KYC / details needed</span>
               </div>
             </div>
 
             {/* Due Payouts Table */}
-            <div className="rounded-2xl bg-white border border-zinc-200/90 p-5 shadow-2xs space-y-4">
-              <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 border-b border-zinc-100 pb-3 font-mono">
+            <div className="rounded-2xl bg-white border border-zinc-200/90 p-4 sm:p-6 shadow-2xs space-y-4">
+              <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 border-b border-zinc-100 pb-3">
                 <div>
                   <h3 className="text-xs font-bold uppercase tracking-wider text-zinc-900">
                     Current Payout Batches
                   </h3>
-                  <span className="text-[11px] text-zinc-400">
+                  <span className="text-xs text-zinc-400">
                     {filteredCurrentPayouts.length} pending settlement
                   </span>
                 </div>
@@ -1834,53 +2201,108 @@ export function AdminConsoleClient({
                       setPayoutPage(1)
                     }}
                     placeholder="Search pending payouts..."
-                    className="w-full h-8 pl-9 pr-3 rounded-lg border border-zinc-200 text-xs font-mono bg-white focus:outline-none focus:ring-1 focus:ring-[#ea580c]"
+                    className="w-full h-9 pl-9 pr-3 rounded-xl border border-zinc-200 text-xs bg-white focus:outline-none focus:ring-1 focus:ring-[#ea580c]"
                   />
                 </div>
               </div>
 
-              <div className="overflow-x-auto">
-                <table className="w-full text-left font-mono text-xs">
+              {/* Mobile View: Clean Card List */}
+              <div className="md:hidden space-y-3">
+                {paginatedCurrentPayouts.map((p) => (
+                  <div key={p.id} className="p-4 rounded-xl border border-zinc-200 bg-zinc-50/50 space-y-3">
+                    <div className="flex items-center justify-between">
+                      <span className="text-xs font-bold text-zinc-600 bg-white px-2 py-0.5 rounded border border-zinc-200">
+                        {p.id}
+                      </span>
+                      <span className={`px-2 py-0.5 rounded text-[11px] font-bold ${
+                        p.status === "due" ? "bg-amber-50 text-amber-700 border border-amber-200" : "bg-zinc-100 text-zinc-700"
+                      }`}>
+                        {p.status.toUpperCase()}
+                      </span>
+                    </div>
+
+                    <div>
+                      <div className="font-bold text-zinc-950 text-sm">{formatMemberName(p.userName)}</div>
+                      <div className="text-xs text-zinc-500">{p.userEmail}</div>
+                    </div>
+
+                    <div className="flex items-center justify-between pt-1 border-t border-zinc-100 text-xs">
+                      <div>
+                        <span className="text-zinc-400 block text-[11px]">UPI / Bank:</span>
+                        <span className="font-medium text-zinc-700">{p.upiId || p.bankAccount || "rohan@okhdfcbank"}</span>
+                      </div>
+                      <div className="text-right">
+                        <span className="text-zinc-400 block text-[11px]">Commission:</span>
+                        <span className="font-black text-base text-[#ea580c]">₹{p.amount.toLocaleString("en-IN")}</span>
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-2 pt-1">
+                      <button
+                        onClick={() => handleProcessPayout(p.id, "paid")}
+                        className="py-2 px-3 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold transition-colors cursor-pointer text-center"
+                      >
+                        Mark Paid
+                      </button>
+                      <button
+                        onClick={() => handleProcessPayout(p.id, "hold")}
+                        className="py-2 px-3 rounded-xl border border-zinc-300 hover:bg-zinc-100 text-zinc-700 text-xs font-semibold transition-colors cursor-pointer text-center bg-white"
+                      >
+                        Hold
+                      </button>
+                    </div>
+                  </div>
+                ))}
+                {paginatedCurrentPayouts.length === 0 && (
+                  <div className="py-8 text-center text-zinc-400 text-xs italic">
+                    No pending payouts due right now.
+                  </div>
+                )}
+              </div>
+
+              {/* Desktop View: Full Analytical Table */}
+              <div className="hidden md:block overflow-x-auto">
+                <table className="w-full text-left text-xs min-w-[700px]">
                   <thead>
-                    <tr className="border-b border-zinc-100 text-zinc-400 text-[10px] uppercase">
-                      <th className="pb-3 font-medium">Payout ID</th>
-                      <th className="pb-3 font-medium">Member</th>
-                      <th className="pb-3 font-medium">UPI / Bank</th>
-                      <th className="pb-3 font-medium text-right">Commission Amount</th>
-                      <th className="pb-3 font-medium text-center">Status</th>
-                      <th className="pb-3 font-medium text-right">Action</th>
+                    <tr className="border-b border-zinc-100 text-zinc-400 text-[11px] uppercase font-semibold">
+                      <th className="pb-3 font-semibold">Payout ID</th>
+                      <th className="pb-3 font-semibold">Member</th>
+                      <th className="pb-3 font-semibold">UPI / Bank</th>
+                      <th className="pb-3 font-semibold text-right">Commission Amount</th>
+                      <th className="pb-3 font-semibold text-center">Status</th>
+                      <th className="pb-3 font-semibold text-right">Action</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-zinc-50">
                     {paginatedCurrentPayouts.map((p) => (
-                      <tr key={p.id}>
-                        <td className="py-3 text-zinc-400 text-[11px]">{p.id}</td>
-                        <td className="py-3">
-                          <span className="font-bold text-zinc-950 block">{p.userName}</span>
+                      <tr key={p.id} className="hover:bg-zinc-50/50">
+                        <td className="py-3.5 text-zinc-500 font-semibold">{p.id}</td>
+                        <td className="py-3.5">
+                          <span className="font-bold text-zinc-950 block">{formatMemberName(p.userName)}</span>
                           <span className="text-[11px] text-zinc-400 block">{p.userEmail}</span>
                         </td>
-                        <td className="py-3 text-zinc-600">{p.upiId || p.bankAccount || "rohan@okhdfcbank"}</td>
-                        <td className="py-3 text-right font-black text-orange-600">
+                        <td className="py-3.5 text-zinc-600">{p.upiId || p.bankAccount || "rohan@okhdfcbank"}</td>
+                        <td className="py-3.5 text-right font-black text-orange-600">
                           ₹{p.amount.toLocaleString("en-IN")}
                         </td>
-                        <td className="py-3 text-center">
-                          <span className={`px-2 py-0.5 rounded text-[10px] font-bold ${
-                            p.status === "due" ? "bg-amber-50 text-amber-700" : "bg-zinc-100 text-zinc-700"
+                        <td className="py-3.5 text-center">
+                          <span className={`px-2.5 py-0.5 rounded text-[11px] font-bold ${
+                            p.status === "due" ? "bg-amber-50 text-amber-700 border border-amber-200" : "bg-zinc-100 text-zinc-700"
                           }`}>
                             {p.status.toUpperCase()}
                           </span>
                         </td>
-                        <td className="py-3 text-right">
+                        <td className="py-3.5 text-right">
                           <div className="flex items-center justify-end gap-1.5">
                             <button
                               onClick={() => handleProcessPayout(p.id, "paid")}
-                              className="px-2.5 py-1 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white text-[11px] font-bold cursor-pointer"
+                              className="px-3 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold transition-colors cursor-pointer"
                             >
                               Mark Paid
                             </button>
                             <button
                               onClick={() => handleProcessPayout(p.id, "hold")}
-                              className="px-2.5 py-1 rounded-lg border border-zinc-200 hover:bg-zinc-100 text-zinc-700 text-[11px] cursor-pointer"
+                              className="px-3 py-1.5 rounded-lg border border-zinc-200 hover:bg-zinc-100 text-zinc-700 text-xs font-semibold transition-colors cursor-pointer"
                             >
                               Hold
                             </button>
@@ -1890,7 +2312,7 @@ export function AdminConsoleClient({
                     ))}
                     {paginatedCurrentPayouts.length === 0 && (
                       <tr>
-                        <td colSpan={6} className="py-6 text-center text-zinc-400 font-mono italic">
+                        <td colSpan={6} className="py-8 text-center text-zinc-400 italic">
                           No pending payouts due right now.
                         </td>
                       </tr>
@@ -1911,13 +2333,13 @@ export function AdminConsoleClient({
             </div>
 
             {/* Payout History Table */}
-            <div className="rounded-2xl bg-white border border-zinc-200/90 p-5 shadow-2xs space-y-4">
-              <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 border-b border-zinc-100 pb-3 font-mono">
+            <div className="rounded-2xl bg-white border border-zinc-200/90 p-4 sm:p-6 shadow-2xs space-y-4">
+              <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 border-b border-zinc-100 pb-3">
                 <div>
                   <h3 className="text-xs font-bold uppercase tracking-wider text-zinc-900">
                     Payout History
                   </h3>
-                  <span className="text-[11px] text-zinc-400">
+                  <span className="text-xs text-zinc-400">
                     {filteredPayoutHistory.length} completed
                   </span>
                 </div>
@@ -1932,43 +2354,72 @@ export function AdminConsoleClient({
                       setHistoryPage(1)
                     }}
                     placeholder="Search payout history..."
-                    className="w-full h-8 pl-9 pr-3 rounded-lg border border-zinc-200 text-xs font-mono bg-white focus:outline-none focus:ring-1 focus:ring-[#ea580c]"
+                    className="w-full h-9 pl-9 pr-3 rounded-xl border border-zinc-200 text-xs bg-white focus:outline-none focus:ring-1 focus:ring-[#ea580c]"
                   />
                 </div>
               </div>
 
-              <div className="overflow-x-auto">
-                <table className="w-full text-left font-mono text-xs">
+              {/* Mobile View: Clean Card List */}
+              <div className="md:hidden space-y-3">
+                {paginatedPayoutHistory.map((p) => (
+                  <div key={p.id} className="p-4 rounded-xl border border-zinc-200 bg-zinc-50/50 space-y-2">
+                    <div className="flex items-center justify-between">
+                      <span className="text-xs font-bold text-zinc-600 bg-white px-2 py-0.5 rounded border border-zinc-200">
+                        {p.id}
+                      </span>
+                      <span className="px-2.5 py-0.5 rounded text-[11px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
+                        PAID
+                      </span>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <div className="font-bold text-zinc-950 text-sm">{formatMemberName(p.userName)}</div>
+                      <div className="font-black text-emerald-600 text-base">₹{p.amount.toLocaleString("en-IN")}</div>
+                    </div>
+                    <div className="text-xs text-zinc-400 pt-1 border-t border-zinc-100">
+                      Settled: {p.paidAt ? p.paidAt.split("T")[0] : "2026-09-24"}
+                    </div>
+                  </div>
+                ))}
+                {paginatedPayoutHistory.length === 0 && (
+                  <div className="py-8 text-center text-zinc-400 text-xs italic">
+                    No historical payouts found.
+                  </div>
+                )}
+              </div>
+
+              {/* Desktop View: Full Analytical Table */}
+              <div className="hidden md:block overflow-x-auto">
+                <table className="w-full text-left text-xs min-w-[650px]">
                   <thead>
-                    <tr className="border-b border-zinc-100 text-zinc-400 text-[10px] uppercase">
-                      <th className="pb-3 font-medium">Payout ID</th>
-                      <th className="pb-3 font-medium">Member</th>
-                      <th className="pb-3 font-medium text-right">Amount</th>
-                      <th className="pb-3 font-medium text-center">Status</th>
-                      <th className="pb-3 font-medium text-right">Settled At</th>
+                    <tr className="border-b border-zinc-100 text-zinc-400 text-[11px] uppercase font-semibold">
+                      <th className="pb-3 font-semibold">Payout ID</th>
+                      <th className="pb-3 font-semibold">Member</th>
+                      <th className="pb-3 font-semibold text-right">Amount</th>
+                      <th className="pb-3 font-semibold text-center">Status</th>
+                      <th className="pb-3 font-semibold text-right">Settled At</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-zinc-50">
                     {paginatedPayoutHistory.map((p) => (
-                      <tr key={p.id}>
-                        <td className="py-3 text-zinc-400 text-[11px]">{p.id}</td>
-                        <td className="py-3 font-bold text-zinc-950">{p.userName}</td>
-                        <td className="py-3 text-right font-black text-emerald-600">
+                      <tr key={p.id} className="hover:bg-zinc-50/50">
+                        <td className="py-3.5 text-zinc-500 font-semibold">{p.id}</td>
+                        <td className="py-3.5 font-bold text-zinc-950">{formatMemberName(p.userName)}</td>
+                        <td className="py-3.5 text-right font-black text-emerald-600">
                           ₹{p.amount.toLocaleString("en-IN")}
                         </td>
-                        <td className="py-3 text-center">
-                          <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-50 text-emerald-700">
+                        <td className="py-3.5 text-center">
+                          <span className="px-2.5 py-0.5 rounded text-[11px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
                             PAID
                           </span>
                         </td>
-                        <td className="py-3 text-right text-zinc-400 text-[11px]">
+                        <td className="py-3.5 text-right text-zinc-500">
                           {p.paidAt ? p.paidAt.split("T")[0] : "2026-09-24"}
                         </td>
                       </tr>
                     ))}
                     {paginatedPayoutHistory.length === 0 && (
                       <tr>
-                        <td colSpan={5} className="py-6 text-center text-zinc-400 font-mono italic">
+                        <td colSpan={5} className="py-8 text-center text-zinc-400 italic">
                           No historical payouts found.
                         </td>
                       </tr>
@@ -1992,65 +2443,69 @@ export function AdminConsoleClient({
 
         {/* TAB 6: REDEMPTIONS (Matching Screenshot 1 exactly) */}
         {activeTab === "redemptions" && (
-          <main className="p-6 sm:p-8 lg:p-10 max-w-7xl w-full mx-auto space-y-6">
+          <main className="p-3.5 sm:p-6 lg:p-8 max-w-7xl w-full mx-auto space-y-5 sm:space-y-6">
             <div>
-              <h1 className="text-3xl sm:text-4xl font-black text-zinc-950 uppercase tracking-tight">
+              <h1 className="text-2xl sm:text-3xl lg:text-4xl font-black text-zinc-950 uppercase tracking-tight">
                 REDEMPTIONS
               </h1>
               <p className="text-xs sm:text-sm text-zinc-500 mt-1">
-                Drive-credit bookings at Turboride venues. Scheduling and completion actions are mock only.
+                Drive-credit bookings at Turboride venues. Manage bookings, schedule slots, and verify completions.
               </p>
             </div>
 
-            {/* 3 Top Stat Cards matching Screenshot 1 */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6">
+            {/* 3 Top Stat Cards */}
+            <div className="grid grid-cols-3 gap-2 sm:gap-4 sm:gap-6">
               {/* Card 1: Requested */}
-              <div className="rounded-2xl bg-white border border-zinc-200/90 p-5 shadow-xs flex flex-col justify-between">
-                <div className="flex items-center gap-2 text-zinc-500 text-xs font-semibold">
-                  <Ticket size={16} />
-                  <span>Requested</span>
+              <div className="rounded-2xl bg-white border border-zinc-200/90 p-3.5 sm:p-5 shadow-xs flex flex-col justify-between">
+                <div className="flex items-center gap-1.5 sm:gap-2 text-zinc-500 text-xs font-semibold">
+                  <Ticket size={16} className="text-[#ea580c] shrink-0" />
+                  <span className="truncate">Requested</span>
                 </div>
-                <div className="text-3xl font-black text-zinc-950 mt-3 mb-1">
+                <div className="text-2xl sm:text-3xl font-black text-zinc-950 mt-2 sm:mt-3 mb-1">
                   {requestedCount}
                 </div>
-                <div className="text-xs text-zinc-400">
-                  Awaiting scheduling
+                <div className="text-[11px] sm:text-xs text-zinc-400 truncate">
+                  Awaiting slot
                 </div>
               </div>
 
               {/* Card 2: Scheduled */}
-              <div className="rounded-2xl bg-white border border-zinc-200/90 p-5 shadow-xs flex flex-col justify-between">
-                <div className="flex items-center gap-2 text-zinc-500 text-xs font-semibold">
-                  <Calendar size={16} />
-                  <span>Scheduled</span>
+              <div className="rounded-2xl bg-white border border-zinc-200/90 p-3.5 sm:p-5 shadow-xs flex flex-col justify-between">
+                <div className="flex items-center gap-1.5 sm:gap-2 text-zinc-500 text-xs font-semibold">
+                  <Calendar size={16} className="text-blue-600 shrink-0" />
+                  <span className="truncate">Scheduled</span>
                 </div>
-                <div className="text-3xl font-black text-zinc-950 mt-3 mb-1">
+                <div className="text-2xl sm:text-3xl font-black text-zinc-950 mt-2 sm:mt-3 mb-1">
                   {scheduledCount}
                 </div>
-                <div className="text-xs text-zinc-400 min-h-[16px]"></div>
+                <div className="text-[11px] sm:text-xs text-zinc-400 truncate">
+                  Track booked
+                </div>
               </div>
 
               {/* Card 3: Fulfilled */}
-              <div className="rounded-2xl bg-white border border-zinc-200/90 p-5 shadow-xs flex flex-col justify-between">
-                <div className="flex items-center gap-2 text-zinc-500 text-xs font-semibold">
-                  <CheckCircle size={16} />
-                  <span>Fulfilled</span>
+              <div className="rounded-2xl bg-white border border-zinc-200/90 p-3.5 sm:p-5 shadow-xs flex flex-col justify-between">
+                <div className="flex items-center gap-1.5 sm:gap-2 text-zinc-500 text-xs font-semibold">
+                  <CheckCircle size={16} className="text-emerald-600 shrink-0" />
+                  <span className="truncate">Fulfilled</span>
                 </div>
-                <div className="text-3xl font-black text-zinc-950 mt-3 mb-1">
+                <div className="text-2xl sm:text-3xl font-black text-zinc-950 mt-2 sm:mt-3 mb-1">
                   {fulfilledCount}
                 </div>
-                <div className="text-xs text-zinc-400 min-h-[16px]"></div>
+                <div className="text-[11px] sm:text-xs text-zinc-400 truncate">
+                  Completed
+                </div>
               </div>
             </div>
 
-            {/* ALL REDEMPTIONS Table Card matching Screenshot 1 */}
-            <div className="rounded-2xl bg-white border border-zinc-200/90 p-5 sm:p-6 shadow-xs space-y-4">
-              <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
-                <div className="flex items-center gap-2">
+            {/* ALL REDEMPTIONS Table / Card View */}
+            <div className="rounded-2xl bg-white border border-zinc-200/90 p-4 sm:p-6 shadow-xs space-y-4">
+              <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 border-b border-zinc-100 pb-3">
+                <div className="flex items-center gap-2 flex-wrap">
                   <span className="font-black text-xs uppercase tracking-wider text-zinc-900">
                     ALL REDEMPTIONS
                   </span>
-                  <div className="flex items-center gap-1 pl-2">
+                  <div className="flex items-center gap-1 overflow-x-auto pb-0.5 sm:pb-0">
                     {(["All", "Requested", "Scheduled", "Fulfilled"] as const).map((tab) => (
                       <button
                         key={tab}
@@ -2058,9 +2513,9 @@ export function AdminConsoleClient({
                           setRedemptionFilter(tab)
                           setRedemptionPage(1)
                         }}
-                        className={`px-2.5 py-0.5 rounded text-[11px] font-bold transition-colors cursor-pointer ${
+                        className={`px-2.5 py-1 rounded-lg text-xs font-bold transition-colors cursor-pointer shrink-0 ${
                           redemptionFilter === tab
-                            ? "bg-[#ea580c] text-white"
+                            ? "bg-[#ea580c] text-white shadow-2xs"
                             : "bg-zinc-100 text-zinc-600 hover:bg-zinc-200"
                         }`}
                       >
@@ -2080,23 +2535,115 @@ export function AdminConsoleClient({
                       setRedemptionPage(1)
                     }}
                     placeholder="Search redemptions..."
-                    className="w-full h-8 pl-9 pr-3 rounded-lg border border-zinc-200 text-xs font-mono focus:outline-none focus:border-orange-500"
+                    className="w-full h-9 pl-9 pr-3 rounded-xl border border-zinc-200 text-xs bg-white focus:outline-none focus:ring-1 focus:ring-[#ea580c]"
                   />
                 </div>
               </div>
 
-              <div className="overflow-x-auto">
-                <table className="w-full text-left font-mono text-xs">
+              {/* Mobile View: Dedicated Un-crowded Cards */}
+              <div className="md:hidden space-y-3">
+                {paginatedRedemptions.map((r) => {
+                  const isScheduled = r.status.toLowerCase() === "scheduled"
+                  const isFulfilled = r.status.toLowerCase() === "fulfilled"
+                  const isRequested = r.status.toLowerCase() === "requested"
+
+                  return (
+                    <div
+                      key={r.id}
+                      className="p-4 rounded-2xl border border-zinc-200 bg-zinc-50/50 space-y-3"
+                    >
+                      {/* Top Bar: Reference ID & Status */}
+                      <div className="flex items-center justify-between">
+                        <span className="text-xs font-bold text-zinc-700 bg-white px-2.5 py-1 rounded-lg border border-zinc-200 shadow-2xs">
+                          {r.refCode}
+                        </span>
+                        <span
+                          className={`px-2.5 py-0.5 rounded-full text-xs font-bold border ${
+                            isScheduled
+                              ? "bg-blue-50 text-blue-700 border-blue-200"
+                              : isFulfilled
+                              ? "bg-emerald-50 text-emerald-700 border-emerald-200"
+                              : "bg-amber-50 text-amber-700 border-amber-200"
+                          }`}
+                        >
+                          {r.status}
+                        </span>
+                      </div>
+
+                      {/* Reward Title & Member */}
+                      <div>
+                        <h4 className="font-black text-zinc-950 text-base uppercase tracking-tight">
+                          {r.rewardTitle}
+                        </h4>
+                        <div className="flex items-center gap-1.5 text-xs text-zinc-600 mt-1">
+                          <span className="font-semibold text-zinc-800">{formatMemberName(r.userName)}</span>
+                          <span className="text-zinc-300">•</span>
+                          <span className="font-bold text-[#ea580c]">{r.creditsSpent.toLocaleString("en-IN")} Credits</span>
+                        </div>
+                      </div>
+
+                      {/* Venue & Slot Details Box */}
+                      <div className="grid grid-cols-2 gap-2 text-xs bg-white p-3 rounded-xl border border-zinc-200/80 shadow-2xs">
+                        <div>
+                          <span className="text-zinc-400 text-[11px] block font-medium">Venue</span>
+                          <span className="font-semibold text-zinc-800 line-clamp-1">{r.venue || "Turboride Bengaluru"}</span>
+                        </div>
+                        <div>
+                          <span className="text-zinc-400 text-[11px] block font-medium">Track Slot</span>
+                          <span className={`font-semibold ${r.slot ? "text-blue-700" : "text-zinc-400 italic"}`}>
+                            {r.slot || "Unscheduled"}
+                          </span>
+                        </div>
+                      </div>
+
+                      {/* Action Button */}
+                      {isRequested && (
+                        <button
+                          onClick={() => handleOpenScheduleModal(r)}
+                          className="w-full py-2.5 px-3 rounded-xl bg-[#ea580c] hover:bg-[#c2410c] text-white text-xs font-bold transition-colors cursor-pointer text-center shadow-xs flex items-center justify-center gap-1.5"
+                        >
+                          <Calendar size={14} weight="bold" />
+                          <span>Schedule Track Slot</span>
+                        </button>
+                      )}
+                      {isScheduled && (
+                        <button
+                          onClick={() => handleMarkDone(r.id)}
+                          className="w-full py-2.5 px-3 rounded-xl border border-zinc-300 hover:bg-zinc-100 text-zinc-800 text-xs font-semibold transition-colors cursor-pointer text-center bg-white shadow-2xs flex items-center justify-center gap-1.5"
+                        >
+                          <CheckCircle size={14} weight="bold" className="text-emerald-600" />
+                          <span>Mark as Completed</span>
+                        </button>
+                      )}
+                      {isFulfilled && (
+                        <div className="text-center py-1 text-xs text-emerald-600 font-semibold flex items-center justify-center gap-1">
+                          <CheckCircle size={14} weight="bold" />
+                          <span>Experience Fulfilled</span>
+                        </div>
+                      )}
+                    </div>
+                  )
+                })}
+                {paginatedRedemptions.length === 0 && (
+                  <div className="py-8 text-center text-zinc-400 text-xs italic">
+                    No redemptions found.
+                  </div>
+                )}
+              </div>
+
+              {/* Desktop View: Full Analytical Table */}
+              <div className="hidden md:block overflow-x-auto">
+                <table className="w-full text-left text-xs min-w-[850px]">
                   <thead>
-                    <tr className="border-b border-zinc-100 text-zinc-400 text-[10px] uppercase">
-                      <th className="pb-3 font-medium">REF</th>
-                      <th className="pb-3 font-medium">MEMBER</th>
-                      <th className="pb-3 font-medium">REWARD</th>
-                      <th className="pb-3 font-medium text-right">CREDITS</th>
-                      <th className="pb-3 font-medium">VENUE</th>
-                      <th className="pb-3 font-medium">SLOT</th>
-                      <th className="pb-3 font-medium text-center">STATUS</th>
-                      <th className="pb-3 font-medium text-right"></th>
+                    <tr className="border-b border-zinc-100 text-zinc-400 text-[11px] uppercase font-semibold">
+                      <th className="pb-3 font-semibold">REF</th>
+                      <th className="pb-3 font-semibold">MEMBER</th>
+                      <th className="pb-3 font-semibold">REWARD</th>
+                      <th className="pb-3 font-semibold text-right">CREDITS</th>
+                      <th className="pb-3 font-semibold">VENUE</th>
+                      <th className="pb-3 font-semibold">SLOT</th>
+                      <th className="pb-3 font-semibold text-center">STATUS</th>
+                      <th className="pb-3 font-semibold text-right">ACTION</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-zinc-50">
@@ -2107,9 +2654,9 @@ export function AdminConsoleClient({
 
                       return (
                         <tr key={r.id} className="hover:bg-zinc-50/50">
-                          <td className="py-3.5 text-zinc-600 font-bold text-xs">{r.refCode}</td>
-                          <td className="py-3.5 font-bold text-zinc-950">{r.userName}</td>
-                          <td className="py-3.5 text-zinc-800">{r.rewardTitle}</td>
+                          <td className="py-3.5 text-zinc-700 font-bold text-xs">{r.refCode}</td>
+                          <td className="py-3.5 font-bold text-zinc-950">{formatMemberName(r.userName)}</td>
+                          <td className="py-3.5 text-zinc-800 font-medium">{r.rewardTitle}</td>
                           <td className="py-3.5 text-right font-black text-zinc-900">
                             {r.creditsSpent.toLocaleString("en-IN")}
                           </td>
@@ -2132,7 +2679,7 @@ export function AdminConsoleClient({
                             {isScheduled && (
                               <button
                                 onClick={() => handleMarkDone(r.id)}
-                                className="px-3 py-1 rounded-lg border border-zinc-200 hover:bg-zinc-100 text-xs font-semibold text-zinc-800 transition-colors cursor-pointer"
+                                className="px-3 py-1.5 rounded-lg border border-zinc-200 hover:bg-zinc-100 text-xs font-semibold text-zinc-800 transition-colors cursor-pointer"
                               >
                                 Mark done
                               </button>
@@ -2140,19 +2687,19 @@ export function AdminConsoleClient({
                             {isRequested && (
                               <button
                                 onClick={() => handleOpenScheduleModal(r)}
-                                className="px-3 py-1 rounded-lg bg-[#ea580c] hover:bg-[#c2410c] text-white text-xs font-bold transition-colors cursor-pointer"
+                                className="px-3 py-1.5 rounded-lg bg-[#ea580c] hover:bg-[#c2410c] text-white text-xs font-bold transition-colors cursor-pointer"
                               >
                                 Schedule
                               </button>
                             )}
-                            {isFulfilled && <span className="text-zinc-400">—</span>}
+                            {isFulfilled && <span className="text-zinc-400 text-xs">—</span>}
                           </td>
                         </tr>
                       )
                     })}
                     {paginatedRedemptions.length === 0 && (
                       <tr>
-                        <td colSpan={8} className="py-8 text-center text-zinc-400 font-mono italic">
+                        <td colSpan={8} className="py-8 text-center text-zinc-400 italic">
                           No redemptions found.
                         </td>
                       </tr>
@@ -2174,12 +2721,12 @@ export function AdminConsoleClient({
           </main>
         )}
 
-        {/* TAB 7: SETTINGS (Matching Screenshot 2 exactly) */}
+        {/* TAB 7: SETTINGS */}
         {activeTab === "settings" && (
-          <main className="p-6 sm:p-8 lg:p-10 max-w-7xl w-full mx-auto space-y-6">
+          <main className="p-3.5 sm:p-6 lg:p-8 max-w-7xl w-full mx-auto space-y-5 sm:space-y-6">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
               <div>
-                <h1 className="text-3xl sm:text-4xl font-black text-zinc-950 uppercase tracking-tight">
+                <h1 className="text-2xl sm:text-3xl lg:text-4xl font-black text-zinc-950 uppercase tracking-tight">
                   SETTINGS
                 </h1>
                 <p className="text-xs sm:text-sm text-zinc-500 mt-1">
@@ -2191,11 +2738,11 @@ export function AdminConsoleClient({
                 type="button"
                 onClick={handleSaveSettings}
                 disabled={isSavingSettings}
-                className="px-5 py-2.5 rounded-xl bg-[#ea580c] hover:bg-[#c2410c] text-white font-bold text-xs uppercase tracking-wider transition-colors shadow-xs cursor-pointer self-start sm:self-auto disabled:opacity-50 flex items-center gap-2"
+                className="w-full sm:w-auto h-11 px-5 rounded-xl bg-[#ea580c] hover:bg-[#c2410c] text-white font-bold text-xs uppercase tracking-wider transition-colors shadow-xs cursor-pointer flex items-center justify-center gap-2 disabled:opacity-50"
               >
                 {isSavingSettings ? (
                   <>
-                    <ArrowsClockwise size={14} className="animate-spin" />
+                    <ArrowsClockwise size={15} className="animate-spin" />
                     <span>Saving...</span>
                   </>
                 ) : (
@@ -2204,28 +2751,28 @@ export function AdminConsoleClient({
               </button>
             </div>
 
-            {/* 4 Cards in 2x2 Grid matching Screenshot 2 */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {/* 4 Cards in 2x2 Grid */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
               
               {/* CARD 1: PRICING & CREDITS */}
-              <div className="rounded-2xl bg-white border border-zinc-200/90 p-6 shadow-xs flex flex-col justify-between">
+              <div className="rounded-2xl bg-white border border-zinc-200/90 p-4 sm:p-6 shadow-xs flex flex-col justify-between">
                 <div>
                   <h3 className="font-black text-xs uppercase tracking-wider text-zinc-900 mb-4">
                     PRICING & CREDITS
                   </h3>
 
-                  <div className="grid grid-cols-2 gap-4">
+                  <div className="grid grid-cols-2 gap-3 sm:gap-4">
                     <div>
                       <label className="block text-xs font-semibold text-zinc-700 mb-1.5">
                         Ticket price
                       </label>
-                      <div className="flex items-center bg-[#f4f4f5]/80 rounded-xl px-3.5 py-2.5">
-                        <span className="text-zinc-500 text-xs font-mono mr-2">₹</span>
+                      <div className="flex items-center bg-zinc-100 rounded-xl px-3.5 py-2.5">
+                        <span className="text-zinc-500 text-xs font-bold mr-2">₹</span>
                         <input
                           type="number"
                           value={settings.ticketPrice}
                           onChange={(e) => setSettings({ ...settings, ticketPrice: Number(e.target.value) })}
-                          className="w-full bg-transparent text-xs font-mono text-zinc-900 focus:outline-none"
+                          className="w-full bg-transparent text-xs sm:text-sm font-bold text-zinc-900 focus:outline-none"
                         />
                       </div>
                       <span className="block text-[11px] text-zinc-400 mt-1">Per ticket</span>
@@ -2235,14 +2782,14 @@ export function AdminConsoleClient({
                       <label className="block text-xs font-semibold text-zinc-700 mb-1.5">
                         Credits per ticket
                       </label>
-                      <div className="flex items-center justify-between bg-[#f4f4f5]/80 rounded-xl px-3.5 py-2.5">
+                      <div className="flex items-center justify-between bg-zinc-100 rounded-xl px-3.5 py-2.5">
                         <input
                           type="number"
                           value={settings.creditsPerTicket}
                           onChange={(e) => setSettings({ ...settings, creditsPerTicket: Number(e.target.value) })}
-                          className="w-full bg-transparent text-xs font-mono text-zinc-900 focus:outline-none"
+                          className="w-full bg-transparent text-xs sm:text-sm font-bold text-zinc-900 focus:outline-none"
                         />
-                        <span className="text-zinc-500 text-xs font-mono ml-2">cr</span>
+                        <span className="text-zinc-500 text-xs font-bold ml-2">cr</span>
                       </div>
                     </div>
                   </div>
@@ -2250,25 +2797,25 @@ export function AdminConsoleClient({
               </div>
 
               {/* CARD 2: REFERRAL ECONOMICS */}
-              <div className="rounded-2xl bg-white border border-zinc-200/90 p-6 shadow-xs flex flex-col justify-between">
+              <div className="rounded-2xl bg-white border border-zinc-200/90 p-4 sm:p-6 shadow-xs flex flex-col justify-between">
                 <div>
                   <h3 className="font-black text-xs uppercase tracking-wider text-zinc-900 mb-4">
                     REFERRAL ECONOMICS
                   </h3>
 
-                  <div className="grid grid-cols-2 gap-4 mb-4">
+                  <div className="grid grid-cols-2 gap-3 sm:gap-4 mb-4">
                     <div>
                       <label className="block text-xs font-semibold text-zinc-700 mb-1.5">
                         Drive-credit reward
                       </label>
-                      <div className="flex items-center justify-between bg-[#f4f4f5]/80 rounded-xl px-3.5 py-2.5">
+                      <div className="flex items-center justify-between bg-zinc-100 rounded-xl px-3.5 py-2.5">
                         <input
                           type="number"
                           value={settings.creditRewardPercent}
                           onChange={(e) => setSettings({ ...settings, creditRewardPercent: Number(e.target.value) })}
-                          className="w-full bg-transparent text-xs font-mono text-zinc-900 focus:outline-none"
+                          className="w-full bg-transparent text-xs sm:text-sm font-bold text-zinc-900 focus:outline-none"
                         />
-                        <span className="text-zinc-500 text-xs font-mono ml-2">%</span>
+                        <span className="text-zinc-500 text-xs font-bold ml-2">%</span>
                       </div>
                       <span className="block text-[11px] text-zinc-400 mt-1">Of referred buyer's credits</span>
                     </div>
@@ -2277,14 +2824,14 @@ export function AdminConsoleClient({
                       <label className="block text-xs font-semibold text-zinc-700 mb-1.5">
                         Cash commission
                       </label>
-                      <div className="flex items-center justify-between bg-[#f4f4f5]/80 rounded-xl px-3.5 py-2.5">
+                      <div className="flex items-center justify-between bg-zinc-100 rounded-xl px-3.5 py-2.5">
                         <input
                           type="number"
                           value={settings.cashCommissionPercent}
                           onChange={(e) => setSettings({ ...settings, cashCommissionPercent: Number(e.target.value) })}
-                          className="w-full bg-transparent text-xs font-mono text-zinc-900 focus:outline-none"
+                          className="w-full bg-transparent text-xs sm:text-sm font-bold text-zinc-900 focus:outline-none"
                         />
-                        <span className="text-zinc-500 text-xs font-mono ml-2">%</span>
+                        <span className="text-zinc-500 text-xs font-bold ml-2">%</span>
                       </div>
                       <span className="block text-[11px] text-zinc-400 mt-1">Of referred buyer's spend</span>
                     </div>
@@ -2294,14 +2841,14 @@ export function AdminConsoleClient({
                     <label className="block text-xs font-semibold text-zinc-700 mb-1.5">
                       Cash unlock threshold
                     </label>
-                    <div className="flex items-center justify-between bg-[#f4f4f5]/80 rounded-xl px-3.5 py-2.5">
+                    <div className="flex items-center justify-between bg-zinc-100 rounded-xl px-3.5 py-2.5">
                       <input
                         type="number"
                         value={settings.cashUnlockThreshold}
                         onChange={(e) => setSettings({ ...settings, cashUnlockThreshold: Number(e.target.value) })}
-                        className="w-full bg-transparent text-xs font-mono text-zinc-900 focus:outline-none"
+                        className="w-full bg-transparent text-xs sm:text-sm font-bold text-zinc-900 focus:outline-none"
                       />
-                      <span className="text-zinc-500 text-xs font-mono ml-2">tickets</span>
+                      <span className="text-zinc-500 text-xs font-bold ml-2">tickets</span>
                     </div>
                     <span className="block text-[11px] text-zinc-400 mt-1">Buy to unlock cash commission</span>
                   </div>
@@ -2309,25 +2856,25 @@ export function AdminConsoleClient({
               </div>
 
               {/* CARD 3: CONTEST RULES */}
-              <div className="rounded-2xl bg-white border border-zinc-200/90 p-6 shadow-xs flex flex-col justify-between">
+              <div className="rounded-2xl bg-white border border-zinc-200/90 p-4 sm:p-6 shadow-xs flex flex-col justify-between">
                 <div>
                   <h3 className="font-black text-xs uppercase tracking-wider text-zinc-900 mb-4">
                     CONTEST RULES
                   </h3>
 
-                  <div className="grid grid-cols-2 gap-4">
+                  <div className="grid grid-cols-2 gap-3 sm:gap-4">
                     <div>
                       <label className="block text-xs font-semibold text-zinc-700 mb-1.5">
                         Fallback payout
                       </label>
-                      <div className="flex items-center justify-between bg-[#f4f4f5]/80 rounded-xl px-3.5 py-2.5">
+                      <div className="flex items-center justify-between bg-zinc-100 rounded-xl px-3.5 py-2.5">
                         <input
                           type="number"
                           value={settings.fallbackPayoutPercent}
                           onChange={(e) => setSettings({ ...settings, fallbackPayoutPercent: Number(e.target.value) })}
-                          className="w-full bg-transparent text-xs font-mono text-zinc-900 focus:outline-none"
+                          className="w-full bg-transparent text-xs sm:text-sm font-bold text-zinc-900 focus:outline-none"
                         />
-                        <span className="text-zinc-500 text-xs font-mono ml-2">%</span>
+                        <span className="text-zinc-500 text-xs font-bold ml-2">%</span>
                       </div>
                       <span className="block text-[11px] text-zinc-400 mt-1">Of collected amount if not sold out</span>
                     </div>
@@ -2336,12 +2883,12 @@ export function AdminConsoleClient({
                       <label className="block text-xs font-semibold text-zinc-700 mb-1.5">
                         Draw type
                       </label>
-                      <div className="flex items-center bg-[#f4f4f5]/80 rounded-xl px-3.5 py-2.5">
+                      <div className="flex items-center bg-zinc-100 rounded-xl px-3.5 py-2.5">
                         <input
                           type="text"
                           value={settings.drawType}
                           onChange={(e) => setSettings({ ...settings, drawType: e.target.value })}
-                          className="w-full bg-transparent text-xs font-mono text-zinc-900 focus:outline-none"
+                          className="w-full bg-transparent text-xs sm:text-sm font-bold text-zinc-900 focus:outline-none"
                         />
                       </div>
                     </div>
@@ -2350,7 +2897,7 @@ export function AdminConsoleClient({
               </div>
 
               {/* CARD 4: DANGER ZONE */}
-              <div className="rounded-2xl bg-white border border-zinc-200/90 p-6 shadow-xs flex flex-col justify-between">
+              <div className="rounded-2xl bg-white border border-zinc-200/90 p-4 sm:p-6 shadow-xs flex flex-col justify-between">
                 <div>
                   <h3 className="font-black text-xs uppercase tracking-wider text-zinc-900 mb-4">
                     DANGER ZONE
@@ -2368,9 +2915,9 @@ export function AdminConsoleClient({
                           setSettings({ ...settings, isPaused: !settings.isPaused })
                           showToast(!settings.isPaused ? "Ticket sales paused (Demo preview)." : "Ticket sales resumed.")
                         }}
-                        className={`rounded-lg border px-3 py-1.5 text-xs font-bold cursor-pointer transition-colors ${
+                        className={`rounded-xl border px-3.5 py-2 text-xs font-bold cursor-pointer transition-colors ${
                           settings.isPaused
-                            ? "bg-amber-500 text-white border-amber-600"
+                            ? "bg-amber-500 text-white border-amber-600 shadow-2xs"
                             : "border-zinc-200 text-zinc-700 hover:bg-zinc-100"
                         }`}
                       >
@@ -2389,9 +2936,9 @@ export function AdminConsoleClient({
                           setSettings({ ...settings, isClosed: !settings.isClosed })
                           showToast(!settings.isClosed ? "Contest locked (Demo preview)." : "Contest reopened.")
                         }}
-                        className={`rounded-lg border px-3 py-1.5 text-xs font-bold cursor-pointer transition-colors ${
+                        className={`rounded-xl border px-3.5 py-2 text-xs font-bold cursor-pointer transition-colors ${
                           settings.isClosed
-                            ? "bg-red-600 text-white border-red-700"
+                            ? "bg-red-600 text-white border-red-700 shadow-2xs"
                             : "border-red-200 text-red-600 hover:bg-red-50"
                         }`}
                       >
@@ -2410,18 +2957,18 @@ export function AdminConsoleClient({
 
       {/* SCHEDULING MODAL FOR REDEMPTIONS */}
       {schedulingItem && (
-        <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl border border-zinc-200 space-y-4 font-mono text-xs animate-in fade-in zoom-in-95">
+        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-3.5 sm:p-4 overflow-y-auto">
+          <div className="bg-white rounded-3xl max-w-md w-full p-5 sm:p-6 shadow-2xl border border-zinc-200 space-y-4 text-xs animate-in fade-in zoom-in-95 my-auto max-h-[90vh] overflow-y-auto">
             <div className="flex items-center justify-between border-b border-zinc-100 pb-3">
               <div>
                 <h3 className="font-black text-sm text-zinc-950 uppercase">
                   Schedule Redemption
                 </h3>
-                <span className="text-[11px] text-zinc-400">{schedulingItem.refCode} · {schedulingItem.userName}</span>
+                <span className="text-[11px] text-zinc-400 font-medium">{schedulingItem.refCode} · {formatMemberName(schedulingItem.userName)}</span>
               </div>
               <button
                 onClick={() => setSchedulingItem(null)}
-                className="p-1 text-zinc-400 hover:text-zinc-900 cursor-pointer"
+                className="p-1.5 rounded-lg text-zinc-400 hover:text-zinc-900 cursor-pointer"
               >
                 <X size={18} />
               </button>
@@ -2447,7 +2994,7 @@ export function AdminConsoleClient({
                   value={scheduleSlot}
                   onChange={(e) => setScheduleSlot(e.target.value)}
                   placeholder="e.g. 24 Sep, 14:00"
-                  className="w-full h-10 px-3 rounded-xl border border-zinc-300 font-mono text-xs focus:outline-none focus:border-orange-500"
+                  className="w-full h-10 px-3.5 rounded-xl border border-zinc-300 text-xs focus:outline-none focus:ring-2 focus:ring-[#ea580c]"
                 />
               </div>
 
@@ -2457,9 +3004,9 @@ export function AdminConsoleClient({
                     key={preset}
                     type="button"
                     onClick={() => setScheduleSlot(preset)}
-                    className={`px-2.5 py-1 rounded-lg text-[10px] font-bold border cursor-pointer transition-colors ${
+                    className={`px-3 py-1.5 rounded-xl text-[11px] font-bold border cursor-pointer transition-colors ${
                       scheduleSlot === preset
-                        ? "bg-[#ea580c] text-white border-[#ea580c]"
+                        ? "bg-[#ea580c] text-white border-[#ea580c] shadow-2xs"
                         : "bg-zinc-50 text-zinc-700 border-zinc-200 hover:bg-zinc-100"
                     }`}
                   >
@@ -2473,7 +3020,7 @@ export function AdminConsoleClient({
               <button
                 type="button"
                 onClick={() => setSchedulingItem(null)}
-                className="px-4 py-2 rounded-xl border border-zinc-200 text-xs font-mono text-zinc-700 hover:bg-zinc-50 cursor-pointer"
+                className="px-4 py-2.5 rounded-xl border border-zinc-200 text-xs font-semibold text-zinc-700 hover:bg-zinc-50 cursor-pointer"
               >
                 Cancel
               </button>
@@ -2481,7 +3028,7 @@ export function AdminConsoleClient({
                 type="button"
                 onClick={handleConfirmSchedule}
                 disabled={actionLoading}
-                className="px-4 py-2 rounded-xl bg-[#ea580c] hover:bg-[#c2410c] text-white text-xs font-mono font-bold cursor-pointer transition-colors"
+                className="px-4 py-2.5 rounded-xl bg-[#ea580c] hover:bg-[#c2410c] text-white text-xs font-bold cursor-pointer transition-colors shadow-2xs"
               >
                 {actionLoading ? "Scheduling..." : "Confirm & Schedule"}
               </button>
@@ -2492,10 +3039,10 @@ export function AdminConsoleClient({
 
       {/* EDIT CONTEST MODAL */}
       {editingContest && (
-        <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="bg-white rounded-3xl max-w-lg w-full p-6 sm:p-8 shadow-2xl border border-zinc-200 space-y-5 animate-in fade-in zoom-in-95">
+        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-3.5 sm:p-4 overflow-y-auto">
+          <div className="bg-white rounded-3xl max-w-lg w-full p-5 sm:p-8 shadow-2xl border border-zinc-200 space-y-5 animate-in fade-in zoom-in-95 my-auto max-h-[90vh] overflow-y-auto">
             <div className="flex items-center justify-between border-b border-zinc-100 pb-3">
-              <h3 className="text-lg font-black uppercase text-zinc-950 font-mono">
+              <h3 className="text-base sm:text-lg font-black uppercase text-zinc-950">
                 Edit Contest: {editingContest.carName}
               </h3>
               <button
@@ -2508,40 +3055,40 @@ export function AdminConsoleClient({
 
             <form onSubmit={handleSaveContest} className="space-y-4">
               <div>
-                <label className="block text-[11px] font-mono font-bold text-zinc-600 mb-1">
+                <label className="block text-xs font-bold text-zinc-700 mb-1">
                   Car Name (Title)
                 </label>
                 <input
                   type="text"
                   value={editingContest.carName}
                   onChange={(e) => setEditingContest({ ...editingContest, carName: e.target.value })}
-                  className="w-full h-10 px-3 rounded-xl border border-zinc-300 font-mono text-xs"
+                  className="w-full h-10 px-3.5 rounded-xl border border-zinc-300 text-xs focus:outline-none focus:ring-2 focus:ring-[#ea580c]"
                   required
                 />
               </div>
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-[11px] font-mono font-bold text-zinc-600 mb-1">
+                  <label className="block text-xs font-bold text-zinc-700 mb-1">
                     Worth Display Text
                   </label>
                   <input
                     type="text"
                     value={editingContest.worthDisplay}
                     onChange={(e) => setEditingContest({ ...editingContest, worthDisplay: e.target.value })}
-                    className="w-full h-10 px-3 rounded-xl border border-zinc-300 font-mono text-xs"
+                    className="w-full h-10 px-3.5 rounded-xl border border-zinc-300 text-xs focus:outline-none focus:ring-2 focus:ring-[#ea580c]"
                     required
                   />
                 </div>
                 <div>
-                  <label className="block text-[11px] font-mono font-bold text-zinc-600 mb-1">
+                  <label className="block text-xs font-bold text-zinc-700 mb-1">
                     Ticket Price (₹)
                   </label>
                   <input
                     type="number"
                     value={editingContest.ticketPrice}
                     onChange={(e) => setEditingContest({ ...editingContest, ticketPrice: Number(e.target.value) })}
-                    className="w-full h-10 px-3 rounded-xl border border-zinc-300 font-mono text-xs"
+                    className="w-full h-10 px-3.5 rounded-xl border border-zinc-300 text-xs focus:outline-none focus:ring-2 focus:ring-[#ea580c]"
                     required
                   />
                 </div>
@@ -2549,26 +3096,26 @@ export function AdminConsoleClient({
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-[11px] font-mono font-bold text-zinc-600 mb-1">
+                  <label className="block text-xs font-bold text-zinc-700 mb-1">
                     Sold Tickets Count
                   </label>
                   <input
                     type="number"
                     value={editingContest.soldTickets}
                     onChange={(e) => setEditingContest({ ...editingContest, soldTickets: Number(e.target.value) })}
-                    className="w-full h-10 px-3 rounded-xl border border-zinc-300 font-mono text-xs"
+                    className="w-full h-10 px-3.5 rounded-xl border border-zinc-300 text-xs focus:outline-none focus:ring-2 focus:ring-[#ea580c]"
                     required
                   />
                 </div>
                 <div>
-                  <label className="block text-[11px] font-mono font-bold text-zinc-600 mb-1">
+                  <label className="block text-xs font-bold text-zinc-700 mb-1">
                     Target Tickets (Total Pool)
                   </label>
                   <input
                     type="number"
                     value={editingContest.targetTickets}
                     onChange={(e) => setEditingContest({ ...editingContest, targetTickets: Number(e.target.value) })}
-                    className="w-full h-10 px-3 rounded-xl border border-zinc-300 font-mono text-xs"
+                    className="w-full h-10 px-3.5 rounded-xl border border-zinc-300 text-xs focus:outline-none focus:ring-2 focus:ring-[#ea580c]"
                     required
                   />
                 </div>
@@ -2576,13 +3123,13 @@ export function AdminConsoleClient({
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-[11px] font-mono font-bold text-zinc-600 mb-1">
+                  <label className="block text-xs font-bold text-zinc-700 mb-1">
                     Status
                   </label>
                   <select
                     value={editingContest.status}
                     onChange={(e) => setEditingContest({ ...editingContest, status: e.target.value as any })}
-                    className="w-full h-10 px-3 rounded-xl border border-zinc-300 font-mono text-xs bg-white"
+                    className="w-full h-10 px-3.5 rounded-xl border border-zinc-300 text-xs bg-white font-medium focus:outline-none focus:ring-2 focus:ring-[#ea580c]"
                   >
                     <option value="active">Active (Live On Site)</option>
                     <option value="upcoming">Scheduled (Upcoming)</option>
@@ -2590,7 +3137,7 @@ export function AdminConsoleClient({
                   </select>
                 </div>
                 <div>
-                  <label className="block text-[11px] font-mono font-bold text-zinc-600 mb-1">
+                  <label className="block text-xs font-bold text-zinc-700 mb-1">
                     Draw Date (Text / ISO)
                   </label>
                   <input
@@ -2598,7 +3145,7 @@ export function AdminConsoleClient({
                     value={editingContest.drawDate || ""}
                     onChange={(e) => setEditingContest({ ...editingContest, drawDate: e.target.value })}
                     placeholder="30 Sep 2026"
-                    className="w-full h-10 px-3 rounded-xl border border-zinc-300 font-mono text-xs"
+                    className="w-full h-10 px-3.5 rounded-xl border border-zinc-300 text-xs focus:outline-none focus:ring-2 focus:ring-[#ea580c]"
                   />
                 </div>
               </div>
@@ -2607,14 +3154,14 @@ export function AdminConsoleClient({
                 <button
                   type="button"
                   onClick={() => setEditingContest(null)}
-                  className="px-4 py-2 rounded-xl border border-zinc-200 text-xs font-mono text-zinc-700 hover:bg-zinc-50 cursor-pointer"
+                  className="px-4 py-2.5 rounded-xl border border-zinc-200 text-xs font-semibold text-zinc-700 hover:bg-zinc-50 cursor-pointer"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
                   disabled={actionLoading}
-                  className="px-5 py-2 rounded-xl bg-[#ea580c] hover:bg-[#c2410c] text-white text-xs font-mono font-bold cursor-pointer transition-colors shadow-xs"
+                  className="px-5 py-2.5 rounded-xl bg-[#ea580c] hover:bg-[#c2410c] text-white text-xs font-bold cursor-pointer transition-colors shadow-2xs"
                 >
                   {actionLoading ? "Saving..." : "Save Changes"}
                 </button>
@@ -2626,10 +3173,10 @@ export function AdminConsoleClient({
 
       {/* NEW CONTEST MODAL */}
       {isNewContestOpen && (
-        <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="bg-white rounded-3xl max-w-lg w-full p-6 sm:p-8 shadow-2xl border border-zinc-200 space-y-5 animate-in fade-in zoom-in-95">
+        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-3.5 sm:p-4 overflow-y-auto">
+          <div className="bg-white rounded-3xl max-w-lg w-full p-5 sm:p-8 shadow-2xl border border-zinc-200 space-y-5 animate-in fade-in zoom-in-95 my-auto max-h-[90vh] overflow-y-auto">
             <div className="flex items-center justify-between border-b border-zinc-100 pb-3">
-              <h3 className="text-lg font-black uppercase text-zinc-950 font-mono">
+              <h3 className="text-base sm:text-lg font-black uppercase text-zinc-950">
                 Create New Supercar Drop
               </h3>
               <button
@@ -2642,7 +3189,7 @@ export function AdminConsoleClient({
 
             <form onSubmit={handleCreateContest} className="space-y-4">
               <div>
-                <label className="block text-[11px] font-mono font-bold text-zinc-600 mb-1">
+                <label className="block text-xs font-bold text-zinc-700 mb-1">
                   Unique Slug / ID (e.g. ferrari-296)
                 </label>
                 <input
@@ -2650,13 +3197,13 @@ export function AdminConsoleClient({
                   value={newContest.id}
                   onChange={(e) => setNewContest({ ...newContest, id: e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, "") })}
                   placeholder="e.g. lamborghini-huracan"
-                  className="w-full h-10 px-3 rounded-xl border border-zinc-300 font-mono text-xs"
+                  className="w-full h-10 px-3.5 rounded-xl border border-zinc-300 text-xs focus:outline-none focus:ring-2 focus:ring-[#ea580c]"
                   required
                 />
               </div>
 
               <div>
-                <label className="block text-[11px] font-mono font-bold text-zinc-600 mb-1">
+                <label className="block text-xs font-bold text-zinc-700 mb-1">
                   Car Name (Title)
                 </label>
                 <input
@@ -2664,14 +3211,14 @@ export function AdminConsoleClient({
                   value={newContest.carName}
                   onChange={(e) => setNewContest({ ...newContest, carName: e.target.value, title: `Win A ${e.target.value}` })}
                   placeholder="e.g. Lamborghini Huracán Tecnica"
-                  className="w-full h-10 px-3 rounded-xl border border-zinc-300 font-mono text-xs"
+                  className="w-full h-10 px-3.5 rounded-xl border border-zinc-300 text-xs focus:outline-none focus:ring-2 focus:ring-[#ea580c]"
                   required
                 />
               </div>
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-[11px] font-mono font-bold text-zinc-600 mb-1">
+                  <label className="block text-xs font-bold text-zinc-700 mb-1">
                     Worth Display Text
                   </label>
                   <input
@@ -2679,33 +3226,33 @@ export function AdminConsoleClient({
                     value={newContest.worthDisplay}
                     onChange={(e) => setNewContest({ ...newContest, worthDisplay: e.target.value })}
                     placeholder="₹4.50 Cr Value"
-                    className="w-full h-10 px-3 rounded-xl border border-zinc-300 font-mono text-xs"
+                    className="w-full h-10 px-3.5 rounded-xl border border-zinc-300 text-xs focus:outline-none focus:ring-2 focus:ring-[#ea580c]"
                     required
                   />
                 </div>
                 <div>
-                  <label className="block text-[11px] font-mono font-bold text-zinc-600 mb-1">
+                  <label className="block text-xs font-bold text-zinc-700 mb-1">
                     Ticket Price (₹)
                   </label>
                   <input
                     type="number"
                     value={newContest.ticketPrice}
                     onChange={(e) => setNewContest({ ...newContest, ticketPrice: Number(e.target.value) })}
-                    className="w-full h-10 px-3 rounded-xl border border-zinc-300 font-mono text-xs"
+                    className="w-full h-10 px-3.5 rounded-xl border border-zinc-300 text-xs focus:outline-none focus:ring-2 focus:ring-[#ea580c]"
                     required
                   />
                 </div>
               </div>
 
               <div>
-                <label className="block text-[11px] font-mono font-bold text-zinc-600 mb-1">
+                <label className="block text-xs font-bold text-zinc-700 mb-1">
                   Target Pool Entries
                 </label>
                 <input
                   type="number"
                   value={newContest.targetTickets}
                   onChange={(e) => setNewContest({ ...newContest, targetTickets: Number(e.target.value) })}
-                  className="w-full h-10 px-3 rounded-xl border border-zinc-300 font-mono text-xs"
+                  className="w-full h-10 px-3.5 rounded-xl border border-zinc-300 text-xs focus:outline-none focus:ring-2 focus:ring-[#ea580c]"
                   required
                 />
               </div>
@@ -2714,14 +3261,14 @@ export function AdminConsoleClient({
                 <button
                   type="button"
                   onClick={() => setIsNewContestOpen(false)}
-                  className="px-4 py-2 rounded-xl border border-zinc-200 text-xs font-mono text-zinc-700 hover:bg-zinc-50 cursor-pointer"
+                  className="px-4 py-2.5 rounded-xl border border-zinc-200 text-xs font-semibold text-zinc-700 hover:bg-zinc-50 cursor-pointer"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
                   disabled={actionLoading}
-                  className="px-5 py-2 rounded-xl bg-[#ea580c] hover:bg-[#c2410c] text-white text-xs font-mono font-bold cursor-pointer transition-colors shadow-xs"
+                  className="px-5 py-2.5 rounded-xl bg-[#ea580c] hover:bg-[#c2410c] text-white text-xs font-bold cursor-pointer transition-colors shadow-2xs"
                 >
                   {actionLoading ? "Creating..." : "Create Contest"}
                 </button>
@@ -2733,50 +3280,50 @@ export function AdminConsoleClient({
 
       {/* MEMBER PROFILE DRAWER / MODAL */}
       {selectedMember && (
-        <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl border border-zinc-200 space-y-4 font-mono text-xs animate-in fade-in zoom-in-95">
+        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-3.5 sm:p-4 overflow-y-auto">
+          <div className="bg-white rounded-3xl max-w-md w-full p-5 sm:p-6 shadow-2xl border border-zinc-200 space-y-4 text-xs animate-in fade-in zoom-in-95 my-auto max-h-[90vh] overflow-y-auto">
             <div className="flex items-center justify-between border-b border-zinc-100 pb-3">
               <div>
                 <h3 className="font-black text-sm text-zinc-950 uppercase">
-                  {selectedMember.name}
+                  {formatMemberName(selectedMember.name)}
                 </h3>
-                <span className="text-[11px] text-zinc-400">{selectedMember.email}</span>
+                <span className="text-[11px] text-zinc-400 font-medium">{selectedMember.email}</span>
               </div>
               <button
                 onClick={() => setSelectedMember(null)}
-                className="p-1 text-zinc-400 hover:text-zinc-900 cursor-pointer"
+                className="p-1.5 rounded-lg text-zinc-400 hover:text-zinc-900 cursor-pointer"
               >
                 <X size={18} />
               </button>
             </div>
 
             <div className="space-y-2.5">
-              <div className="flex justify-between py-1 border-b border-zinc-50">
-                <span className="text-zinc-500">Member ID:</span>
+              <div className="flex justify-between py-1.5 border-b border-zinc-50">
+                <span className="text-zinc-500 font-medium">Member ID:</span>
                 <span className="font-bold text-zinc-900">{selectedMember.id}</span>
               </div>
-              <div className="flex justify-between py-1 border-b border-zinc-50">
-                <span className="text-zinc-500">Phone:</span>
-                <span className="text-zinc-900">{selectedMember.phone}</span>
+              <div className="flex justify-between py-1.5 border-b border-zinc-50">
+                <span className="text-zinc-500 font-medium">Phone:</span>
+                <span className="text-zinc-900 font-semibold">{selectedMember.phone}</span>
               </div>
-              <div className="flex justify-between py-1 border-b border-zinc-50">
-                <span className="text-zinc-500">Referral Code:</span>
+              <div className="flex justify-between py-1.5 border-b border-zinc-50">
+                <span className="text-zinc-500 font-medium">Referral Code:</span>
                 <span className="font-bold text-[#ea580c]">{selectedMember.referralCode}</span>
               </div>
-              <div className="flex justify-between py-1 border-b border-zinc-50">
-                <span className="text-zinc-500">Tickets Purchased:</span>
+              <div className="flex justify-between py-1.5 border-b border-zinc-50">
+                <span className="text-zinc-500 font-medium">Tickets Purchased:</span>
                 <span className="font-bold text-zinc-900">{selectedMember.ticketsBought}</span>
               </div>
-              <div className="flex justify-between py-1 border-b border-zinc-50">
-                <span className="text-zinc-500">Drive Credits Balance:</span>
+              <div className="flex justify-between py-1.5 border-b border-zinc-50">
+                <span className="text-zinc-500 font-medium">Drive Credits Balance:</span>
                 <span className="font-bold text-emerald-600">{selectedMember.creditsBalance.toLocaleString("en-IN")}</span>
               </div>
-              <div className="flex justify-between py-1 border-b border-zinc-50">
-                <span className="text-zinc-500">Cash Commission Earned:</span>
+              <div className="flex justify-between py-1.5 border-b border-zinc-50">
+                <span className="text-zinc-500 font-medium">Cash Commission Earned:</span>
                 <span className="font-black text-[#ea580c]">₹{selectedMember.cashEarned.toLocaleString("en-IN")}</span>
               </div>
-              <div className="flex justify-between py-1 border-b border-zinc-50">
-                <span className="text-zinc-500">Account Status:</span>
+              <div className="flex justify-between py-1.5 border-b border-zinc-50">
+                <span className="text-zinc-500 font-medium">Account Status:</span>
                 <span className="font-bold uppercase text-zinc-900">{selectedMember.status}</span>
               </div>
             </div>
@@ -2785,7 +3332,7 @@ export function AdminConsoleClient({
               <button
                 type="button"
                 onClick={() => setSelectedMember(null)}
-                className="px-4 py-2 rounded-xl bg-zinc-950 text-white font-bold text-xs cursor-pointer"
+                className="w-full sm:w-auto px-5 py-2.5 rounded-xl bg-zinc-950 text-white font-bold text-xs cursor-pointer shadow-xs text-center"
               >
                 Close Profile
               </button>

@@ -529,29 +529,29 @@ export function MemberDashboardClient({
       tag: "Single Entry",
       price: 1 * unitPrice,
       highlight: false,
-      desc: `1 Contest Ticket + ${(1 * unitPrice).toLocaleString("en-IN")} Drive Credits`,
+      desc: "1 Draw Ticket + 1,000 Credits",
     },
     {
       count: 25,
-      tag: "VIP Commission Unlock",
+      tag: "VIP Unlock",
       price: 25 * unitPrice,
       highlight: true,
-      badge: "MOST POPULAR",
-      desc: `25 Tickets + ${(25 * unitPrice).toLocaleString("en-IN")} Credits + 25% LIFETIME CASH UNLOCK`,
+      badge: "POPULAR",
+      desc: "25 Tickets + 25% Cash Unlock",
     },
     {
       count: 50,
-      tag: "High Roller Pack",
+      tag: "High Roller",
       price: 50 * unitPrice,
       highlight: false,
-      desc: `50 Tickets + ${(50 * unitPrice).toLocaleString("en-IN")} Credits for massive draw probability`,
+      desc: "50 Tickets + 50,000 Credits",
     },
     {
       count: 100,
-      tag: "Syndicate Allocation",
+      tag: "Syndicate",
       price: 100 * unitPrice,
       highlight: false,
-      desc: `100 Tickets + ${(100 * unitPrice).toLocaleString("en-IN")} Credits (Full Track Booking Equivalent)`,
+      desc: "100 Tickets + Full Track Drive",
     },
   ]
 
@@ -559,33 +559,34 @@ export function MemberDashboardClient({
     <div className="min-h-[100dvh] bg-[#fbfbfb] text-zinc-950 font-sans selection:bg-orange-500 selection:text-white flex flex-col justify-between">
       
       {/* 1. Header Bar with Paddock Badge & Member Auth */}
-      <header className="border-b border-zinc-200/70 bg-white/90 backdrop-blur-md sticky top-0 z-50 py-3.5 px-4 sm:px-8">
-        <div className="max-w-7xl mx-auto flex items-center justify-between">
-          <div className="flex items-center gap-4">
+      <header className="border-b border-zinc-200/70 bg-white/95 backdrop-blur-md sticky top-0 z-50 py-3 sm:py-3.5 px-3.5 sm:px-8 shadow-2xs">
+        <div className="max-w-7xl mx-auto flex items-center justify-between gap-2">
+          <div className="flex items-center gap-2.5 sm:gap-4 shrink-0">
             <Link href="/" className="flex items-center gap-2 group">
-              <span className="text-xl font-black tracking-tight text-zinc-950 uppercase font-sans">
+              <span className="text-base sm:text-xl font-black tracking-tight text-zinc-950 uppercase shrink-0">
                 WINMY<span className="text-[#ea580c]">PORSCHE</span>
               </span>
             </Link>
-            <span className="hidden md:inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-mono font-bold bg-zinc-100 text-zinc-600 border border-zinc-200/60 uppercase">
+            <span className="hidden md:inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-zinc-100 text-zinc-600 border border-zinc-200/60 uppercase">
               <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
               Member Garage
             </span>
           </div>
 
-          <div className="flex items-center gap-3 sm:gap-4">
+          <div className="flex items-center gap-2 sm:gap-3 shrink-0">
             {/* Quick Redeem CTA in Header */}
             <Link
               href="/members/rewards"
-              className="px-3.5 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-mono text-xs font-bold flex items-center gap-1.5 transition-colors shadow-2xs cursor-pointer"
+              className="px-2.5 sm:px-3.5 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold flex items-center gap-1 sm:gap-1.5 transition-colors shadow-2xs cursor-pointer shrink-0"
             >
-              <Sparkle size={14} weight="fill" />
-              <span>Redeem Credits</span>
+              <Sparkle size={13} weight="fill" className="shrink-0" />
+              <span className="hidden sm:inline">Redeem Credits</span>
+              <span className="sm:hidden">Redeem</span>
               <span className="hidden md:inline text-emerald-100 font-normal">({credits.toLocaleString("en-IN")})</span>
             </Link>
 
-            <div className="flex items-center gap-2.5 font-mono text-xs">
-              <div className="w-7 h-7 rounded-full bg-orange-100 text-[#ea580c] font-black flex items-center justify-center text-xs">
+            <div className="flex items-center gap-2 text-xs shrink-0">
+              <div className="w-7 h-7 rounded-full bg-orange-100 text-[#ea580c] font-black flex items-center justify-center text-xs shrink-0">
                 {session.name.slice(0, 1).toUpperCase()}
               </div>
               <div className="hidden sm:block text-left leading-tight">
@@ -596,7 +597,7 @@ export function MemberDashboardClient({
 
             <button
               onClick={handleLogout}
-              className="px-3 py-1.5 rounded-xl border border-zinc-200/90 hover:border-zinc-300 bg-white hover:bg-zinc-50 text-zinc-600 hover:text-zinc-950 transition-all font-mono text-xs flex items-center gap-1.5 cursor-pointer shadow-2xs"
+              className="w-7 h-7 sm:w-auto sm:px-3 sm:py-1.5 rounded-lg sm:rounded-xl border border-zinc-200/90 hover:border-zinc-300 bg-white hover:bg-zinc-50 text-zinc-600 hover:text-zinc-950 transition-all text-xs flex items-center justify-center gap-1.5 cursor-pointer shadow-2xs shrink-0"
               title="Sign Out"
             >
               <SignOut size={15} />
@@ -607,15 +608,15 @@ export function MemberDashboardClient({
       </header>
 
       {/* Main Experience Body */}
-      <main className="flex-1 max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-8 sm:py-12 space-y-10">
+      <main className="flex-1 max-w-7xl mx-auto w-full px-3.5 sm:px-6 lg:px-8 py-6 sm:py-10 space-y-6 sm:space-y-8">
         
-        {/* 2. Executive VIP Telemetry HUD (3 Glass Bento Cards) */}
-        <section className="grid grid-cols-1 md:grid-cols-3 gap-5">
+        {/* 2. Executive VIP Telemetry HUD (3 Bento Cards) */}
+        <section className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-5">
           {/* Bento Card 1: Drive Credits */}
-          <div className="relative overflow-hidden rounded-3xl bg-white border border-zinc-200/80 p-6 shadow-xs group hover:border-orange-200 transition-all flex flex-col justify-between">
+          <div className="relative overflow-hidden rounded-2xl bg-white border border-zinc-200/80 p-4 sm:p-6 shadow-xs group hover:border-orange-200 transition-all flex flex-col justify-between">
             <div>
               <div className="flex items-center justify-between mb-3">
-                <span className="text-xs font-mono font-bold uppercase tracking-wider text-zinc-400">
+                <span className="text-xs font-bold uppercase tracking-wider text-zinc-500">
                   Drive Credits Vault
                 </span>
                 <div className="w-8 h-8 rounded-full bg-emerald-50 text-emerald-600 flex items-center justify-center">
@@ -623,10 +624,10 @@ export function MemberDashboardClient({
                 </div>
               </div>
               <div className="flex items-baseline gap-2 mb-1.5">
-                <span className="text-3xl sm:text-4xl font-black font-mono text-zinc-950 tracking-tight">
+                <span className="text-3xl sm:text-4xl font-black text-zinc-950 tracking-tight tabular-nums">
                   {credits.toLocaleString("en-IN")}
                 </span>
-                <span className="text-xs font-mono text-emerald-600 font-bold uppercase">
+                <span className="text-xs text-emerald-600 font-bold uppercase">
                   1:1 with INR
                 </span>
               </div>
@@ -637,7 +638,7 @@ export function MemberDashboardClient({
 
             <Link
               href="/members/rewards"
-              className="w-full py-2.5 px-4 rounded-xl bg-zinc-950 hover:bg-zinc-800 text-white font-mono text-xs font-bold flex items-center justify-between transition-colors shadow-xs group-hover:bg-[#ea580c]"
+              className="w-full py-2.5 px-4 rounded-xl bg-zinc-950 hover:bg-zinc-800 text-white text-xs font-bold flex items-center justify-between transition-colors shadow-xs group-hover:bg-[#ea580c] cursor-pointer"
             >
               <span>Redeem for Track Drives</span>
               <ArrowRight size={14} weight="bold" />
@@ -645,24 +646,24 @@ export function MemberDashboardClient({
           </div>
 
           {/* Bento Card 2: Contest Allocation & Lucky Numbers */}
-          <div className="relative overflow-hidden rounded-3xl bg-white border border-zinc-200/80 p-6 shadow-xs group hover:border-orange-200 transition-all">
+          <div className="relative overflow-hidden rounded-2xl bg-white border border-zinc-200/80 p-4 sm:p-6 shadow-xs group hover:border-orange-200 transition-all">
             <div className="flex items-center justify-between mb-3">
-              <span className="text-xs font-mono font-bold uppercase tracking-wider text-zinc-400">
+              <span className="text-xs font-bold uppercase tracking-wider text-zinc-500">
                 Contest Allocation
               </span>
               <div className="w-8 h-8 rounded-full bg-orange-50 text-[#ea580c] flex items-center justify-center">
                 <Ticket size={16} weight="bold" />
               </div>
             </div>
-            <div className="flex items-baseline gap-3 mb-1.5">
-              <span className="text-3xl sm:text-4xl font-black font-mono text-zinc-950 tracking-tight">
+            <div className="flex items-baseline gap-2.5 mb-1.5">
+              <span className="text-3xl sm:text-4xl font-black text-zinc-950 tracking-tight tabular-nums">
                 {ticketStats.totalBought}
               </span>
-              <span className="text-xs font-mono text-zinc-500">
+              <span className="text-xs text-zinc-500 font-medium">
                 entries bought
               </span>
             </div>
-            <div className="flex items-center gap-2 text-xs font-mono">
+            <div className="flex items-center gap-2 text-xs flex-wrap">
               <span className="px-2 py-0.5 rounded-md bg-zinc-100 text-zinc-700 font-semibold">
                 {ticketStats.totalAssigned} Used
               </span>
@@ -673,30 +674,30 @@ export function MemberDashboardClient({
           </div>
 
           {/* Bento Card 3: Referral Syndicate & Commission Status */}
-          <div className="relative overflow-hidden rounded-3xl bg-white border border-zinc-200/80 p-6 shadow-xs group hover:border-orange-200 transition-all">
+          <div className="relative overflow-hidden rounded-2xl bg-white border border-zinc-200/80 p-4 sm:p-6 shadow-xs group hover:border-orange-200 transition-all">
             <div className="flex items-center justify-between mb-3">
-              <span className="text-xs font-mono font-bold uppercase tracking-wider text-zinc-400">
+              <span className="text-xs font-bold uppercase tracking-wider text-zinc-500">
                 Referral Rewards
               </span>
               <div className="w-8 h-8 rounded-full bg-orange-50 text-[#ea580c] flex items-center justify-center">
                 <Gift size={16} weight="bold" />
               </div>
             </div>
-            <div className="flex items-baseline gap-3 mb-1.5">
-              <span className="text-3xl sm:text-4xl font-black font-mono text-[#ea580c] tracking-tight">
+            <div className="flex items-baseline gap-2 mb-1.5 flex-wrap">
+              <span className="text-3xl sm:text-4xl font-black text-[#ea580c] tracking-tight tabular-nums">
                 ₹{referralProfile?.totalCashEarned?.toLocaleString("en-IN") || 0}
               </span>
-              <span className="text-xs font-mono text-zinc-500">
+              <span className="text-xs text-zinc-500 font-semibold">
                 + {referralProfile?.totalCreditsEarned?.toLocaleString("en-IN") || 0} credits
               </span>
             </div>
             <div className="flex items-center gap-1.5 text-xs">
               {isCashUnlocked ? (
-                <span className="inline-flex items-center gap-1 text-emerald-600 font-bold font-mono">
+                <span className="inline-flex items-center gap-1 text-emerald-600 font-bold">
                   <CheckCircle size={14} weight="fill" /> 25% Cash Commission Unlocked
                 </span>
               ) : (
-                <span className="inline-flex items-center gap-1 text-zinc-500 font-mono">
+                <span className="inline-flex items-center gap-1 text-zinc-500 font-medium">
                   <Lock size={13} /> Buy {ticketsNeededForCash} more for 25% Cash
                 </span>
               )}
@@ -780,28 +781,28 @@ export function MemberDashboardClient({
 
         {/* 3. The Grand Draw Arena (Widescreen Showcase + Lucky Number Terminal) */}
         <section className="rounded-3xl bg-white border border-zinc-200/90 shadow-sm overflow-hidden">
-          <div className="p-6 sm:p-8 border-b border-zinc-100 flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div className="p-4 sm:p-6 md:p-8 border-b border-zinc-100 flex flex-col md:flex-row md:items-center justify-between gap-4">
             <div>
-              <div className="flex items-center gap-2 mb-1">
-                <span className="px-2.5 py-0.5 rounded-full text-[10px] font-mono font-black bg-[#ea580c] text-white uppercase tracking-wider">
+              <div className="flex flex-wrap items-center gap-2 mb-1">
+                <span className="px-2.5 py-1 rounded-full text-[10px] font-black bg-[#ea580c] text-white uppercase tracking-wider whitespace-nowrap shrink-0">
                   GRAND PRIZE ARENA
                 </span>
-                <span className="text-xs text-zinc-400 font-mono">Official Entrant Pool</span>
+                <span className="text-xs text-zinc-400 font-medium whitespace-nowrap">Official Entrant Pool</span>
               </div>
-              <h2 className="text-2xl sm:text-3xl font-black text-zinc-950 uppercase tracking-tight">
+              <h2 className="text-xl sm:text-2xl md:text-3xl font-black text-zinc-950 uppercase tracking-tight">
                 Porsche 718 Cayman Grand Draw
               </h2>
             </div>
 
             {/* Car Switcher Pills */}
-            <div className="flex items-center gap-1.5 bg-zinc-100 p-1.5 rounded-2xl self-start md:self-auto">
+            <div className="flex items-center gap-1.5 bg-zinc-100 p-1.5 rounded-2xl self-start md:self-auto overflow-x-auto max-w-full">
               <button
                 type="button"
                 onClick={() => {
                   setActiveCarTab("porsche")
                   setTabNotice(null)
                 }}
-                className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+                className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer whitespace-nowrap shrink-0 ${
                   activeCarTab === "porsche"
                     ? "bg-white text-zinc-950 shadow-xs"
                     : "text-zinc-500 hover:text-zinc-900"
@@ -815,10 +816,10 @@ export function MemberDashboardClient({
                   setActiveCarTab("cyberster")
                   setTabNotice("MG Cyberster drop entries will unlock immediately when the Porsche 718 Cayman allocation closes.")
                 }}
-                className="px-3.5 py-1.5 rounded-xl text-xs font-medium text-zinc-500 hover:text-zinc-900 transition-colors flex items-center gap-1 cursor-pointer"
+                className="px-3.5 py-1.5 rounded-xl text-xs font-medium text-zinc-500 hover:text-zinc-900 transition-colors flex items-center gap-1 cursor-pointer whitespace-nowrap shrink-0"
               >
                 <span>MG Cyberster</span>
-                <span className="text-[9px] font-mono bg-zinc-200/70 text-zinc-600 px-1 py-0.2 rounded uppercase">Soon</span>
+                <span className="text-[9px] font-bold bg-zinc-200/70 text-zinc-600 px-1 py-0.2 rounded uppercase">Soon</span>
               </button>
               <button
                 type="button"
@@ -826,23 +827,23 @@ export function MemberDashboardClient({
                   setActiveCarTab("mustang")
                   setTabNotice("Ford Mustang GT phase will open in Phase 2. Credits acquired today carry forward.")
                 }}
-                className="px-3.5 py-1.5 rounded-xl text-xs font-medium text-zinc-500 hover:text-zinc-900 transition-colors flex items-center gap-1 cursor-pointer"
+                className="px-3.5 py-1.5 rounded-xl text-xs font-medium text-zinc-500 hover:text-zinc-900 transition-colors flex items-center gap-1 cursor-pointer whitespace-nowrap shrink-0"
               >
                 <span>Mustang GT</span>
-                <span className="text-[9px] font-mono bg-zinc-200/70 text-zinc-600 px-1 py-0.2 rounded uppercase">Soon</span>
+                <span className="text-[9px] font-bold bg-zinc-200/70 text-zinc-600 px-1 py-0.2 rounded uppercase">Soon</span>
               </button>
             </div>
           </div>
 
           {tabNotice && (
-            <div className="mx-6 sm:mx-8 mt-4 p-3 rounded-xl bg-orange-50 border border-orange-200/80 text-orange-900 text-xs flex items-center justify-between">
+            <div className="mx-4 sm:mx-8 mt-4 p-3 rounded-xl bg-orange-50 border border-orange-200/80 text-orange-900 text-xs flex items-center justify-between">
               <span>{tabNotice}</span>
               <button onClick={() => setTabNotice(null)} className="text-orange-700 font-bold ml-2">×</button>
             </div>
           )}
 
           {/* Arena Content Grid: Car Visual (Left) + Interactive Lucky Terminal (Right) */}
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 p-6 sm:p-8 items-center">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 sm:gap-8 p-4 sm:p-6 md:p-8 items-center">
             
             {/* Left: Cinematic Car Showcase (7 cols) */}
             <div className="lg:col-span-7 space-y-4">
@@ -855,22 +856,22 @@ export function MemberDashboardClient({
                   sizes="(max-width: 1024px) 100vw, 60vw"
                   className="object-cover group-hover:scale-102 transition-transform duration-700"
                 />
-                <div className="absolute top-4 left-4 flex items-center gap-2">
-                  <span className="px-3 py-1 rounded-full bg-[#ea580c] text-white text-[10px] font-black uppercase tracking-wider shadow-lg flex items-center gap-1.5">
+                <div className="absolute top-3 sm:top-4 left-3 sm:left-4 flex items-center gap-2">
+                  <span className="px-2.5 sm:px-3 py-1 rounded-full bg-[#ea580c] text-white text-[10px] font-black uppercase tracking-wider shadow-lg flex items-center gap-1.5 whitespace-nowrap">
                     <span className="w-1.5 h-1.5 rounded-full bg-white animate-pulse" />
                     LIVE GRAND DRAW
                   </span>
-                  <span className="px-2.5 py-1 rounded-full bg-black/60 backdrop-blur-md text-white/90 text-[10px] font-mono">
+                  <span className="px-2.5 py-1 rounded-full bg-black/60 backdrop-blur-md text-white/90 text-[10px] font-bold whitespace-nowrap">
                     ₹1.22 Cr Value
                   </span>
                 </div>
               </div>
 
               {/* Contest Claim Progress Bar */}
-              <div className="p-4 rounded-2xl bg-zinc-50 border border-zinc-200/70">
-                <div className="flex items-center justify-between text-xs font-mono mb-2">
+              <div className="p-3.5 sm:p-4 rounded-2xl bg-zinc-50 border border-zinc-200/70">
+                <div className="flex items-center justify-between text-xs mb-2">
                   <span className="text-zinc-600 font-bold">Allocation Claimed</span>
-                  <span className="text-[#ea580c] font-black">{percentageClaimed}% (6,350 / 10,000)</span>
+                  <span className="text-[#ea580c] font-black tabular-nums">{percentageClaimed}% (6,350 / 10,000)</span>
                 </div>
                 <div className="w-full h-2 bg-zinc-200 rounded-full overflow-hidden">
                   <div
@@ -878,44 +879,44 @@ export function MemberDashboardClient({
                     style={{ width: `${percentageClaimed}%` }}
                   />
                 </div>
-                <div className="flex items-center justify-between text-[11px] text-zinc-400 mt-2 font-mono">
-                  <span>Guaranteed transparent live draw</span>
-                  <span>Free Track Delivery</span>
+                <div className="flex items-center justify-between text-[11px] text-zinc-500 mt-2 font-medium">
+                  <span>Guaranteed live audit</span>
+                  <span className="text-emerald-700 font-semibold">Free Track Delivery</span>
                 </div>
               </div>
             </div>
 
             {/* Right: Interactive Lucky Number Terminal (5 cols) */}
-            <div className="lg:col-span-5 rounded-2xl bg-zinc-50/80 border border-zinc-200/80 p-6 flex flex-col justify-between space-y-6">
+            <div className="lg:col-span-5 rounded-2xl bg-zinc-50/80 border border-zinc-200/80 p-4 sm:p-6 flex flex-col justify-between space-y-4 sm:space-y-6">
               <div>
                 <div className="flex items-center justify-between mb-2">
-                  <span className="text-xs font-mono font-bold uppercase tracking-wider text-zinc-500">
+                  <span className="text-xs font-bold uppercase tracking-wider text-zinc-500">
                     Lucky Number Terminal
                   </span>
-                  <span className="text-[11px] font-mono text-zinc-400">
+                  <span className="text-[11px] font-semibold text-zinc-400">
                     5-Digit Custom
                   </span>
                 </div>
-                <h3 className="text-lg font-black text-zinc-950 uppercase tracking-tight mb-1">
+                <h3 className="text-base sm:text-lg font-black text-zinc-950 uppercase tracking-tight mb-1">
                   Assign Your Entry Numbers
                 </h3>
-                <p className="text-xs text-zinc-500 mb-5 leading-relaxed">
+                <p className="text-xs text-zinc-500 mb-4 leading-relaxed">
                   Choose your lucky 5-digit number (e.g. 40821) or auto-pick a verified unclaimed number.
                 </p>
 
                 {/* Available Counter Pill */}
-                <div className={`p-4 rounded-xl mb-4 flex items-center justify-between border transition-all ${
+                <div className={`p-3 sm:p-4 rounded-xl mb-3 sm:mb-4 flex items-center justify-between border transition-all ${
                   ticketStats.availableToAssign > 0
                     ? "bg-orange-50/80 border-orange-200 text-orange-950"
                     : "bg-white border-zinc-200 text-zinc-600"
                 }`}>
                   <div className="flex items-center gap-2">
                     <Lightning size={18} className={ticketStats.availableToAssign > 0 ? "text-[#ea580c] animate-bounce" : "text-zinc-400"} weight="fill" />
-                    <span className="text-xs font-bold font-mono">
+                    <span className="text-xs font-bold">
                       Entries Available to Assign
                     </span>
                   </div>
-                  <span className={`text-2xl font-black font-mono ${ticketStats.availableToAssign > 0 ? "text-[#ea580c]" : "text-zinc-400"}`}>
+                  <span className={`text-xl sm:text-2xl font-black tabular-nums ${ticketStats.availableToAssign > 0 ? "text-[#ea580c]" : "text-zinc-400"}`}>
                     {ticketStats.availableToAssign}
                   </span>
                 </div>
@@ -928,16 +929,16 @@ export function MemberDashboardClient({
                       maxLength={5}
                       value={customNumber}
                       onChange={(e) => setCustomNumber(e.target.value.replace(/\D/g, "").slice(0, 5))}
-                      placeholder="Enter 5-digit number (e.g. 40821)"
+                      placeholder="5-digit # (e.g. 40821)"
                       disabled={assigning || ticketStats.availableToAssign <= 0}
-                      className="flex-1 h-12 px-4 rounded-xl bg-white border border-zinc-300 text-sm font-mono tracking-widest text-zinc-950 placeholder:text-zinc-400 placeholder:tracking-normal focus:outline-none focus:border-orange-500 disabled:bg-zinc-100 disabled:text-zinc-400"
+                      className="flex-1 min-w-0 h-11 sm:h-12 px-3 sm:px-4 rounded-xl bg-white border border-zinc-300 text-xs sm:text-sm font-bold tracking-widest text-zinc-950 placeholder:text-zinc-400 placeholder:tracking-normal placeholder:font-normal focus:outline-none focus:border-[#ea580c] disabled:bg-zinc-100 disabled:text-zinc-400"
                     />
 
                     <button
                       type="button"
                       onClick={handleAssignNumber}
                       disabled={assigning || customNumber.length !== 5 || ticketStats.availableToAssign <= 0}
-                      className="h-12 px-5 rounded-xl bg-[#ea580c] hover:bg-[#c2410c] text-white font-extrabold text-xs uppercase tracking-wider flex items-center gap-1.5 cursor-pointer disabled:opacity-40 transition-all shrink-0 shadow-xs"
+                      className="h-11 sm:h-12 px-3.5 sm:px-5 rounded-xl font-bold text-xs uppercase tracking-wider flex items-center justify-center gap-1.5 cursor-pointer transition-all shrink-0 shadow-2xs disabled:bg-zinc-200 disabled:text-zinc-400 disabled:cursor-not-allowed bg-[#ea580c] hover:bg-[#c2410c] text-white"
                     >
                       <Ticket size={16} weight="bold" />
                       <span>{assigning ? "..." : "Lock In"}</span>
@@ -949,16 +950,16 @@ export function MemberDashboardClient({
                     type="button"
                     onClick={handleAutoPick}
                     disabled={assigning || ticketStats.availableToAssign <= 0}
-                    className="w-full h-11 rounded-xl border border-zinc-300 bg-white hover:bg-zinc-50 text-zinc-800 font-bold text-xs font-mono flex items-center justify-center gap-2 transition-all cursor-pointer disabled:opacity-40 shadow-2xs"
+                    className="w-full h-10 sm:h-11 rounded-xl border border-zinc-300 bg-white hover:bg-zinc-50 text-zinc-800 font-bold text-xs flex items-center justify-center gap-2 transition-all cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed shadow-2xs"
                   >
-                    <Shuffle size={16} weight="bold" />
-                    <span>{assigning ? "Generating Unclaimed Number..." : "Auto-pick random available number"}</span>
+                    <Shuffle size={15} weight="bold" />
+                    <span className="truncate">{assigning ? "Generating Unclaimed Number..." : "Auto-pick random available number"}</span>
                   </button>
                 </div>
 
                 {assignMsg && (
                   <div
-                    className={`p-3 rounded-xl text-xs mb-3 font-mono ${
+                    className={`p-3 rounded-xl text-xs mb-3 font-medium ${
                       assignMsg.type === "success"
                         ? "bg-emerald-50 border border-emerald-200 text-emerald-800"
                         : "bg-red-50 border border-red-200 text-red-700"
@@ -970,13 +971,13 @@ export function MemberDashboardClient({
               </div>
 
               {/* Status Note */}
-              <div className="pt-3 border-t border-zinc-200/60 text-center">
+              <div className="pt-2.5 border-t border-zinc-200/60 text-center">
                 {ticketStats.availableToAssign <= 0 ? (
-                  <p className="text-xs text-zinc-500 font-mono">
+                  <p className="text-xs text-zinc-500 font-medium">
                     All purchased entries currently assigned. <a href="#buy-tickets" className="text-[#ea580c] font-bold hover:underline">Acquire more tickets</a> to enter again.
                   </p>
                 ) : (
-                  <p className="text-xs text-emerald-600 font-mono font-bold">
+                  <p className="text-xs text-emerald-600 font-bold">
                     ✓ {ticketStats.availableToAssign} ticket {ticketStats.availableToAssign === 1 ? "entry is" : "entries are"} ready to be locked in.
                   </p>
                 )}
@@ -987,7 +988,7 @@ export function MemberDashboardClient({
         </section>
 
         {/* 4. The Ticket Vault (Assigned / Used Tickets Display with Active vs Past & Pagination) */}
-        <section className="rounded-3xl bg-white border border-zinc-200/90 shadow-sm p-6 sm:p-8 space-y-6">
+        <section className="rounded-3xl bg-white border border-zinc-200/90 shadow-sm p-4 sm:p-6 md:p-8 space-y-5 sm:space-y-6">
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-zinc-100 pb-5">
             <div>
               <div className="flex items-center gap-2 mb-1">
@@ -1001,8 +1002,8 @@ export function MemberDashboardClient({
               </p>
             </div>
 
-            <div className="flex flex-wrap items-center gap-2 font-mono text-xs">
-              <span className="px-3 py-1.5 rounded-xl bg-orange-50 border border-orange-200/80 text-[#ea580c] font-black flex items-center gap-1.5">
+            <div className="flex flex-wrap items-center gap-2 text-xs">
+              <span className="px-3 py-1.5 rounded-xl bg-orange-50 border border-orange-200/80 text-[#ea580c] font-bold flex items-center gap-1.5">
                 <span className="w-1.5 h-1.5 rounded-full bg-orange-500 animate-pulse" />
                 {activeTicketsList.length} Active in Live Draw
               </span>
@@ -1027,7 +1028,7 @@ export function MemberDashboardClient({
                   setTicketFilter("active")
                   setTicketPage(1)
                 }}
-                className={`px-3 py-1.5 rounded-xl text-xs font-mono font-bold transition-all cursor-pointer flex items-center gap-1.5 ${
+                className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5 ${
                   ticketFilter === "active"
                     ? "bg-[#ea580c] text-white shadow-xs"
                     : "bg-zinc-100 text-zinc-600 hover:bg-zinc-200"
@@ -1043,7 +1044,7 @@ export function MemberDashboardClient({
                   setTicketFilter("past")
                   setTicketPage(1)
                 }}
-                className={`px-3 py-1.5 rounded-xl text-xs font-mono font-bold transition-all cursor-pointer ${
+                className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
                   ticketFilter === "past"
                     ? "bg-zinc-900 text-white shadow-xs"
                     : "bg-zinc-100 text-zinc-600 hover:bg-zinc-200"
@@ -1058,7 +1059,7 @@ export function MemberDashboardClient({
                   setTicketFilter("all")
                   setTicketPage(1)
                 }}
-                className={`px-3 py-1.5 rounded-xl text-xs font-mono font-bold transition-all cursor-pointer ${
+                className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
                   ticketFilter === "all"
                     ? "bg-zinc-900 text-white shadow-xs"
                     : "bg-zinc-100 text-zinc-600 hover:bg-zinc-200"
@@ -1083,7 +1084,7 @@ export function MemberDashboardClient({
                     setTicketPage(1)
                   }}
                   placeholder="Search ticket number..."
-                  className="w-full h-10 pl-10 pr-8 rounded-xl border border-zinc-200 bg-white text-xs font-mono text-zinc-950 placeholder:text-zinc-400 focus:outline-none focus:border-orange-500 focus:ring-2 focus:ring-orange-500/10 shadow-2xs transition-all"
+                  className="w-full h-10 pl-10 pr-8 rounded-xl border border-zinc-200 bg-white text-xs font-medium text-zinc-950 placeholder:text-zinc-400 focus:outline-none focus:border-orange-500 focus:ring-2 focus:ring-orange-500/10 shadow-2xs transition-all"
                 />
                 {searchTicketQuery && (
                   <button
@@ -1092,7 +1093,7 @@ export function MemberDashboardClient({
                       setSearchTicketQuery("")
                       setTicketPage(1)
                     }}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-zinc-700 font-mono text-xs font-bold p-1 cursor-pointer"
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-zinc-700 text-xs font-bold p-1 cursor-pointer"
                     title="Clear search"
                   >
                     ✕
@@ -1224,7 +1225,7 @@ export function MemberDashboardClient({
                     </div>
 
                     {/* Footer Status Badge */}
-                    <div className="pt-2 border-t border-zinc-100 flex items-center justify-between text-[11px] font-mono">
+                    <div className="pt-2 border-t border-zinc-100 flex items-center justify-between text-[11px]">
                       {isActive ? (
                         <>
                           <span className="flex items-center gap-1.5 text-emerald-600 font-bold">
@@ -1258,7 +1259,7 @@ export function MemberDashboardClient({
 
           {/* Pagination Controls Bar */}
           {filteredTickets.length > ticketPageSize && (
-            <div className="pt-4 border-t border-zinc-100 flex flex-col sm:flex-row items-center justify-between gap-4 font-mono text-xs">
+            <div className="pt-4 border-t border-zinc-100 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs">
               <div className="text-zinc-500 text-[11px]">
                 Showing{" "}
                 <strong className="text-zinc-900 font-bold">
@@ -1468,61 +1469,64 @@ export function MemberDashboardClient({
         </section>
 
         {/* 5. Buy Tickets & Allocation Desk */}
-        <section id="buy-tickets" className="rounded-3xl bg-white border border-zinc-200/90 shadow-sm p-6 sm:p-8 space-y-8">
+        <section id="buy-tickets" className="rounded-3xl bg-white border border-zinc-200/90 shadow-sm p-4 sm:p-6 md:p-8 space-y-6 sm:space-y-8">
           <div>
-            <div className="flex items-center gap-2 mb-1">
-              <span className="px-2.5 py-0.5 rounded-full text-[10px] font-mono font-black bg-zinc-900 text-white uppercase tracking-wider">
+            <div className="flex flex-wrap items-center gap-2 mb-1.5">
+              <span className="px-2.5 py-1 rounded-full text-[10px] font-black bg-zinc-950 text-white uppercase tracking-wider whitespace-nowrap shrink-0">
                 ALLOCATION DESK
               </span>
-              <span className="text-xs text-emerald-600 font-bold font-mono">
+              <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200/80 whitespace-nowrap shrink-0">
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse shrink-0" />
                 100% Money Back In Drive Credits
               </span>
             </div>
-            <h3 className="text-2xl sm:text-3xl font-black text-zinc-950 uppercase tracking-tight">
+            <h3 className="text-xl sm:text-2xl md:text-3xl font-black text-zinc-950 uppercase tracking-tight">
               Acquire Tickets & Expand Draw Probability
             </h3>
             <p className="text-xs sm:text-sm text-zinc-500 mt-1 max-w-2xl leading-relaxed">
-              Every ₹1,000 ticket adds 1 official contest entry AND grants 1,000 Drive Credits to your garage balance for booking luxury supercar drives on track.
+              Every ₹1,000 ticket adds 1 official contest entry AND gives 1,000 Drive Credits to your garage balance to book supercar track drives.
             </p>
           </div>
 
-          {/* Tier Cards Selector */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          {/* Tier Cards Selector - 2x2 on Mobile, 4 Cols on Desktop */}
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-2.5 sm:gap-4">
             {ticketTiers.map((tier) => (
               <div
                 key={tier.count}
                 onClick={() => setTicketBuyCount(tier.count)}
-                className={`rounded-2xl p-5 border text-left cursor-pointer transition-all relative flex flex-col justify-between ${
+                className={`rounded-2xl p-3.5 sm:p-5 border text-left cursor-pointer transition-all flex flex-col justify-between ${
                   ticketBuyCount === tier.count
-                    ? "border-orange-500 bg-orange-50/30 shadow-sm ring-1 ring-orange-500"
+                    ? "border-[#ea580c] bg-orange-50/40 shadow-xs ring-2 ring-[#ea580c]"
                     : "border-zinc-200/80 bg-white hover:border-zinc-300"
                 }`}
               >
-                {tier.badge && (
-                  <span className="absolute -top-2.5 right-4 px-2 py-0.5 rounded-full text-[9px] font-black uppercase font-mono bg-[#ea580c] text-white tracking-wider shadow-sm">
-                    {tier.badge}
-                  </span>
-                )}
                 <div>
-                  <span className="text-xs font-mono font-bold text-zinc-400 block mb-1">
-                    {tier.tag}
-                  </span>
-                  <div className="flex items-baseline gap-1.5 mb-2">
-                    <span className="text-3xl font-black font-mono text-zinc-950">
+                  <div className="flex items-center justify-between gap-1 mb-1.5">
+                    <span className="text-[10px] sm:text-xs font-bold text-zinc-400 uppercase tracking-wider truncate">
+                      {tier.tag}
+                    </span>
+                    {tier.badge && (
+                      <span className="px-1.5 py-0.5 rounded-full text-[8px] sm:text-[9px] font-black uppercase bg-[#ea580c] text-white tracking-wider whitespace-nowrap shrink-0">
+                        {tier.badge}
+                      </span>
+                    )}
+                  </div>
+                  <div className="flex items-baseline gap-1 mb-1">
+                    <span className="text-2xl sm:text-3xl font-black text-zinc-950 tracking-tight">
                       {tier.count}
                     </span>
-                    <span className="text-xs font-mono text-zinc-500">
+                    <span className="text-[11px] sm:text-xs text-zinc-500 font-medium">
                       {tier.count === 1 ? "ticket" : "tickets"}
                     </span>
                   </div>
-                  <p className="text-xs text-zinc-500 leading-relaxed mb-4">
+                  <p className="text-[11px] sm:text-xs text-zinc-500 leading-tight mb-3">
                     {tier.desc}
                   </p>
                 </div>
 
-                <div className="pt-3 border-t border-zinc-100 flex items-center justify-between font-mono">
-                  <span className="text-xs text-zinc-400">Total Price</span>
-                  <span className="text-sm font-black text-zinc-900">
+                <div className="pt-2.5 border-t border-zinc-100 flex flex-col xs:flex-row xs:items-center justify-between gap-0.5">
+                  <span className="text-[10px] text-zinc-400 uppercase font-bold">Total</span>
+                  <span className="text-xs sm:text-sm font-black text-zinc-900 tabular-nums">
                     ₹{tier.price.toLocaleString("en-IN")}
                   </span>
                 </div>
@@ -1531,17 +1535,19 @@ export function MemberDashboardClient({
           </div>
 
           {/* Stepper + Dynamic Calculation + Payment CTA */}
-          <div className="rounded-2xl bg-zinc-50 border border-zinc-200/80 p-6 flex flex-col lg:flex-row items-center justify-between gap-6">
-            <div className="flex items-center gap-4 w-full lg:w-auto">
-              <span className="text-xs font-mono font-bold uppercase tracking-wider text-zinc-500 whitespace-nowrap">
+          <div className="rounded-2xl bg-zinc-50 border border-zinc-200/80 p-4 sm:p-6 flex flex-col lg:flex-row items-stretch lg:items-center justify-between gap-4 sm:gap-6">
+            {/* Stepper Control */}
+            <div className="flex items-center justify-between sm:justify-start gap-3 w-full lg:w-auto pb-3 border-b border-zinc-200/70 lg:border-b-0 lg:pb-0">
+              <span className="text-xs font-bold uppercase tracking-wider text-zinc-600 whitespace-nowrap">
                 Custom Quantity:
               </span>
-              <div className="flex items-center gap-1.5">
+              <div className="flex items-center gap-1.5 shrink-0">
                 <button
                   type="button"
                   onClick={() => setTicketBuyCount((prev) => Math.max(1, prev - 1))}
                   disabled={ticketBuyCount <= 1}
-                  className="w-10 h-10 rounded-xl border border-zinc-300 bg-white hover:bg-zinc-100 text-zinc-800 font-bold flex items-center justify-center disabled:opacity-40 transition-colors cursor-pointer"
+                  className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl border border-zinc-300 bg-white hover:bg-zinc-100 text-zinc-800 font-bold flex items-center justify-center disabled:opacity-40 transition-colors cursor-pointer text-base"
+                  aria-label="Decrease quantity"
                 >
                   -
                 </button>
@@ -1551,12 +1557,13 @@ export function MemberDashboardClient({
                   max="1000"
                   value={ticketBuyCount}
                   onChange={(e) => setTicketBuyCount(Math.max(1, parseInt(e.target.value) || 1))}
-                  className="w-20 h-10 rounded-xl border border-zinc-300 bg-white text-center font-black font-mono text-zinc-950 focus:outline-none focus:border-orange-500"
+                  className="w-14 sm:w-20 h-9 sm:h-10 rounded-xl border border-zinc-300 bg-white text-center font-black text-sm text-zinc-950 focus:outline-none focus:border-[#ea580c]"
                 />
                 <button
                   type="button"
                   onClick={() => setTicketBuyCount((prev) => prev + 1)}
-                  className="w-10 h-10 rounded-xl border border-zinc-300 bg-white hover:bg-zinc-100 text-zinc-800 font-bold flex items-center justify-center transition-colors cursor-pointer"
+                  className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl border border-zinc-300 bg-white hover:bg-zinc-100 text-zinc-800 font-bold flex items-center justify-center transition-colors cursor-pointer text-base"
+                  aria-label="Increase quantity"
                 >
                   +
                 </button>
@@ -1564,17 +1571,17 @@ export function MemberDashboardClient({
             </div>
 
             {/* Calculations Breakdown */}
-            <div className="flex items-center gap-6 sm:gap-10 font-mono">
+            <div className="flex items-center justify-between sm:justify-center gap-6 sm:gap-10 py-1 lg:py-0">
               <div>
-                <span className="text-[11px] text-zinc-400 block">Total Investment</span>
-                <span className="text-xl sm:text-2xl font-black text-zinc-950">
+                <span className="text-[10px] text-zinc-400 uppercase font-bold block">Total Investment</span>
+                <span className="text-lg sm:text-2xl font-black text-zinc-950 tabular-nums">
                   ₹{(ticketBuyCount * unitPrice).toLocaleString("en-IN")}
                 </span>
               </div>
               <div className="text-right">
-                <span className="text-[11px] text-zinc-400 block">Drive Credits Granted</span>
-                <span className="text-xl sm:text-2xl font-black text-[#ea580c]">
-                  +{(ticketBuyCount * unitPrice).toLocaleString("en-IN")} Credits
+                <span className="text-[10px] text-emerald-600 uppercase font-bold block">Drive Credits Granted</span>
+                <span className="text-lg sm:text-2xl font-black text-[#ea580c] tabular-nums">
+                  +{(ticketBuyCount * unitPrice).toLocaleString("en-IN")}
                 </span>
               </div>
             </div>
@@ -1584,15 +1591,16 @@ export function MemberDashboardClient({
               type="button"
               onClick={() => handleBuyTickets()}
               disabled={buying}
-              className="w-full lg:w-auto px-8 py-4 rounded-xl bg-[#ea580c] hover:bg-[#c2410c] text-white font-black text-xs uppercase tracking-widest shadow-md shadow-orange-500/25 active:scale-98 transition-all disabled:opacity-50 cursor-pointer whitespace-nowrap"
+              className="w-full lg:w-auto h-12 px-6 sm:px-8 rounded-xl bg-[#ea580c] hover:bg-[#c2410c] text-white font-bold text-xs uppercase tracking-wider shadow-md shadow-orange-500/20 active:scale-98 transition-all disabled:opacity-50 cursor-pointer flex items-center justify-center gap-2 shrink-0"
             >
-              {buying ? "Depositing Credits..." : "Complete Mock Payment"}
+              <span>{buying ? "Depositing Credits..." : "Complete Mock Payment"}</span>
+              {!buying && <ArrowRight size={14} weight="bold" />}
             </button>
           </div>
 
           {buyMsg && (
             <div
-              className={`p-4 rounded-xl text-xs font-mono ${
+              className={`p-3.5 sm:p-4 rounded-xl text-xs font-medium ${
                 buyMsg.type === "success"
                   ? "bg-emerald-50 border border-emerald-200 text-emerald-800"
                   : "bg-red-50 border border-red-200 text-red-700"
@@ -1604,32 +1612,32 @@ export function MemberDashboardClient({
         </section>
 
         {/* 6. VIP Referral Syndicate & Earning Command Center */}
-        <section className="rounded-3xl bg-white border border-zinc-200/90 shadow-sm p-6 sm:p-8 space-y-8">
+        <section className="rounded-3xl bg-white border border-zinc-200/90 shadow-sm p-4 sm:p-6 md:p-8 space-y-6 sm:space-y-8">
           <div>
             <div className="flex items-center gap-2 mb-1">
               <Gift size={20} className="text-[#ea580c]" />
-              <h3 className="text-2xl sm:text-3xl font-black text-zinc-950 uppercase tracking-tight">
+              <h3 className="text-xl sm:text-2xl md:text-3xl font-black text-zinc-950 uppercase tracking-tight">
                 VIP Referral Syndicate
               </h3>
             </div>
             <p className="text-xs sm:text-sm text-zinc-500 leading-relaxed max-w-2xl">
-              Earn 25% Drive Credits on every friend ticket purchase. Acquire 25 tickets to unlock an additional 25% direct cash commission.
+              Earn 25% Drive Credits on every friend ticket purchase. Acquire 25 tickets to unlock direct cash commissions.
             </p>
           </div>
 
           {/* Cash Commission Unlock Milestone Card */}
-          <div className="rounded-2xl border border-zinc-200/90 p-5 bg-gradient-to-r from-zinc-50 via-white to-orange-50/20 flex flex-col md:flex-row md:items-center justify-between gap-4">
-            <div className="flex items-start gap-3.5">
-              <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 ${
+          <div className="rounded-2xl border border-zinc-200/90 p-3.5 sm:p-5 bg-gradient-to-r from-zinc-50 via-white to-orange-50/20 flex flex-col md:flex-row md:items-center justify-between gap-3 sm:gap-4">
+            <div className="flex items-start gap-3">
+              <div className={`w-9 h-9 sm:w-10 sm:h-10 rounded-xl flex items-center justify-center shrink-0 ${
                 isCashUnlocked ? "bg-emerald-100 text-emerald-700" : "bg-zinc-100 text-zinc-500"
               }`}>
-                {isCashUnlocked ? <ShieldCheck size={22} weight="bold" /> : <Lock size={20} />}
+                {isCashUnlocked ? <ShieldCheck size={20} weight="bold" /> : <Lock size={18} />}
               </div>
-              <div>
-                <span className="font-bold text-zinc-950 text-sm block">
+              <div className="min-w-0">
+                <span className="font-bold text-zinc-950 text-xs sm:text-sm block">
                   {isCashUnlocked ? "VIP 25% Direct Cash Commission Unlocked!" : "Unlock 25% Direct Cash Commission"}
                 </span>
-                <span className="text-xs text-zinc-500 block mt-0.5">
+                <span className="text-[11px] sm:text-xs text-zinc-500 block mt-0.5 leading-relaxed">
                   {isCashUnlocked
                     ? "Every referral order deposits 25% direct cash in INR to your account in addition to 25% drive credits."
                     : `Buy ${ticketsNeededForCash} more tickets (₹${(ticketsNeededForCash * unitPrice).toLocaleString("en-IN")}) to unlock direct cash payouts.`}
@@ -1638,10 +1646,10 @@ export function MemberDashboardClient({
             </div>
 
             {/* Progress Gauge */}
-            <div className="min-w-[200px] text-right font-mono">
+            <div className="w-full md:w-auto md:min-w-[180px] text-left md:text-right pt-2 md:pt-0 border-t md:border-t-0 border-zinc-100">
               <div className="flex justify-between text-xs mb-1.5">
-                <span className="text-zinc-400">Milestone Progress</span>
-                <span className="font-bold text-zinc-900">{Math.min(25, ticketsBoughtTotal)} / 25</span>
+                <span className="text-zinc-500 font-medium">Milestone Progress</span>
+                <span className="font-bold text-zinc-900 tabular-nums">{Math.min(25, ticketsBoughtTotal)} / 25</span>
               </div>
               <div className="w-full h-2 bg-zinc-200 rounded-full overflow-hidden">
                 <div
@@ -1653,119 +1661,148 @@ export function MemberDashboardClient({
           </div>
 
           {/* Referral Link & Sharing Station */}
-          <div className="rounded-2xl bg-zinc-50 border border-zinc-200/80 p-6 space-y-4">
+          <div className="rounded-2xl bg-zinc-50 border border-zinc-200/80 p-3.5 sm:p-6 space-y-3.5 sm:space-y-4">
             <div>
-              <span className="text-xs font-mono font-bold uppercase tracking-wider text-zinc-500 block mb-1">
-                Your Exclusive Referral Link
-              </span>
-              <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
+              <div className="flex flex-wrap items-center justify-between gap-1.5 mb-2">
+                <span className="text-[11px] sm:text-xs font-bold uppercase tracking-wider text-zinc-500">
+                  Your Exclusive Referral Link
+                </span>
+                <span className="text-[10px] font-bold text-emerald-700 bg-emerald-50 border border-emerald-200/80 px-2 py-0.5 rounded-full whitespace-nowrap shrink-0">
+                  25% Credit Match
+                </span>
+              </div>
+
+              {/* Unified Link Box with Integrated Copy Button */}
+              <div className="flex items-center gap-2 p-1.5 pl-3 sm:pl-4 rounded-xl bg-white border border-zinc-300 shadow-2xs">
                 <input
                   type="text"
                   readOnly
                   value={referralUrl}
-                  className="flex-1 h-11 px-4 rounded-xl bg-white border border-zinc-200 text-xs sm:text-sm font-mono text-zinc-800 focus:outline-none"
+                  className="flex-1 min-w-0 bg-transparent text-xs sm:text-sm font-semibold text-zinc-900 select-all outline-none truncate"
                 />
                 <button
                   type="button"
                   onClick={handleCopyLink}
-                  className="h-11 px-5 rounded-xl bg-white hover:bg-zinc-100 border border-zinc-300 text-zinc-900 font-bold text-xs font-mono flex items-center justify-center gap-1.5 cursor-pointer shadow-2xs transition-all shrink-0"
+                  className="h-9 px-3.5 sm:px-4 rounded-lg bg-[#ea580c] hover:bg-[#c2410c] text-white font-bold text-xs flex items-center justify-center gap-1.5 cursor-pointer shadow-2xs transition-all shrink-0 active:scale-95"
                 >
-                  {copied ? <Check size={16} className="text-emerald-600" weight="bold" /> : <Copy size={16} />}
-                  <span>{copied ? "Copied!" : "Copy Link"}</span>
+                  {copied ? <Check size={14} weight="bold" /> : <Copy size={14} />}
+                  <span>{copied ? "Copied" : "Copy"}</span>
                 </button>
+              </div>
+
+              {/* Action Buttons Row - Balanced Grid */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 mt-2.5">
                 <a
                   href={`https://api.whatsapp.com/send?text=${encodeURIComponent(`Hey! Enter the Win A Porsche 718 Cayman contest with 100% money back in drive credits. Use my referral link: ${referralUrl}`)}`}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="h-11 px-5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs font-mono flex items-center justify-center gap-1.5 shadow-xs transition-colors shrink-0"
+                  className="h-10 px-4 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs flex items-center justify-center gap-2 shadow-2xs transition-colors shrink-0"
                 >
                   <ShareNetwork size={16} weight="bold" />
                   <span>Share on WhatsApp</span>
                 </a>
+
+                <div className="h-10 px-3.5 rounded-xl bg-white border border-zinc-300 text-xs font-semibold text-zinc-700 flex items-center justify-between shadow-2xs">
+                  <div className="flex items-center gap-1.5">
+                    <span className="text-zinc-400 text-[11px]">Code:</span>
+                    <strong className="text-zinc-950 font-black">{referralCode}</strong>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      navigator.clipboard.writeText(referralCode)
+                      setCopied(true)
+                      setTimeout(() => setCopied(false), 2000)
+                    }}
+                    className="text-[11px] font-bold text-[#ea580c] hover:underline cursor-pointer"
+                  >
+                    Copy Code
+                  </button>
+                </div>
               </div>
-              <span className="text-xs font-mono text-zinc-500 block mt-2">
-                Referral Code: <strong className="text-zinc-950 font-black">{referralCode}</strong>
-              </span>
             </div>
 
-            {/* Live Interactive Referral Simulator */}
-            <div className="pt-5 border-t border-zinc-200/70">
-              <span className="text-xs font-mono font-bold uppercase tracking-wider text-zinc-600 block mb-3">
-                Simulate A Referral (Live Demo Test)
-              </span>
+            {/* Collapsible Live Referral Simulator (Kept clean & non-intrusive) */}
+            <details className="group pt-3 border-t border-zinc-200/70">
+              <summary className="text-xs font-bold text-zinc-500 hover:text-zinc-950 cursor-pointer flex items-center justify-between py-1 select-none">
+                <span>Test Referral Simulation (Demo Mode)</span>
+                <span className="text-[11px] text-zinc-400 font-normal group-open:rotate-180 transition-transform">▼</span>
+              </summary>
 
-              <form onSubmit={handleSimulateReferral} className="flex flex-col sm:flex-row items-end gap-3 mb-2.5">
-                <div className="flex-1 w-full">
-                  <label className="block text-[11px] text-zinc-500 font-mono mb-1">
-                    Friend&apos;s Name
-                  </label>
-                  <input
-                    type="text"
-                    placeholder="e.g. Rahul Sharma"
-                    value={friendName}
-                    onChange={(e) => setFriendName(e.target.value)}
-                    className="h-10 px-3.5 rounded-xl bg-white border border-zinc-300 text-xs text-zinc-950 placeholder:text-zinc-400 focus:outline-none focus:border-orange-500 w-full font-mono"
-                  />
-                </div>
+              <div className="pt-3">
+                <form onSubmit={handleSimulateReferral} className="flex flex-col sm:flex-row items-stretch sm:items-end gap-2.5 mb-2">
+                  <div className="flex-1">
+                    <label className="block text-[11px] text-zinc-500 font-semibold mb-1">
+                      Friend&apos;s Name
+                    </label>
+                    <input
+                      type="text"
+                      placeholder="e.g. Rahul Sharma"
+                      value={friendName}
+                      onChange={(e) => setFriendName(e.target.value)}
+                      className="h-10 px-3 rounded-xl bg-white border border-zinc-300 text-xs text-zinc-950 placeholder:text-zinc-400 focus:outline-none focus:border-[#ea580c] w-full font-medium"
+                    />
+                  </div>
 
-                <div className="w-full sm:w-28">
-                  <label className="block text-[11px] text-zinc-500 font-mono mb-1">
-                    Tickets Bought
-                  </label>
-                  <input
-                    type="number"
-                    min="1"
-                    max="100"
-                    value={simTickets}
-                    onChange={(e) => setSimTickets(Math.max(1, parseInt(e.target.value) || 1))}
-                    className="h-10 px-3 rounded-xl bg-white border border-zinc-300 text-xs text-center font-mono font-bold text-zinc-950 focus:outline-none focus:border-orange-500 w-full"
-                  />
-                </div>
+                  <div className="w-full sm:w-28">
+                    <label className="block text-[11px] text-zinc-500 font-semibold mb-1">
+                      Tickets Bought
+                    </label>
+                    <input
+                      type="number"
+                      min="1"
+                      max="100"
+                      value={simTickets}
+                      onChange={(e) => setSimTickets(Math.max(1, parseInt(e.target.value) || 1))}
+                      className="h-10 px-3 rounded-xl bg-white border border-zinc-300 text-xs text-center font-bold text-zinc-950 focus:outline-none focus:border-[#ea580c] w-full"
+                    />
+                  </div>
 
-                <button
-                  type="submit"
-                  disabled={simulating}
-                  className="h-10 px-6 rounded-xl bg-zinc-950 hover:bg-zinc-800 text-white font-extrabold text-xs uppercase tracking-wider transition-colors shrink-0 cursor-pointer disabled:opacity-50 font-mono shadow-xs"
-                >
-                  {simulating ? "Simulating..." : "Add Referral"}
-                </button>
-              </form>
+                  <button
+                    type="submit"
+                    disabled={simulating}
+                    className="h-10 px-5 rounded-xl bg-zinc-950 hover:bg-zinc-800 text-white font-bold text-xs uppercase tracking-wider transition-colors shrink-0 cursor-pointer disabled:opacity-50 shadow-2xs"
+                  >
+                    {simulating ? "Simulating..." : "Add Referral"}
+                  </button>
+                </form>
 
-              <span className="text-xs text-zinc-500 font-mono block">
-                {simTickets} × ₹1,000 → you earn{" "}
-                <strong className="text-[#ea580c] font-bold">{simTickets * 250} credits</strong>{" "}
-                {isCashUnlocked ? `(+₹${(simTickets * 250).toLocaleString("en-IN")} direct cash)` : "(cash unlocked at 25 tickets)"}
-              </span>
+                <span className="text-[11px] text-zinc-500 block">
+                  {simTickets} × ₹1,000 → you earn{" "}
+                  <strong className="text-[#ea580c] font-bold">{simTickets * 250} credits</strong>{" "}
+                  {isCashUnlocked ? `(+₹${(simTickets * 250).toLocaleString("en-IN")} direct cash)` : "(cash unlocked at 25 tickets)"}
+                </span>
 
-              {simMsg && (
-                <div
-                  className={`p-3 rounded-xl text-xs mt-3 font-mono ${
-                    simMsg.type === "success"
-                      ? "bg-emerald-50 border border-emerald-200 text-emerald-800"
-                      : "bg-red-50 border border-red-200 text-red-700"
-                  }`}
-                >
-                  {simMsg.text}
-                </div>
-              )}
-            </div>
+                {simMsg && (
+                  <div
+                    className={`p-2.5 rounded-xl text-xs mt-2 font-medium ${
+                      simMsg.type === "success"
+                        ? "bg-emerald-50 border border-emerald-200 text-emerald-800"
+                        : "bg-red-50 border border-red-200 text-red-700"
+                    }`}
+                  >
+                    {simMsg.text}
+                  </div>
+                )}
+              </div>
+            </details>
           </div>
 
           {/* Referrals Activity Ledger */}
           <div>
-            <div className="flex items-center gap-1.5 text-xs sm:text-sm font-bold text-zinc-950 mb-3 font-mono">
+            <div className="flex items-center gap-1.5 text-xs sm:text-sm font-bold text-zinc-950 mb-3">
               <Users size={16} className="text-zinc-600" />
               <span>Verified Referrals Log ({referrals.length})</span>
             </div>
 
             {referrals.length === 0 ? (
-              <div className="rounded-2xl border border-dashed border-zinc-200 p-8 text-center text-xs text-zinc-400 font-mono">
+              <div className="rounded-2xl border border-dashed border-zinc-200 p-6 sm:p-8 text-center text-xs text-zinc-400">
                 No referrals recorded yet. Share your link above to begin earning 25% commissions.
               </div>
             ) : (
               <div className="divide-y divide-zinc-100 rounded-2xl border border-zinc-200/80 overflow-hidden bg-white shadow-2xs">
                 {referrals.map((ref) => (
-                  <div key={ref.id} className="p-4 flex items-center justify-between text-xs font-mono">
+                  <div key={ref.id} className="p-3.5 sm:p-4 flex items-center justify-between text-xs">
                     <div>
                       <span className="font-bold text-zinc-950 block">{ref.userName}</span>
                       <span className="text-[11px] text-zinc-400">
