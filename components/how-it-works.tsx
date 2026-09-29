@@ -74,23 +74,23 @@ export function HowItWorks({
                 className="relative rounded-none bg-zinc-50 border border-zinc-200 p-5 sm:p-6 flex flex-col justify-between hover:bg-white hover:border-zinc-400 hover:shadow-xs transition-all"
               >
                 <div>
-                  <div className="flex items-center justify-between pb-3 mb-3 border-b border-zinc-200/60">
-                    <span className="text-2xl font-black text-zinc-400 tabular-nums">
+                  <div className="flex items-center justify-between pb-3 mb-3.5 border-b border-zinc-200/60">
+                    <span className="text-2xl sm:text-3xl font-black text-zinc-400 tabular-nums">
                       {step.num}
                     </span>
-                    <span className="text-xs uppercase font-extrabold text-[#ea580c] bg-orange-100/80 border border-orange-200 px-2 py-0.5 rounded-none">
+                    <span className="text-[11px] sm:text-xs uppercase font-extrabold text-[#ea580c] bg-orange-100/80 border border-orange-200 px-2.5 py-0.5 rounded-none tracking-tight">
                       {step.badge}
                     </span>
                   </div>
 
-                  <div className="flex items-center gap-2 mb-2">
-                    <Icon size={20} weight="bold" className="text-zinc-950 shrink-0" />
-                    <h3 className="text-base sm:text-lg font-black text-zinc-950 uppercase tracking-tight">
+                  <div className="flex items-center gap-2.5 mb-2.5">
+                    <Icon size={22} weight="bold" className="text-zinc-950 shrink-0" />
+                    <h3 className="text-lg xs:text-xl sm:text-lg lg:text-xl font-black text-zinc-950 uppercase tracking-tight">
                       {step.action}
                     </h3>
                   </div>
 
-                  <p className="text-xs sm:text-sm text-zinc-950 leading-relaxed font-medium">
+                  <p className="text-[13px] sm:text-sm text-zinc-950 leading-relaxed font-medium">
                     {step.detail}
                   </p>
                 </div>
