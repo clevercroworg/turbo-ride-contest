@@ -45,7 +45,7 @@ export function HeroSection({
   const cleanWorth = worthDisplay ? worthDisplay.replace(/^Worth\s+(over\s+)?/i, "").trim() : "₹1.6 Crore"
 
   return (
-    <section className="relative pt-26 sm:pt-28 md:pt-30 lg:pt-32 pb-8 sm:pb-10 md:pb-12 lg:pb-14 flex flex-col justify-center overflow-hidden border-b border-orange-700 bg-[#ea580c]">
+    <section className="relative pt-28 sm:pt-30 md:pt-30 lg:pt-32 pb-12 sm:pb-14 md:pb-12 lg:pb-14 flex flex-col justify-center overflow-hidden border-b border-orange-700 bg-[#ea580c]">
       
       {/* Smooth Automotive Studio Lighting - Clean & Glossy */}
       <div 
@@ -158,7 +158,7 @@ export function HeroSection({
           <div className="lg:col-span-6 xl:col-span-7 flex flex-col justify-center max-w-xl md:max-w-2xl lg:max-w-none mx-auto w-full">
             
             {/* Specs Strip - Crisp White Card with High-Impact Hierarchy & Tablet-Tuned Sizing */}
-            <div className="w-full grid grid-cols-3 gap-1.5 sm:gap-3 p-3 sm:p-4 rounded-none bg-white text-zinc-950 shadow-[0_6px_20px_rgba(0,0,0,0.15)] border border-white mb-2 sm:mb-3">
+            <div className="w-full grid grid-cols-3 gap-1.5 sm:gap-3 p-3 sm:p-4 rounded-none bg-white text-zinc-950 shadow-[0_6px_20px_rgba(0,0,0,0.15)] border border-white mb-3.5 sm:mb-4 md:mb-4">
               <div className="flex flex-col items-start min-w-0 px-1 sm:px-2">
                 <span className="text-[10px] sm:text-xs uppercase tracking-wider text-zinc-500 font-bold block mb-1">
                   Horsepower
@@ -187,12 +187,12 @@ export function HeroSection({
               </div>
             </div>
 
-            {/* Vehicle Render - Expansive on Desktop, Proportioned on Tablet & Mobile */}
+            {/* Vehicle Render - Expansive on Desktop, Proportioned with Generous Breathing Space on Mobile & Tablet */}
             <motion.div
               initial={reduceMotion ? false : { opacity: 0, scale: 0.98 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
-              className="relative w-full flex flex-col items-center justify-center my-1 sm:my-2 md:my-3 lg:my-2 group"
+              className="relative w-full flex flex-col items-center justify-center pt-4 pb-7 sm:pt-5 sm:pb-8 md:pt-4 md:pb-6 lg:py-2 group"
             >
               <div className="relative w-full max-w-[420px] sm:max-w-[560px] md:max-w-[640px] lg:max-w-[760px] xl:max-w-[840px] mx-auto">
                 <Image
