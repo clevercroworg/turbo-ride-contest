@@ -48,10 +48,16 @@ export function FaqAccordion() {
     <section id="faq" className="py-12 sm:py-20 bg-[#fafafa] border-t border-zinc-200">
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
         
-        {/* Centralized & Enlarged Section Header - Single line */}
+        {/* Creative Automotive Telemetry Deco & Single Line Heading */}
         <div className="text-center max-w-3xl mx-auto mb-8 sm:mb-12">
-          <div className="inline-flex items-center gap-1.5 mb-2 px-3 py-1 rounded-full text-[11px] sm:text-xs font-bold uppercase tracking-wider text-[#ea580c] bg-orange-50 border border-orange-200/80 shadow-2xs">
-            <span>AUDITING & DISCLOSURES</span>
+          <div className="flex items-center justify-center gap-2.5 mb-2.5">
+            <span className="w-6 sm:w-10 h-px bg-gradient-to-r from-transparent to-[#ea580c]" />
+            <span className="text-[10px] sm:text-[11px] font-mono tracking-widest text-[#ea580c] font-black uppercase flex items-center gap-1.5">
+              <span className="w-1.5 h-1.5 bg-[#ea580c] rotate-45 inline-block" />
+              07 // AUDIT & DISCLOSURES
+              <span className="w-1.5 h-1.5 bg-[#ea580c] rotate-45 inline-block" />
+            </span>
+            <span className="w-6 sm:w-10 h-px bg-gradient-to-l from-transparent to-[#ea580c]" />
           </div>
           <h2 className="text-2xl sm:text-3xl lg:text-4xl font-black text-zinc-950 uppercase tracking-tight leading-none mb-3">
             FAQS & VERIFICATION
@@ -61,14 +67,14 @@ export function FaqAccordion() {
           </p>
         </div>
 
-        {/* Accordion List with Motion */}
+        {/* Accordion List with Motion - Sharp Edged */}
         <div className="flex flex-col gap-2.5 sm:gap-3">
           {faqs.map((faq, idx) => {
             const isOpen = openIndex === idx
             return (
               <div
                 key={idx}
-                className="rounded-2xl bg-white border border-zinc-200 overflow-hidden shadow-2xs transition-colors"
+                className="rounded-none bg-white border border-zinc-200 overflow-hidden shadow-2xs transition-colors"
               >
                 <button
                   type="button"
@@ -84,7 +90,7 @@ export function FaqAccordion() {
                     </span>
                   </div>
                   <div
-                    className={`w-6 h-6 rounded-lg flex items-center justify-center shrink-0 transition-transform duration-200 border ${
+                    className={`w-6 h-6 rounded-none flex items-center justify-center shrink-0 transition-transform duration-200 border ${
                       isOpen
                         ? "rotate-180 bg-[#ea580c] text-white border-[#ea580c]"
                         : "bg-zinc-50 text-zinc-600 border-zinc-200"

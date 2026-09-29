@@ -3,6 +3,7 @@
 import { useState } from "react"
 import { Nav } from "@/components/nav"
 import { HeroSection } from "@/components/hero-section"
+import { TireTrackDivider } from "@/components/tire-track-divider"
 import { EntryAllocation } from "@/components/entry-allocation"
 import { HowItWorks } from "@/components/how-it-works"
 import { ValueMatrix } from "@/components/value-matrix"
@@ -48,6 +49,9 @@ export function HomeClient({ contest, memberEmail, userCredits = 0 }: HomeClient
           carName={contest.carName}
           worthDisplay={contest.worthDisplay}
         />
+
+        {/* 2.2. Supercar Launch Skid Mark & Dust Path Divider */}
+        <TireTrackDivider />
 
         {/* 2.5. Dedicated Entry Allocation Terminal */}
         <EntryAllocation

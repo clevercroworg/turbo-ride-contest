@@ -1,7 +1,7 @@
 "use client"
 
 import { useState } from "react"
-import { Ticket, ArrowRight, ShieldCheck, Lightning, CheckCircle } from "@phosphor-icons/react"
+import { Ticket, ArrowRight, ShieldCheck, CheckCircle } from "@phosphor-icons/react"
 
 interface EntryAllocationProps {
   onBuyClick: (ticketCount: number) => void
@@ -49,14 +49,19 @@ export function EntryAllocation({
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
-        {/* Centralized & Enlarged Section Header - Single line on mobile */}
+        {/* Creative Automotive Telemetry Deco & Single Line Heading */}
         <div className="text-center max-w-3xl mx-auto mb-8 sm:mb-12">
-          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] sm:text-xs font-bold bg-orange-50 text-[#ea580c] uppercase tracking-wider border border-orange-200/80 mb-2.5 sm:mb-3 shadow-2xs">
-            <Ticket size={14} weight="bold" />
-            <span>OFFICIAL ALLOCATION</span>
+          <div className="flex items-center justify-center gap-2.5 mb-2.5">
+            <span className="w-6 sm:w-10 h-px bg-gradient-to-r from-transparent to-[#ea580c]" />
+            <span className="text-[10px] sm:text-[11px] font-mono tracking-widest text-[#ea580c] font-black uppercase flex items-center gap-1.5">
+              <span className="w-1.5 h-1.5 bg-[#ea580c] rotate-45 inline-block" />
+              01 // ENTRY ALLOCATION
+              <span className="w-1.5 h-1.5 bg-[#ea580c] rotate-45 inline-block" />
+            </span>
+            <span className="w-6 sm:w-10 h-px bg-gradient-to-l from-transparent to-[#ea580c]" />
           </div>
           
-          <h2 className="text-2xl sm:text-3xl lg:text-4xl font-black text-zinc-950 uppercase tracking-tight leading-none mb-3 truncate">
+          <h2 className="text-2xl sm:text-3xl lg:text-4xl font-black text-zinc-950 uppercase tracking-tight leading-none mb-3">
             SELECT ENTRY ALLOCATION
           </h2>
 
@@ -65,9 +70,9 @@ export function EntryAllocation({
           </p>
         </div>
 
-        {/* Centralized Card Container */}
+        {/* Centralized Card Container - Sharp Edged */}
         <div className="max-w-xl mx-auto">
-          <div className="rounded-3xl bg-white/95 backdrop-blur-md border border-orange-200/90 p-5 sm:p-7 shadow-[0_16px_48px_rgba(234,88,12,0.12)] relative">
+          <div className="rounded-none bg-white border border-zinc-200 p-5 sm:p-7 shadow-[0_16px_48px_rgba(234,88,12,0.10)] relative">
             
             {/* Terminal Header */}
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1.5 pb-3.5 mb-4 border-b border-zinc-100">
@@ -82,7 +87,7 @@ export function EntryAllocation({
               </span>
             </div>
 
-            {/* 5 Selector Buttons */}
+            {/* 5 Selector Buttons - Sharp Edged */}
             <div className="grid grid-cols-5 gap-1.5 sm:gap-2.5 mb-4">
               {ticketOptions.map((opt) => {
                 const isSelected = selectedTickets === opt.count
@@ -91,15 +96,15 @@ export function EntryAllocation({
                     key={opt.count}
                     type="button"
                     onClick={() => setSelectedTickets(opt.count)}
-                    className={`relative py-2.5 sm:py-3 px-1 rounded-xl flex flex-col items-center justify-center transition-all cursor-pointer border ${
+                    className={`relative py-2.5 sm:py-3 px-1 rounded-none flex flex-col items-center justify-center transition-all cursor-pointer border ${
                       isSelected
-                        ? "bg-zinc-950 text-white border-zinc-950 shadow-md scale-[1.03]"
+                        ? "bg-zinc-950 text-white border-zinc-950 shadow-md scale-[1.02]"
                         : "bg-zinc-50 hover:bg-zinc-100 text-zinc-800 border-zinc-200"
                     }`}
                   >
                     {opt.bonus && (
                       <span
-                        className={`absolute -top-2.5 left-1/2 -translate-x-1/2 text-[9px] sm:text-[10px] font-extrabold uppercase px-1.5 sm:px-2 py-0.5 rounded-full tracking-tight whitespace-nowrap shadow-xs ${
+                        className={`absolute -top-2.5 left-1/2 -translate-x-1/2 text-[9px] sm:text-[10px] font-extrabold uppercase px-1.5 sm:px-2 py-0.5 rounded-none tracking-tight whitespace-nowrap shadow-xs ${
                           isSelected
                             ? "bg-[#ea580c] text-white"
                             : "bg-orange-100 text-[#ea580c] border border-orange-200"
@@ -119,8 +124,8 @@ export function EntryAllocation({
               })}
             </div>
 
-            {/* Dynamic Live Telemetry Calculation Grid - Never truncates, clean 3-col layout */}
-            <div className="grid grid-cols-3 gap-1 sm:gap-2 py-3 px-2 sm:px-4 rounded-2xl bg-orange-50/80 border border-orange-200/90 mb-4 text-center">
+            {/* Dynamic Live Telemetry Calculation Grid - Sharp Edges */}
+            <div className="grid grid-cols-3 gap-1 sm:gap-2 py-3 px-2 sm:px-4 rounded-none bg-orange-50/80 border border-orange-200/90 mb-4 text-center">
               <div className="min-w-0 flex flex-col items-center justify-center">
                 <span className="text-zinc-500 block text-[11px] sm:text-xs uppercase font-extrabold tracking-tight leading-tight mb-0.5">
                   Deposit
@@ -150,11 +155,11 @@ export function EntryAllocation({
               </div>
             </div>
 
-            {/* Primary Action Button */}
+            {/* Primary Action Button - Sharp */}
             <button
               type="button"
               onClick={() => onBuyClick(selectedTickets)}
-              className="w-full py-3.5 sm:py-4 px-5 rounded-2xl bg-[#ea580c] hover:bg-[#c2410c] text-white text-sm sm:text-base font-bold uppercase tracking-wider transition-all shadow-[0_6px_20px_rgba(234,88,12,0.38)] hover:shadow-[0_8px_28px_rgba(234,88,12,0.5)] active:scale-[0.99] flex items-center justify-center gap-2.5 cursor-pointer mb-4"
+              className="w-full py-3.5 sm:py-4 px-5 rounded-none bg-[#ea580c] hover:bg-[#c2410c] text-white text-sm sm:text-base font-bold uppercase tracking-wider transition-all shadow-[0_6px_20px_rgba(234,88,12,0.35)] hover:shadow-[0_8px_28px_rgba(234,88,12,0.5)] active:scale-[0.99] flex items-center justify-center gap-2.5 cursor-pointer mb-4"
             >
               <Ticket size={18} weight="fill" className="shrink-0" />
               <span className="truncate">
@@ -163,7 +168,7 @@ export function EntryAllocation({
               <ArrowRight size={16} weight="bold" className="shrink-0" />
             </button>
 
-            {/* Real-time Allocation Progress Bar */}
+            {/* Real-time Allocation Progress Bar - Sharp */}
             <div className="pt-3 border-t border-zinc-100 text-xs sm:text-sm">
               <div className="flex items-center justify-between gap-1 text-zinc-600 mb-2">
                 <span className="tracking-tight truncate font-medium">
@@ -173,9 +178,9 @@ export function EntryAllocation({
                   {progressPercent}% Claimed
                 </span>
               </div>
-              <div className="w-full h-2.5 bg-zinc-200 rounded-full overflow-hidden flex">
+              <div className="w-full h-2.5 bg-zinc-200 rounded-none overflow-hidden flex">
                 <div 
-                  className="h-full bg-gradient-to-r from-orange-500 to-[#ea580c] transition-all duration-500 rounded-full"
+                  className="h-full bg-gradient-to-r from-orange-500 to-[#ea580c] transition-all duration-500 rounded-none"
                   style={{ width: `${progressPercent}%` }}
                 />
               </div>

@@ -41,10 +41,16 @@ export function ReferralEngine({ ticketPrice = 1000 }: ReferralEngineProps = {})
     <section id="referrals" className="py-12 sm:py-20 bg-[#fafafa] border-t border-zinc-200">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
-        {/* Centralized & Enlarged Section Header - Single line */}
+        {/* Creative Automotive Telemetry Deco & Single Line Heading */}
         <div className="text-center max-w-3xl mx-auto mb-8 sm:mb-12">
-          <div className="inline-flex items-center gap-1.5 mb-2 px-3 py-1 rounded-full text-[11px] sm:text-xs font-bold uppercase tracking-wider text-[#ea580c] bg-orange-50 border border-orange-200/80 shadow-2xs">
-            <span>SYNDICATE REWARDS</span>
+          <div className="flex items-center justify-center gap-2.5 mb-2.5">
+            <span className="w-6 sm:w-10 h-px bg-gradient-to-r from-transparent to-[#ea580c]" />
+            <span className="text-[10px] sm:text-[11px] font-mono tracking-widest text-[#ea580c] font-black uppercase flex items-center gap-1.5">
+              <span className="w-1.5 h-1.5 bg-[#ea580c] rotate-45 inline-block" />
+              06 // SYNDICATE NETWORK
+              <span className="w-1.5 h-1.5 bg-[#ea580c] rotate-45 inline-block" />
+            </span>
+            <span className="w-6 sm:w-10 h-px bg-gradient-to-l from-transparent to-[#ea580c]" />
           </div>
           <h2 className="text-2xl sm:text-3xl lg:text-4xl font-black text-zinc-950 uppercase tracking-tight leading-none mb-3">
             INVITE & EARN CASH
@@ -60,26 +66,26 @@ export function ReferralEngine({ ticketPrice = 1000 }: ReferralEngineProps = {})
           {/* LEFT COLUMN: Link Box + Earnings Calculator */}
           <div className="lg:col-span-6 flex flex-col justify-between gap-4 sm:gap-6">
             
-            {/* Box 1: Your Referral Link Card */}
-            <div className="rounded-2xl bg-white border border-zinc-200 p-4 sm:p-6 shadow-2xs">
+            {/* Box 1: Your Referral Link Card - Sharp Edged */}
+            <div className="rounded-none bg-white border border-zinc-200 p-4 sm:p-6 shadow-2xs">
               <div className="flex items-center justify-between gap-2 mb-3">
                 <span className="text-xs font-bold uppercase tracking-wide text-zinc-500">
                   YOUR SYNDICATE LINK
                 </span>
-                <span className="text-[11px] font-bold text-[#ea580c] bg-orange-50 border border-orange-200 px-2 py-0.5 rounded-full">
+                <span className="text-[11px] font-bold text-[#ea580c] bg-orange-50 border border-orange-200 px-2 py-0.5 rounded-none">
                   Instant 25% Match
                 </span>
               </div>
 
               {/* Input & Copy Button Bar */}
-              <div className="bg-zinc-50 rounded-xl p-1.5 pl-3 sm:pl-4 flex items-center justify-between gap-2 border border-zinc-200">
+              <div className="bg-zinc-50 rounded-none p-1.5 pl-3 sm:pl-4 flex items-center justify-between gap-2 border border-zinc-200">
                 <span className="text-xs sm:text-sm text-zinc-800 font-semibold truncate select-all">
                   winmyporsche.in/r/4821
                 </span>
                 <button
                   type="button"
                   onClick={handleCopy}
-                  className="bg-[#ea580c] hover:bg-[#c2410c] text-white text-xs font-bold px-3 sm:px-4 py-2 rounded-lg flex items-center gap-1.5 shadow-xs transition-all shrink-0 cursor-pointer active:scale-95"
+                  className="bg-[#ea580c] hover:bg-[#c2410c] text-white text-xs font-bold px-3 sm:px-4 py-2 rounded-none flex items-center gap-1.5 shadow-xs transition-all shrink-0 cursor-pointer active:scale-95"
                 >
                   {copied ? (
                     <>
@@ -96,14 +102,14 @@ export function ReferralEngine({ ticketPrice = 1000 }: ReferralEngineProps = {})
               </div>
             </div>
 
-            {/* Box 2: Earnings Calculator Card */}
-            <div className="rounded-2xl bg-white border border-zinc-200 p-4 sm:p-6 shadow-2xs flex-1 flex flex-col justify-between">
+            {/* Box 2: Earnings Calculator Card - Sharp Edged */}
+            <div className="rounded-none bg-white border border-zinc-200 p-4 sm:p-6 shadow-2xs flex-1 flex flex-col justify-between">
               <div>
                 <div className="flex items-center justify-between pb-2 mb-3 border-b border-zinc-100">
                   <span className="text-xs font-bold uppercase tracking-wide text-zinc-500">
                     SIMULATE EARNINGS
                   </span>
-                  <span className="text-xs font-black text-[#ea580c] bg-orange-50 px-2.5 py-0.5 rounded-full border border-orange-200 tabular-nums">
+                  <span className="text-xs font-black text-[#ea580c] bg-orange-50 px-2.5 py-0.5 rounded-none border border-orange-200 tabular-nums">
                     {activeTickets} Referred {activeTickets === 1 ? "Ticket" : "Tickets"}
                   </span>
                 </div>
@@ -111,7 +117,7 @@ export function ReferralEngine({ ticketPrice = 1000 }: ReferralEngineProps = {})
                 {/* Dual Stat Metrics */}
                 <div className="grid grid-cols-2 gap-2.5 sm:gap-4 mb-4">
                   {/* Metric 1: Drive Credits */}
-                  <div className="rounded-xl border border-zinc-200 bg-zinc-50 p-3 sm:p-4">
+                  <div className="rounded-none border border-zinc-200 bg-zinc-50 p-3 sm:p-4">
                     <span className="text-[11px] text-zinc-500 font-bold uppercase block mb-1">
                       Drive Credits (1:1)
                     </span>
@@ -124,7 +130,7 @@ export function ReferralEngine({ ticketPrice = 1000 }: ReferralEngineProps = {})
                   </div>
 
                   {/* Metric 2: Cash Commission */}
-                  <div className="rounded-xl border border-orange-200 bg-orange-50/50 p-3 sm:p-4">
+                  <div className="rounded-none border border-orange-200 bg-orange-50/50 p-3 sm:p-4">
                     <span className="text-[11px] text-[#ea580c] font-bold uppercase block mb-1">
                       Cash Commission
                     </span>
@@ -138,7 +144,7 @@ export function ReferralEngine({ ticketPrice = 1000 }: ReferralEngineProps = {})
                 </div>
 
                 {/* Synced Checkpoint Stepper & Slider */}
-                <div className="bg-zinc-50/80 rounded-xl border border-zinc-200/80 p-3 sm:p-3.5 mb-2">
+                <div className="bg-zinc-50/80 rounded-none border border-zinc-200/80 p-3 sm:p-3.5 mb-2">
                   <div className="flex items-center gap-2 mb-3">
                     {/* Previous Checkpoint Button */}
                     <button
@@ -146,7 +152,7 @@ export function ReferralEngine({ ticketPrice = 1000 }: ReferralEngineProps = {})
                       onClick={handlePrev}
                       disabled={checkpointIndex === 0}
                       aria-label="Previous checkpoint"
-                      className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-white hover:bg-zinc-100 disabled:opacity-30 disabled:pointer-events-none text-zinc-800 flex items-center justify-center shrink-0 transition-colors border border-zinc-200 cursor-pointer active:scale-95"
+                      className="w-7 h-7 sm:w-8 sm:h-8 rounded-none bg-white hover:bg-zinc-100 disabled:opacity-30 disabled:pointer-events-none text-zinc-800 flex items-center justify-center shrink-0 transition-colors border border-zinc-200 cursor-pointer active:scale-95"
                     >
                       <ArrowRight size={14} weight="bold" className="rotate-180" />
                     </button>
@@ -154,19 +160,19 @@ export function ReferralEngine({ ticketPrice = 1000 }: ReferralEngineProps = {})
                     {/* Progress Slider Track with Checkpoints */}
                     <div className="relative flex-1 py-2 select-none">
                       {/* Background Bar */}
-                      <div className="relative w-full h-2 rounded-full bg-zinc-200 overflow-hidden">
+                      <div className="relative w-full h-2 rounded-none bg-zinc-200 overflow-hidden">
                         <div
-                          className="h-full bg-gradient-to-r from-orange-500 to-[#ea580c] transition-all duration-200 rounded-full"
+                          className="h-full bg-gradient-to-r from-orange-500 to-[#ea580c] transition-all duration-200 rounded-none"
                           style={{ width: `${progressPercent}%` }}
                         />
                       </div>
 
-                      {/* Checkpoint tick dots */}
+                      {/* Checkpoint tick markers */}
                       <div className="absolute inset-x-0 top-1/2 -translate-y-1/2 pointer-events-none">
                         {checkpoints.map((val, idx) => (
                           <span
                             key={val}
-                            className={`absolute top-1/2 -translate-y-1/2 -translate-x-1/2 w-2 h-2 rounded-full border border-white transition-all ${
+                            className={`absolute top-1/2 -translate-y-1/2 -translate-x-1/2 w-2 h-2 rounded-none border border-white transition-all ${
                               idx <= checkpointIndex ? "bg-[#ea580c]" : "bg-zinc-300"
                             }`}
                             style={{ left: `${(idx / (checkpoints.length - 1)) * 100}%` }}
@@ -176,7 +182,7 @@ export function ReferralEngine({ ticketPrice = 1000 }: ReferralEngineProps = {})
 
                       {/* Visible Thumb Knob */}
                       <div
-                        className="absolute top-1/2 -translate-y-1/2 -translate-x-1/2 w-4 h-4 rounded-full bg-white border-2 border-[#ea580c] shadow-sm pointer-events-none transition-all duration-200 z-10"
+                        className="absolute top-1/2 -translate-y-1/2 -translate-x-1/2 w-4 h-4 rounded-none bg-white border-2 border-[#ea580c] shadow-sm pointer-events-none transition-all duration-200 z-10"
                         style={{ left: `${progressPercent}%` }}
                       />
 
@@ -199,7 +205,7 @@ export function ReferralEngine({ ticketPrice = 1000 }: ReferralEngineProps = {})
                       onClick={handleNext}
                       disabled={checkpointIndex === checkpoints.length - 1}
                       aria-label="Next checkpoint"
-                      className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-white hover:bg-zinc-100 disabled:opacity-30 disabled:pointer-events-none text-zinc-800 flex items-center justify-center shrink-0 transition-colors border border-zinc-200 cursor-pointer active:scale-95"
+                      className="w-7 h-7 sm:w-8 sm:h-8 rounded-none bg-white hover:bg-zinc-100 disabled:opacity-30 disabled:pointer-events-none text-zinc-800 flex items-center justify-center shrink-0 transition-colors border border-zinc-200 cursor-pointer active:scale-95"
                     >
                       <ArrowRight size={14} weight="bold" />
                     </button>
@@ -214,7 +220,7 @@ export function ReferralEngine({ ticketPrice = 1000 }: ReferralEngineProps = {})
                           key={val}
                           type="button"
                           onClick={() => setCheckpointIndex(idx)}
-                          className={`flex-1 py-1 px-1 rounded-md text-[11px] sm:text-xs font-bold transition-all text-center cursor-pointer ${
+                          className={`flex-1 py-1 px-1 rounded-none text-[11px] sm:text-xs font-bold transition-all text-center cursor-pointer ${
                             isSelected
                               ? "bg-zinc-950 text-white shadow-xs font-black"
                               : "bg-white hover:bg-zinc-100 text-zinc-600 border border-zinc-200/80"
@@ -239,9 +245,9 @@ export function ReferralEngine({ ticketPrice = 1000 }: ReferralEngineProps = {})
           {/* RIGHT COLUMN: 3 Numbered Steps with clean inline layout */}
           <div className="lg:col-span-6 flex flex-col justify-between gap-3 sm:gap-4">
             
-            {/* Step 1 */}
-            <div className="rounded-2xl bg-white border border-zinc-200 p-4 sm:p-5 shadow-2xs flex-1 flex items-start gap-3.5">
-              <span className="w-7 h-7 rounded-lg bg-zinc-100 border border-zinc-200 text-zinc-900 font-black text-xs flex items-center justify-center shrink-0 mt-0.5">
+            {/* Step 1 - Sharp */}
+            <div className="rounded-none bg-white border border-zinc-200 p-4 sm:p-5 shadow-2xs flex-1 flex items-start gap-3.5">
+              <span className="w-7 h-7 rounded-none bg-zinc-100 border border-zinc-200 text-zinc-900 font-black text-xs flex items-center justify-center shrink-0 mt-0.5">
                 01
               </span>
               <div className="min-w-0">
@@ -254,9 +260,9 @@ export function ReferralEngine({ ticketPrice = 1000 }: ReferralEngineProps = {})
               </div>
             </div>
 
-            {/* Step 2 */}
-            <div className="rounded-2xl bg-white border border-zinc-200 p-4 sm:p-5 shadow-2xs flex-1 flex items-start gap-3.5">
-              <span className="w-7 h-7 rounded-lg bg-zinc-100 border border-zinc-200 text-zinc-900 font-black text-xs flex items-center justify-center shrink-0 mt-0.5">
+            {/* Step 2 - Sharp */}
+            <div className="rounded-none bg-white border border-zinc-200 p-4 sm:p-5 shadow-2xs flex-1 flex items-start gap-3.5">
+              <span className="w-7 h-7 rounded-none bg-zinc-100 border border-zinc-200 text-zinc-900 font-black text-xs flex items-center justify-center shrink-0 mt-0.5">
                 02
               </span>
               <div className="min-w-0">
@@ -269,9 +275,9 @@ export function ReferralEngine({ ticketPrice = 1000 }: ReferralEngineProps = {})
               </div>
             </div>
 
-            {/* Step 3 */}
-            <div className="rounded-2xl bg-white border border-zinc-200 p-4 sm:p-5 shadow-2xs flex-1 flex items-start gap-3.5">
-              <span className="w-7 h-7 rounded-lg bg-orange-100 border border-orange-200 text-[#ea580c] font-black text-xs flex items-center justify-center shrink-0 mt-0.5">
+            {/* Step 3 - Sharp */}
+            <div className="rounded-none bg-white border border-zinc-200 p-4 sm:p-5 shadow-2xs flex-1 flex items-start gap-3.5">
+              <span className="w-7 h-7 rounded-none bg-orange-100 border border-orange-200 text-[#ea580c] font-black text-xs flex items-center justify-center shrink-0 mt-0.5">
                 03
               </span>
               <div className="min-w-0">
@@ -292,7 +298,7 @@ export function ReferralEngine({ ticketPrice = 1000 }: ReferralEngineProps = {})
         <div className="text-center px-4 sm:px-0">
           <Link
             href="/login"
-            className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-5 sm:px-8 py-3.5 sm:py-4 rounded-xl bg-[#ea580c] hover:bg-[#c2410c] text-white text-xs sm:text-sm font-bold uppercase tracking-wider shadow-md shadow-orange-500/20 transition-all active:scale-95 cursor-pointer"
+            className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-5 sm:px-8 py-3.5 sm:py-4 rounded-none bg-[#ea580c] hover:bg-[#c2410c] text-white text-xs sm:text-sm font-bold uppercase tracking-wider shadow-md shadow-orange-500/20 transition-all active:scale-95 cursor-pointer"
           >
             <span className="hidden sm:inline">Access Member Garage & Copy Syndicate Link</span>
             <span className="sm:hidden">Access Member Garage</span>

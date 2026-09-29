@@ -29,11 +29,17 @@ export function ValueMatrix({
     <section className="py-12 sm:py-20 bg-[#fafafa] border-t border-zinc-200">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
-        {/* Centralized & Enlarged Section Header - Single line */}
+        {/* Creative Automotive Telemetry Deco & Single Line Heading */}
         <div className="text-center max-w-3xl mx-auto mb-8 sm:mb-12">
-          <span className="inline-block text-[11px] sm:text-xs font-bold uppercase tracking-wider text-[#ea580c] mb-2 px-3 py-1 rounded-full bg-orange-50 border border-orange-200/80 shadow-2xs">
-            GUARANTEED UTILITY
-          </span>
+          <div className="flex items-center justify-center gap-2.5 mb-2.5">
+            <span className="w-6 sm:w-10 h-px bg-gradient-to-r from-transparent to-[#ea580c]" />
+            <span className="text-[10px] sm:text-[11px] font-mono tracking-widest text-[#ea580c] font-black uppercase flex items-center gap-1.5">
+              <span className="w-1.5 h-1.5 bg-[#ea580c] rotate-45 inline-block" />
+              03 // GUARANTEED UTILITY
+              <span className="w-1.5 h-1.5 bg-[#ea580c] rotate-45 inline-block" />
+            </span>
+            <span className="w-6 sm:w-10 h-px bg-gradient-to-l from-transparent to-[#ea580c]" />
+          </div>
           <h2 className="text-2xl sm:text-3xl lg:text-4xl font-black text-zinc-950 uppercase tracking-tight leading-none mb-3">
             100% CREDITS BACK
           </h2>
@@ -42,17 +48,17 @@ export function ValueMatrix({
           </p>
         </div>
 
-        {/* 2-Column Bento */}
+        {/* 2-Column Bento - Sharp Edges */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 sm:gap-6 items-stretch">
           
-          {/* Left Column: 1:1 Parity Card */}
-          <div className="lg:col-span-5 rounded-2xl bg-white border border-zinc-200 p-4 sm:p-6 lg:p-7 flex flex-col justify-between shadow-2xs">
+          {/* Left Column: 1:1 Parity Card - Sharp Edged */}
+          <div className="lg:col-span-5 rounded-none bg-white border border-zinc-200 p-4 sm:p-6 lg:p-7 flex flex-col justify-between shadow-2xs">
             <div>
               <div className="flex items-center justify-between pb-3 mb-4 sm:mb-5 border-b border-zinc-100 text-xs font-semibold">
                 <span className="text-zinc-500 uppercase tracking-wider font-bold">
                   CONVERSION RATIO
                 </span>
-                <span className="text-emerald-700 font-bold flex items-center gap-1.5 bg-emerald-50 px-2.5 py-0.5 rounded-full border border-emerald-200 text-[11px] sm:text-xs">
+                <span className="text-emerald-700 font-bold flex items-center gap-1.5 bg-emerald-50 px-2.5 py-0.5 rounded-none border border-emerald-200 text-[11px] sm:text-xs">
                   <ShieldCheck size={14} weight="fill" className="text-emerald-600 shrink-0" />
                   <span>100% Capital Protected</span>
                 </span>
@@ -67,30 +73,30 @@ export function ValueMatrix({
                 </span>
               </div>
 
-              {/* 3 Core Utilities */}
+              {/* 3 Core Utilities - Sharp */}
               <div className="space-y-2.5 sm:space-y-3">
-                <div className="flex items-center gap-3 p-2.5 sm:p-3.5 rounded-xl bg-zinc-50 border border-zinc-200/80">
-                  <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-lg sm:rounded-xl bg-orange-100 text-[#ea580c] flex items-center justify-center shrink-0">
+                <div className="flex items-center gap-3 p-2.5 sm:p-3.5 rounded-none bg-zinc-50 border border-zinc-200/80">
+                  <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-none bg-orange-100 text-[#ea580c] flex items-center justify-center shrink-0">
                     <Gauge size={18} weight="bold" />
                   </div>
                   <div className="min-w-0">
-                    <span className="text-xs sm:text-sm font-bold text-zinc-950 block truncate">Supercar Track Laps</span>
-                    <span className="text-[11px] sm:text-xs text-zinc-500 block truncate">Cayman, Huracán or 488 on real circuit</span>
+                    <span className="text-xs sm:text-sm font-bold text-zinc-950 block truncate">Real Supercar Laps</span>
+                    <span className="text-[11px] sm:text-xs text-zinc-500 block truncate">Redeem for Buddh Circuit seat time</span>
                   </div>
                 </div>
 
-                <div className="flex items-center gap-3 p-2.5 sm:p-3.5 rounded-xl bg-zinc-50 border border-zinc-200/80">
-                  <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-lg sm:rounded-xl bg-emerald-100 text-emerald-700 flex items-center justify-center shrink-0">
+                <div className="flex items-center gap-3 p-2.5 sm:p-3.5 rounded-none bg-zinc-50 border border-zinc-200/80">
+                  <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-none bg-zinc-950 text-white flex items-center justify-center shrink-0">
                     <VideoCamera size={18} weight="bold" />
                   </div>
                   <div className="min-w-0">
-                    <span className="text-xs sm:text-sm font-bold text-zinc-950 block truncate">4K Drone Reel & Telemetry</span>
-                    <span className="text-[11px] sm:text-xs text-zinc-500 block truncate">Cinematic track video produced for you</span>
+                    <span className="text-xs sm:text-sm font-bold text-zinc-950 block truncate">4K FPV Media Shoots</span>
+                    <span className="text-[11px] sm:text-xs text-zinc-500 block truncate">Professional reels & track photos</span>
                   </div>
                 </div>
 
-                <div className="flex items-center gap-3 p-2.5 sm:p-3.5 rounded-xl bg-zinc-50 border border-zinc-200/80">
-                  <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-lg sm:rounded-xl bg-zinc-200 text-zinc-800 flex items-center justify-center shrink-0">
+                <div className="flex items-center gap-3 p-2.5 sm:p-3.5 rounded-none bg-zinc-50 border border-zinc-200/80">
+                  <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-none bg-zinc-200 text-zinc-800 flex items-center justify-center shrink-0">
                     <ClockCounterClockwise size={18} weight="bold" />
                   </div>
                   <div className="min-w-0">
@@ -107,8 +113,8 @@ export function ValueMatrix({
             </div>
           </div>
 
-          {/* Right Column: High-Readability Tier Matrix */}
-          <div className="lg:col-span-7 rounded-2xl bg-white border border-zinc-200 p-4 sm:p-6 lg:p-7 flex flex-col justify-between shadow-2xs">
+          {/* Right Column: High-Readability Tier Matrix - Sharp Edged */}
+          <div className="lg:col-span-7 rounded-none bg-white border border-zinc-200 p-4 sm:p-6 lg:p-7 flex flex-col justify-between shadow-2xs">
             <div>
               <div className="flex items-center justify-between pb-2.5 mb-3 sm:mb-4 border-b border-zinc-100 text-[11px] sm:text-xs font-bold text-zinc-500 tracking-wider">
                 <span className="uppercase">ENTRY TIER</span>
@@ -119,7 +125,7 @@ export function ValueMatrix({
                 {tiers.map((tier) => (
                   <div
                     key={tier.count}
-                    className="p-3 sm:p-4 rounded-xl bg-zinc-50 hover:bg-zinc-100/90 border border-zinc-200/80 transition-colors flex items-center justify-between gap-3"
+                    className="p-3 sm:p-4 rounded-none bg-zinc-50 hover:bg-zinc-100/90 border border-zinc-200/80 transition-colors flex items-center justify-between gap-3"
                   >
                     {/* Left: Ticket count + Badge + Cost */}
                     <div className="min-w-0 flex-1">
@@ -128,7 +134,7 @@ export function ValueMatrix({
                           {tier.count === 1 ? "1 Ticket" : `${tier.count} Tickets`}
                         </span>
                         {tier.badge && (
-                          <span className="text-[9px] sm:text-[10px] font-black uppercase px-2 py-0.5 rounded-full bg-orange-100 text-[#ea580c] border border-orange-200 tracking-tight">
+                          <span className="text-[9px] sm:text-[10px] font-black uppercase px-2 py-0.5 rounded-none bg-orange-100 text-[#ea580c] border border-orange-200 tracking-tight">
                             {tier.badge}
                           </span>
                         )}
@@ -164,4 +170,3 @@ export function ValueMatrix({
     </section>
   )
 }
-

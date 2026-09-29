@@ -76,10 +76,16 @@ export function FleetShowcase() {
     <section id="the-fleet" className="py-12 sm:py-20 bg-[#fafafa] border-t border-zinc-200">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
-        {/* Centralized & Enlarged Section Header - Single line */}
+        {/* Creative Automotive Telemetry Deco & Single Line Heading */}
         <div className="text-center max-w-3xl mx-auto mb-8 sm:mb-12">
-          <div className="inline-flex items-center gap-1.5 mb-2 px-3 py-1 rounded-full text-[11px] sm:text-xs font-bold uppercase tracking-wider text-[#ea580c] bg-orange-50 border border-orange-200/80 shadow-2xs">
-            <span>FLEET EXPERIENCES</span>
+          <div className="flex items-center justify-center gap-2.5 mb-2.5">
+            <span className="w-6 sm:w-10 h-px bg-gradient-to-r from-transparent to-[#ea580c]" />
+            <span className="text-[10px] sm:text-[11px] font-mono tracking-widest text-[#ea580c] font-black uppercase flex items-center gap-1.5">
+              <span className="w-1.5 h-1.5 bg-[#ea580c] rotate-45 inline-block" />
+              04 // FLEET EXPERIENCES
+              <span className="w-1.5 h-1.5 bg-[#ea580c] rotate-45 inline-block" />
+            </span>
+            <span className="w-6 sm:w-10 h-px bg-gradient-to-l from-transparent to-[#ea580c]" />
           </div>
           <h2 className="text-2xl sm:text-3xl lg:text-4xl font-black text-zinc-950 uppercase tracking-tight leading-none mb-3">
             SUPERCAR SEAT TIME
@@ -90,14 +96,15 @@ export function FleetShowcase() {
         </div>
 
         {/* 6-Card Grid */}
+        {/* 6-Card Grid - Sharp Edged Architectural Styling */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
           {fleetItems.map((item) => (
             <div
               key={item.id}
-              className="group rounded-2xl bg-white border border-zinc-200 overflow-hidden shadow-2xs hover:border-zinc-300 transition-all flex flex-col justify-between"
+              className="group rounded-none bg-white border border-zinc-200 overflow-hidden shadow-2xs hover:border-zinc-400 transition-all flex flex-col justify-between"
             >
-              {/* Image Container with Badge */}
-              <div className="relative w-full aspect-[16/10] bg-zinc-950 overflow-hidden">
+              {/* Image Container with Sharp Badges */}
+              <div className="relative w-full aspect-[16/10] bg-zinc-950 overflow-hidden rounded-none">
                 <Image
                   src={item.image}
                   alt={item.name}
@@ -106,12 +113,12 @@ export function FleetShowcase() {
                   className="object-cover group-hover:scale-105 transition-transform duration-500"
                 />
                 
-                {/* Technical Badge Overlay */}
-                <div className="absolute top-3 left-3 text-[10px] font-bold text-white bg-zinc-950/85 backdrop-blur-md px-2.5 py-1 rounded-md uppercase tracking-wider">
+                {/* Technical Badge Overlay - Sharp Edged */}
+                <div className="absolute top-3 left-3 text-[10px] font-bold text-white bg-zinc-950/85 backdrop-blur-md px-2.5 py-1 rounded-none uppercase tracking-wider">
                   {item.badge}
                 </div>
 
-                <div className="absolute top-3 right-3 text-[10px] font-bold text-zinc-900 bg-white/95 backdrop-blur-md px-2.5 py-1 rounded-md uppercase">
+                <div className="absolute top-3 right-3 text-[10px] font-bold text-zinc-900 bg-white/95 backdrop-blur-md px-2.5 py-1 rounded-none uppercase">
                   {item.category}
                 </div>
               </div>
@@ -140,14 +147,14 @@ export function FleetShowcase() {
           ))}
         </div>
 
-        {/* Sub-footer catalog link */}
-        <div className="mt-8 sm:mt-10 text-center">
+        {/* Sub-footer catalog link - Clean single line, sharp edged */}
+        <div className="mt-8 sm:mt-10 flex justify-center px-4">
           <Link
             href="/members/rewards"
-            className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-zinc-100 hover:bg-zinc-200/80 text-zinc-900 text-xs font-bold uppercase tracking-wider transition-all border border-zinc-200 cursor-pointer"
+            className="inline-flex items-center justify-center gap-2 px-5 py-3 sm:px-7 sm:py-3.5 rounded-none bg-zinc-100 hover:bg-zinc-200 text-zinc-950 text-xs sm:text-sm font-bold uppercase tracking-wider transition-all border border-zinc-200/90 shadow-2xs whitespace-nowrap"
           >
-            <span>Browse Full Rewards Garage & Booking Engine</span>
-            <ArrowUpRight size={15} weight="bold" />
+            <span>Browse Rewards Garage</span>
+            <ArrowUpRight size={16} weight="bold" className="shrink-0" />
           </Link>
         </div>
 
