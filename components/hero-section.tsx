@@ -2,10 +2,12 @@
 
 import Image from "next/image"
 import { motion, useReducedMotion } from "motion/react"
-import { Ticket, ArrowDown, ShieldCheck, Gauge, Trophy } from "@phosphor-icons/react"
+import { Ticket, ArrowDown, ArrowUp, ShieldCheck, Gauge, Trophy } from "@phosphor-icons/react"
 
 interface HeroSectionProps {
   onBuyClick: (ticketCount: number) => void
+  onAllocationClick?: () => void
+  isAllocationExpanded?: boolean
   totalTicketsSold?: number
   ticketsRemaining?: number
   soldTickets?: number
@@ -17,6 +19,8 @@ interface HeroSectionProps {
 
 export function HeroSection({
   onBuyClick,
+  onAllocationClick,
+  isAllocationExpanded = false,
   totalTicketsSold,
   soldTickets,
   targetTickets = 10000,
@@ -121,12 +125,24 @@ export function HeroSection({
             <div className="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-2.5 sm:gap-3 mb-4 sm:mb-5 w-full sm:w-auto">
               <button
                 type="button"
-                onClick={handleScrollToAllocation}
+                onClick={onAllocationClick || handleScrollToAllocation}
                 className="w-full sm:w-auto h-[48px] sm:h-[52px] px-6 sm:px-8 rounded-none bg-[#ea580c] hover:bg-[#c2410c] text-white text-sm sm:text-base font-black uppercase tracking-wider transition-all shadow-[0_4px_16px_rgba(234,88,12,0.35)] hover:shadow-[0_6px_22px_rgba(234,88,12,0.5)] active:scale-[0.99] flex items-center justify-center gap-2.5 cursor-pointer"
               >
                 <Ticket size={20} weight="fill" className="shrink-0" />
-                <span className="whitespace-nowrap">Select Entry Allocation</span>
-                <ArrowDown size={18} weight="bold" className="shrink-0 animate-bounce" />
+                <span className="whitespace-nowrap">
+                  {isAllocationExpanded ? (
+                    <span className="hidden lg:inline">Collapse Allocation</span>
+                  ) : (
+                    <span className="hidden lg:inline">Select Entry Allocation</span>
+                  )}
+                  <span className="lg:hidden">Select Entry Allocation</span>
+                </span>
+                {isAllocationExpanded ? (
+                  <ArrowUp size={18} weight="bold" className="shrink-0 hidden lg:inline" />
+                ) : (
+                  <ArrowDown size={18} weight="bold" className="shrink-0 hidden lg:inline" />
+                )}
+                <ArrowDown size={18} weight="bold" className="shrink-0 lg:hidden animate-bounce" />
               </button>
 
               <a

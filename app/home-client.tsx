@@ -24,10 +24,27 @@ interface HomeClientProps {
 export function HomeClient({ contest, memberEmail, userCredits = 0 }: HomeClientProps) {
   const [modalOpen, setModalOpen] = useState(false)
   const [selectedTicketCount, setSelectedTicketCount] = useState(10)
+  const [isAllocationExpanded, setIsAllocationExpanded] = useState(false)
 
   const handleOpenBuy = (count: number = 10) => {
     setSelectedTicketCount(count)
     setModalOpen(true)
+  }
+
+  const handleHeroAllocationClick = () => {
+    if (typeof window !== "undefined" && window.innerWidth >= 1024) {
+      setIsAllocationExpanded((prev) => {
+        const nextState = !prev
+        if (nextState) {
+          setTimeout(() => {
+            document.getElementById("entry-allocation")?.scrollIntoView({ behavior: "smooth", block: "start" })
+          }, 80)
+        }
+        return nextState
+      })
+    } else {
+      document.getElementById("entry-allocation")?.scrollIntoView({ behavior: "smooth" })
+    }
   }
 
   return (
@@ -43,6 +60,8 @@ export function HomeClient({ contest, memberEmail, userCredits = 0 }: HomeClient
         {/* 2. Hero Section: Architectural Center-Stage Showcase */}
         <HeroSection
           onBuyClick={(count) => handleOpenBuy(count || 10)}
+          onAllocationClick={handleHeroAllocationClick}
+          isAllocationExpanded={isAllocationExpanded}
           soldTickets={contest.soldTickets}
           targetTickets={contest.targetTickets}
           ticketPrice={contest.ticketPrice}
@@ -50,17 +69,19 @@ export function HomeClient({ contest, memberEmail, userCredits = 0 }: HomeClient
           worthDisplay={contest.worthDisplay}
         />
 
-        {/* 2.2. Supercar Launch Skid Mark & Dust Path Divider */}
-        <TireTrackDivider />
-
-        {/* 2.5. Dedicated Entry Allocation Terminal */}
+        {/* 2.5. Dedicated Entry Allocation Terminal (Expandable on Web, Always Visible on Mobile) */}
         <EntryAllocation
           onBuyClick={(count) => handleOpenBuy(count || 10)}
+          isExpanded={isAllocationExpanded}
+          onToggleExpand={() => setIsAllocationExpanded((prev) => !prev)}
           soldTickets={contest.soldTickets}
           targetTickets={contest.targetTickets}
           ticketPrice={contest.ticketPrice}
           carName={contest.carName}
         />
+
+        {/* 2.2. Supercar Launch Skid Mark & Dust Path Divider */}
+        <TireTrackDivider />
 
         {/* 3. The Protocol: 4-Step Telemetry Track */}
         <HowItWorks
