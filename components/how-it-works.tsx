@@ -84,8 +84,8 @@ export function HowItWorks({
                   </div>
 
                   <div className="flex items-center gap-2.5 mb-2.5">
-                    <Icon size={22} weight="bold" className="text-zinc-950 shrink-0" />
-                    <h3 className="text-lg xs:text-xl sm:text-lg lg:text-xl font-black text-zinc-950 uppercase tracking-tight">
+                    <Icon size={25} weight="bold" className="text-zinc-950 shrink-0" />
+                    <h3 className="text-[22px] xs:text-2xl sm:text-xl lg:text-2xl font-black text-zinc-950 uppercase tracking-tight leading-tight">
                       {step.action}
                     </h3>
                   </div>
