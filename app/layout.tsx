@@ -17,11 +17,74 @@ export const viewport: Viewport = {
 };
 
 export const metadata: Metadata = {
-  title: "WINMYPORSCHE // TurboRide Supercar Club · Zero-Loss Supercar Giveaway",
+  metadataBase: new URL("https://turbo-ride-contest.vercel.app"),
+  title: {
+    default: "WINMYPORSCHE // TurboRide Supercar Club · Zero-Loss Supercar Giveaway",
+    template: "%s | TurboRide Supercar Club",
+  },
   description:
-    "Deposit ₹1,000 to receive 1,000 permanent TurboRide Drive Credits for track drives, plus a complimentary verified entry to win the Porsche 718 Cayman.",
+    "Deposit ₹1,000 to receive 1,000 permanent TurboRide Drive Credits for track drives, plus a complimentary verified entry to win the Porsche 718 Cayman. 100% capital returned in drive credits.",
+  applicationName: "TurboRide Supercar Club",
+  keywords: [
+    "TurboRide",
+    "Win a Porsche",
+    "Porsche 718 Cayman",
+    "Supercar Giveaway India",
+    "Buddh International Circuit",
+    "Supercar Track Days",
+    "Drive Credits",
+    "Zero Loss Supercar Contest",
+  ],
+  authors: [{ name: "TurboRide Supercar Club" }],
+  creator: "TurboRide",
+  publisher: "TurboRide Supercar Club Pvt Ltd",
+  alternates: {
+    canonical: "/",
+  },
+  openGraph: {
+    title: "WINMYPORSCHE // TurboRide Supercar Club · Zero-Loss Supercar Giveaway",
+    description:
+      "Deposit ₹1,000 to receive 1,000 permanent TurboRide Drive Credits for track drives, plus a complimentary verified entry to win the Porsche 718 Cayman. 100% capital returned in drive credits.",
+    url: "https://turbo-ride-contest.vercel.app",
+    siteName: "TurboRide Supercar Club",
+    images: [
+      {
+        url: "/og-image.png",
+        width: 1200,
+        height: 630,
+        alt: "Win a Porsche 718 Cayman - TurboRide Supercar Club",
+      },
+    ],
+    locale: "en_IN",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "WINMYPORSCHE // TurboRide Supercar Club · Zero-Loss Supercar Giveaway",
+    description:
+      "Deposit ₹1,000 to receive 1,000 permanent TurboRide Drive Credits for track drives, plus a complimentary verified entry to win the Porsche 718 Cayman.",
+    images: ["/og-image.png"],
+    creator: "@turborideclub",
+  },
   icons: {
-    icon: "/favicon.ico",
+    icon: [
+      { url: "/icon.svg", type: "image/svg+xml" },
+      { url: "/favicon.ico", sizes: "any" },
+    ],
+    apple: [
+      { url: "/apple-touch-icon.png", sizes: "180x180", type: "image/png" },
+    ],
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-video-preview": -1,
+      "max-image-preview": "large",
+      "max-snippet": -1,
+    },
   },
 };
 
