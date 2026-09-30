@@ -64,17 +64,17 @@ export function HowItWorks({
           </h2>
         </div>
 
-        {/* 4-Step Connected Telemetry Track - Sharp Edged */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5">
+        {/* 4-Step Connected Telemetry Track - Sharp Edged with Generous Web Padding */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5 lg:gap-6">
           {steps.map((step) => {
             const Icon = step.icon
             return (
               <div
                 key={step.num}
-                className="relative rounded-none bg-zinc-50 border border-zinc-200 p-5 sm:p-6 flex flex-col justify-between hover:bg-white hover:border-zinc-400 hover:shadow-xs transition-all"
+                className="relative rounded-none bg-zinc-50 border border-zinc-200 p-5 sm:p-6 lg:p-7 xl:p-8 flex flex-col justify-between hover:bg-white hover:border-zinc-400 hover:shadow-xs transition-all"
               >
                 <div>
-                  <div className="flex items-center justify-between pb-3 mb-3.5 border-b border-zinc-200/60">
+                  <div className="flex items-center justify-between pb-3 mb-4 lg:mb-6 border-b border-zinc-200/60">
                     <span className="text-2xl sm:text-3xl font-black text-zinc-400 tabular-nums">
                       {step.num}
                     </span>
@@ -83,14 +83,14 @@ export function HowItWorks({
                     </span>
                   </div>
 
-                  <div className="flex items-center gap-2.5 mb-2.5">
-                    <Icon size={25} weight="bold" className="text-zinc-950 shrink-0" />
-                    <h3 className="text-[22px] xs:text-2xl sm:text-xl lg:text-2xl font-bold text-zinc-950 uppercase tracking-tight leading-tight">
+                  <div className="flex items-start gap-2.5 lg:gap-3 mb-3 lg:mb-4">
+                    <Icon size={24} weight="bold" className="text-zinc-950 shrink-0 mt-0.5" />
+                    <h3 className="text-[22px] xs:text-2xl sm:text-xl lg:text-[19px] xl:text-[21px] font-bold text-zinc-950 uppercase tracking-tight leading-snug">
                       {step.action}
                     </h3>
                   </div>
 
-                  <p className="text-[13px] sm:text-sm text-zinc-950 leading-relaxed font-medium">
+                  <p className="text-[13px] sm:text-sm lg:text-[14px] text-zinc-600 leading-relaxed font-medium lg:pt-1">
                     {step.detail}
                   </p>
                 </div>
