@@ -24,7 +24,6 @@ interface HomeClientProps {
 export function HomeClient({ contest, memberEmail, userCredits = 0 }: HomeClientProps) {
   const [modalOpen, setModalOpen] = useState(false)
   const [selectedTicketCount, setSelectedTicketCount] = useState(10)
-  const [isAllocationExpanded, setIsAllocationExpanded] = useState(false)
 
   const handleOpenBuy = (count: number = 10) => {
     setSelectedTicketCount(count)
@@ -32,19 +31,7 @@ export function HomeClient({ contest, memberEmail, userCredits = 0 }: HomeClient
   }
 
   const handleHeroAllocationClick = () => {
-    if (typeof window !== "undefined" && window.innerWidth >= 1024) {
-      setIsAllocationExpanded((prev) => {
-        const nextState = !prev
-        if (nextState) {
-          setTimeout(() => {
-            document.getElementById("entry-allocation")?.scrollIntoView({ behavior: "smooth", block: "start" })
-          }, 80)
-        }
-        return nextState
-      })
-    } else {
-      document.getElementById("entry-allocation")?.scrollIntoView({ behavior: "smooth" })
-    }
+    document.getElementById("entry-allocation")?.scrollIntoView({ behavior: "smooth" })
   }
 
   return (
@@ -61,7 +48,6 @@ export function HomeClient({ contest, memberEmail, userCredits = 0 }: HomeClient
         <HeroSection
           onBuyClick={(count) => handleOpenBuy(count || 10)}
           onAllocationClick={handleHeroAllocationClick}
-          isAllocationExpanded={isAllocationExpanded}
           soldTickets={contest.soldTickets}
           targetTickets={contest.targetTickets}
           ticketPrice={contest.ticketPrice}
@@ -69,11 +55,9 @@ export function HomeClient({ contest, memberEmail, userCredits = 0 }: HomeClient
           worthDisplay={contest.worthDisplay}
         />
 
-        {/* 2.5. Dedicated Entry Allocation Terminal (Expandable on Web, Always Visible on Mobile) */}
+        {/* 2.5. Dedicated Entry Allocation Terminal (Always Open on Mobile & Web) */}
         <EntryAllocation
           onBuyClick={(count) => handleOpenBuy(count || 10)}
-          isExpanded={isAllocationExpanded}
-          onToggleExpand={() => setIsAllocationExpanded((prev) => !prev)}
           soldTickets={contest.soldTickets}
           targetTickets={contest.targetTickets}
           ticketPrice={contest.ticketPrice}

@@ -78,7 +78,7 @@ export function ValueMatrix({
                   </div>
                   <div className="min-w-0">
                     <span className="text-sm sm:text-base font-black text-zinc-950 block">Real Supercar Laps</span>
-                    <span className="text-xs sm:text-sm text-zinc-950 font-bold block">Redeem for Buddh Circuit seat time</span>
+                    <span className="text-xs sm:text-sm text-zinc-600 font-medium block">Redeem for Buddh Circuit seat time</span>
                   </div>
                 </div>
 
@@ -88,7 +88,7 @@ export function ValueMatrix({
                   </div>
                   <div className="min-w-0">
                     <span className="text-sm sm:text-base font-black text-zinc-950 block">4K FPV Media Shoots</span>
-                    <span className="text-xs sm:text-sm text-zinc-950 font-bold block">Professional reels & track photos</span>
+                    <span className="text-xs sm:text-sm text-zinc-600 font-medium block">Professional reels & track photos</span>
                   </div>
                 </div>
 
@@ -98,7 +98,7 @@ export function ValueMatrix({
                   </div>
                   <div className="min-w-0">
                     <span className="text-sm sm:text-base font-black text-zinc-950 block">Credits Never Expire</span>
-                    <span className="text-xs sm:text-sm text-zinc-950 font-bold block">Use your credits whenever you wish</span>
+                    <span className="text-xs sm:text-sm text-zinc-600 font-medium block">Use your credits whenever you wish</span>
                   </div>
                 </div>
               </div>
@@ -137,7 +137,7 @@ export function ValueMatrix({
                         )}
                       </div>
                       <div className="flex items-center gap-2 mt-0.5">
-                        <span className="text-xs sm:text-sm text-zinc-950 font-black whitespace-nowrap">
+                        <span className="text-xs sm:text-sm text-zinc-600 font-medium whitespace-nowrap">
                           {tier.cost}
                         </span>
                         {tier.badge && (
@@ -153,7 +153,7 @@ export function ValueMatrix({
                       <span className="text-base sm:text-lg lg:text-xl font-black text-emerald-600 block tabular-nums whitespace-nowrap">
                         +{tier.credits} Credits
                       </span>
-                      <span className="text-xs sm:text-sm font-black text-[#ea580c] block mt-0.5 whitespace-nowrap">
+                      <span className="text-xs sm:text-sm font-medium text-[#ea580c] block mt-0.5 whitespace-nowrap">
                         {tier.entries}
                       </span>
                     </div>

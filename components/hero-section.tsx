@@ -2,7 +2,7 @@
 
 import Image from "next/image"
 import { motion, useReducedMotion } from "motion/react"
-import { Ticket, ArrowDown, ArrowUp, ShieldCheck, Gauge, Trophy, Scales, Broadcast } from "@phosphor-icons/react"
+import { Ticket, ArrowDown, ShieldCheck, Gauge, Trophy, Scales, Broadcast } from "@phosphor-icons/react"
 
 interface HeroSectionProps {
   onBuyClick: (ticketCount: number) => void
@@ -101,7 +101,7 @@ export function HeroSection({
 
             {/* Well-Sized Subtext in Clean White for High Readability on Orange */}
             <p className="text-[13px] xs:text-sm sm:text-base md:text-base lg:text-[15px] xl:text-lg text-white font-semibold leading-snug sm:leading-relaxed mb-4 sm:mb-5 max-w-xl md:max-w-2xl lg:max-w-none mx-auto lg:mx-0">
-              100% of your deposit returns as Buddh Circuit Drive Credits — win the supercar or hit the track.
+              100% of your deposit returns as Buddh Circuit Drive Credits. Win the supercar or hit the track.
             </p>
 
             {/* Clean Action Row - High-Contrast Jet Black Primary CTA on Orange Canvas */}
@@ -113,19 +113,9 @@ export function HeroSection({
               >
                 <Ticket size={20} weight="fill" className="shrink-0 text-white" />
                 <span className="whitespace-nowrap">
-                  {isAllocationExpanded ? (
-                    <span className="hidden lg:inline">Collapse Allocation</span>
-                  ) : (
-                    <span className="hidden lg:inline">Select Entry Allocation</span>
-                  )}
-                  <span className="lg:hidden">Select Entry Allocation</span>
+                  Select Entry Allocation
                 </span>
-                {isAllocationExpanded ? (
-                  <ArrowUp size={18} weight="bold" className="shrink-0 hidden lg:inline" />
-                ) : (
-                  <ArrowDown size={18} weight="bold" className="shrink-0 hidden lg:inline" />
-                )}
-                <ArrowDown size={18} weight="bold" className="shrink-0 lg:hidden animate-bounce" />
+                <ArrowDown size={18} weight="bold" className="shrink-0 animate-bounce" />
               </button>
 
               <a

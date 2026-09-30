@@ -1,8 +1,7 @@
 "use client"
 
 import { useState } from "react"
-import { motion, AnimatePresence, useReducedMotion } from "motion/react"
-import { Ticket, ArrowRight, ArrowDown, ArrowUp, ShieldCheck, CheckCircle } from "@phosphor-icons/react"
+import { Ticket, ArrowRight, ShieldCheck, CheckCircle } from "@phosphor-icons/react"
 
 interface EntryAllocationProps {
   onBuyClick: (ticketCount: number) => void
@@ -17,15 +16,11 @@ interface EntryAllocationProps {
 
 export function EntryAllocation({
   onBuyClick,
-  isExpanded = false,
-  onToggleExpand,
   totalTicketsSold,
   soldTickets,
   targetTickets = 10000,
   ticketPrice = 1000,
-  carName = "Porsche 718 Cayman",
 }: EntryAllocationProps) {
-  const reduceMotion = useReducedMotion()
   const [selectedTickets, setSelectedTickets] = useState(10)
 
   const ticketsSold = totalTicketsSold ?? soldTickets ?? 6413
@@ -171,20 +166,6 @@ export function EntryAllocation({
           </div>
         </div>
 
-        {/* Web-Only Collapse Button Inside Card */}
-        {onToggleExpand && (
-          <div className="hidden lg:flex justify-center mt-3 pt-2.5 border-t border-zinc-100">
-            <button
-              type="button"
-              onClick={onToggleExpand}
-              className="text-[11px] font-black text-zinc-500 hover:text-zinc-950 flex items-center gap-1 uppercase tracking-wider transition-colors cursor-pointer"
-            >
-              <span>Collapse Terminal</span>
-              <ArrowUp size={12} weight="bold" />
-            </button>
-          </div>
-        )}
-
       </div>
     </div>
   )
@@ -216,46 +197,11 @@ export function EntryAllocation({
           <h2 className="text-2xl sm:text-3xl lg:text-4xl font-black text-zinc-950 uppercase tracking-tight leading-none">
             SELECT ENTRY ALLOCATION
           </h2>
-
-          {/* Web Version Expand / Collapse Interactive Toggle */}
-          <div className="hidden lg:flex items-center justify-center mt-4">
-            <button
-              type="button"
-              onClick={onToggleExpand}
-              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-none bg-zinc-50 hover:bg-zinc-100 border border-zinc-300 hover:border-[#ea580c] text-xs font-black text-zinc-950 uppercase tracking-wider transition-all cursor-pointer shadow-2xs"
-            >
-              <Ticket size={15} weight="fill" className="text-[#ea580c]" />
-              <span>{isExpanded ? "Collapse Calculator / Table" : "Expand Calculator / Table"}</span>
-              {isExpanded ? (
-                <ArrowUp size={14} weight="bold" />
-              ) : (
-                <ArrowDown size={14} weight="bold" />
-              )}
-            </button>
-          </div>
         </div>
 
-        {/* Mobile View: Always fully visible and accessible */}
-        <div className="lg:hidden">
+        {/* Entry Allocation Terminal: Always Open & Directly Visible on Mobile & Web */}
+        <div>
           {renderCalculatorCard()}
-        </div>
-
-        {/* Web View: Smoothly expands with Framer Motion when clicked */}
-        <div className="hidden lg:block">
-          <AnimatePresence initial={false}>
-            {isExpanded && (
-              <motion.div
-                key="web-allocation-calculator"
-                initial={reduceMotion ? { opacity: 0 } : { opacity: 0, height: 0, scale: 0.98 }}
-                animate={reduceMotion ? { opacity: 1 } : { opacity: 1, height: "auto", scale: 1 }}
-                exit={reduceMotion ? { opacity: 0 } : { opacity: 0, height: 0, scale: 0.98 }}
-                transition={{ duration: 0.45, ease: [0.16, 1, 0.3, 1] }}
-                className="overflow-hidden"
-              >
-                {renderCalculatorCard()}
-              </motion.div>
-            )}
-          </AnimatePresence>
         </div>
 
       </div>

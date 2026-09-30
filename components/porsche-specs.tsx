@@ -126,7 +126,7 @@ export function PorscheSpecs() {
                         <Icon size={16} weight="bold" />
                       </div>
                       <div className="min-w-0 flex-1">
-                        <span className="text-[11px] sm:text-xs uppercase tracking-wider text-zinc-950 font-extrabold block mb-0.5">
+                        <span className="text-[11px] sm:text-xs uppercase tracking-wider text-zinc-500 font-medium block mb-0.5">
                           {item.label}
                         </span>
                         <span className="text-xs sm:text-sm font-black text-zinc-950 block truncate">

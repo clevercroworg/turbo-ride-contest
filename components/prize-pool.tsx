@@ -77,22 +77,22 @@ export function PrizePool({
                 </div>
               </div>
 
-              {/* 4-Stat Performance Grid - Sharp, Bold, Large Font */}
+              {/* 4-Stat Performance Grid - Crisp Unbold Labels with High-Impact Values */}
               <div className="grid grid-cols-2 gap-3 pt-5 border-t border-zinc-100">
                 <div className="p-3 sm:p-3.5 rounded-none bg-zinc-50 border border-zinc-200">
-                  <span className="text-xs font-black text-zinc-950 uppercase tracking-wider block mb-1">Engine</span>
+                  <span className="text-xs font-medium text-zinc-500 uppercase tracking-wider block mb-1">Engine</span>
                   <span className="font-black text-zinc-950 text-sm sm:text-base lg:text-lg block tracking-tight">2.0L Turbo Flat-4</span>
                 </div>
                 <div className="p-3 sm:p-3.5 rounded-none bg-zinc-50 border border-zinc-200">
-                  <span className="text-xs font-black text-zinc-950 uppercase tracking-wider block mb-1">Horsepower</span>
+                  <span className="text-xs font-medium text-zinc-500 uppercase tracking-wider block mb-1">Horsepower</span>
                   <span className="font-black text-zinc-950 text-sm sm:text-base lg:text-lg block tracking-tight">300 HP / 380 Nm</span>
                 </div>
                 <div className="p-3 sm:p-3.5 rounded-none bg-zinc-50 border border-zinc-200">
-                  <span className="text-xs font-black text-zinc-950 uppercase tracking-wider block mb-1">0-100 km/h</span>
+                  <span className="text-xs font-medium text-zinc-500 uppercase tracking-wider block mb-1">0-100 km/h</span>
                   <span className="font-black text-zinc-950 text-sm sm:text-base lg:text-lg block tracking-tight">4.9 Seconds</span>
                 </div>
                 <div className="p-3 sm:p-3.5 rounded-none bg-zinc-50 border border-zinc-200">
-                  <span className="text-xs font-black text-zinc-950 uppercase tracking-wider block mb-1">Top Speed</span>
+                  <span className="text-xs font-medium text-zinc-500 uppercase tracking-wider block mb-1">Top Speed</span>
                   <span className="font-black text-zinc-950 text-sm sm:text-base lg:text-lg block tracking-tight">275 km/h</span>
                 </div>
               </div>

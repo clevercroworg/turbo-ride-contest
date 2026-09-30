@@ -17,7 +17,7 @@ export const viewport: Viewport = {
 };
 
 export const metadata: Metadata = {
-  title: "WINMYPORSCHE // TurboRide Supercar Club — Zero-Loss Supercar Giveaway",
+  title: "WINMYPORSCHE // TurboRide Supercar Club · Zero-Loss Supercar Giveaway",
   description:
     "Deposit ₹1,000 to receive 1,000 permanent TurboRide Drive Credits for track drives, plus a complimentary verified entry to win the Porsche 718 Cayman.",
   icons: {
