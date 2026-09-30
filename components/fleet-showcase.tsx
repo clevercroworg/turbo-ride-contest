@@ -1,8 +1,9 @@
 "use client"
 
+import { useState, useEffect, useRef, useCallback } from "react"
 import Image from "next/image"
 import Link from "next/link"
-import { ArrowUpRight } from "@phosphor-icons/react"
+import { ArrowUpRight, CaretLeft, CaretRight } from "@phosphor-icons/react"
 
 interface FleetItem {
   id: string
@@ -15,6 +16,10 @@ interface FleetItem {
 }
 
 export function FleetShowcase() {
+  const [activeSlide, setActiveSlide] = useState(0)
+  const carouselRef = useRef<HTMLDivElement>(null)
+  const isInteractingRef = useRef(false)
+
   const fleetItems: FleetItem[] = [
     {
       id: "huracan",
@@ -72,6 +77,113 @@ export function FleetShowcase() {
     },
   ]
 
+  const isVisibleRef = useRef(false)
+
+  const scrollToSlide = useCallback((index: number) => {
+    if (!carouselRef.current) return
+    const container = carouselRef.current
+    const cards = container.children
+    if (cards[index]) {
+      const card = cards[index] as HTMLElement
+      // Calculate target horizontal scroll offset to center the card within the container
+      const targetLeft = card.offsetLeft - (container.clientWidth - card.clientWidth) / 2
+      container.scrollTo({
+        left: Math.max(0, targetLeft),
+        behavior: "smooth",
+      })
+      setActiveSlide(index)
+    }
+  }, [])
+
+  // Detect whether the carousel section is actually in the user's viewport
+  useEffect(() => {
+    if (!carouselRef.current) return
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        isVisibleRef.current = entry.isIntersecting
+      },
+      { threshold: 0.15 }
+    )
+    observer.observe(carouselRef.current)
+    return () => observer.disconnect()
+  }, [])
+
+  // Auto carousel effect for mobile: gently advances every 3.8s ONLY when visible in viewport and not user-interacting
+  useEffect(() => {
+    const timer = setInterval(() => {
+      if (isInteractingRef.current || !isVisibleRef.current) return
+      setActiveSlide((prev) => {
+        const next = (prev + 1) % fleetItems.length
+        scrollToSlide(next)
+        return next
+      })
+    }, 3800)
+
+    return () => clearInterval(timer)
+  }, [fleetItems.length, scrollToSlide])
+
+  // Update active slide on manual touch/scroll
+  const handleScroll = () => {
+    if (!carouselRef.current) return
+    const container = carouselRef.current
+    const scrollLeft = container.scrollLeft
+    const cardWidth = container.offsetWidth * 0.82
+    const newIndex = Math.round(scrollLeft / (cardWidth + 14))
+    if (newIndex >= 0 && newIndex < fleetItems.length && newIndex !== activeSlide) {
+      setActiveSlide(newIndex)
+    }
+  }
+
+  const renderFleetCard = (item: FleetItem, isCarousel = false) => (
+    <div
+      key={item.id}
+      className={`group rounded-none bg-white border border-zinc-200 overflow-hidden shadow-2xs hover:border-zinc-400 transition-all flex flex-col justify-between select-none ${
+        isCarousel ? "w-[84vw] max-w-[340px] shrink-0 snap-center" : ""
+      }`}
+    >
+      {/* Image Container with Sharp Badges */}
+      <div className="relative w-full aspect-[16/10] bg-zinc-950 overflow-hidden rounded-none">
+        <Image
+          src={item.image}
+          alt={item.name}
+          fill
+          sizes={isCarousel ? "84vw" : "(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"}
+          className="object-cover group-hover:scale-105 transition-transform duration-500"
+        />
+        
+        {/* Technical Badge Overlay - Sharp Edged */}
+        <div className="absolute top-3 left-3 text-[10px] font-bold text-white bg-zinc-950/85 backdrop-blur-md px-2.5 py-1 rounded-none uppercase tracking-wider">
+          {item.badge}
+        </div>
+
+        <div className="absolute top-3 right-3 text-[10px] font-bold text-zinc-900 bg-white/95 backdrop-blur-md px-2.5 py-1 rounded-none uppercase">
+          {item.category}
+        </div>
+      </div>
+
+      {/* Bottom Card Content */}
+      <div className="p-4 sm:p-5 flex items-center justify-between gap-3">
+        <div className="min-w-0">
+          <h3 className="text-base sm:text-lg font-black text-zinc-950 uppercase tracking-tight truncate">
+            {item.name}
+          </h3>
+          <p className="text-xs sm:text-sm text-zinc-600 font-medium mt-0.5 truncate">
+            {item.subtitle}
+          </p>
+        </div>
+
+        <div className="text-right shrink-0">
+          <span className="text-lg sm:text-xl font-black text-[#ea580c] block leading-none tabular-nums">
+            {item.credits.toLocaleString("en-IN")}
+          </span>
+          <span className="text-[10px] text-zinc-500 font-bold block uppercase tracking-wider mt-1">
+            Credits
+          </span>
+        </div>
+      </div>
+    </div>
+  )
+
   return (
     <section id="the-fleet" className="py-12 sm:py-20 bg-[#fafafa] border-t border-zinc-200">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -82,7 +194,7 @@ export function FleetShowcase() {
             <span className="w-4 sm:w-8 h-px bg-gradient-to-r from-transparent to-[#ea580c] shrink" />
             <span className="text-[11px] sm:text-xs font-mono tracking-wider text-[#ea580c] font-black uppercase flex items-center gap-1.5 whitespace-nowrap">
               <span className="w-1.5 h-1.5 bg-[#ea580c] rotate-45 inline-block shrink-0" />
-              04 · FLEET EXPERIENCES
+              05 · FLEET EXPERIENCES
               <span className="w-1.5 h-1.5 bg-[#ea580c] rotate-45 inline-block shrink-0" />
             </span>
             <span className="w-4 sm:w-8 h-px bg-gradient-to-l from-transparent to-[#ea580c] shrink" />
@@ -90,60 +202,92 @@ export function FleetShowcase() {
           <h2 className="text-2xl sm:text-3xl lg:text-4xl font-black text-zinc-950 uppercase tracking-tight leading-none mb-3">
             SUPERCAR SEAT TIME
           </h2>
-          <p className="text-sm sm:text-base lg:text-lg text-zinc-950 font-medium leading-relaxed max-w-2xl mx-auto px-4 xs:px-6 sm:px-0">
+          <p className="text-sm sm:text-base lg:text-lg text-zinc-600 font-medium leading-relaxed max-w-2xl mx-auto px-4 xs:px-6 sm:px-0">
             1 Credit = ₹1. Convert your deposits into supercar track laps, 4K FPV drone reels, or studio photoshoots.
           </p>
         </div>
 
-        {/* 6-Card Grid - Sharp Edged Architectural Styling */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
-          {fleetItems.map((item) => (
-            <div
-              key={item.id}
-              className="group rounded-none bg-white border border-zinc-200 overflow-hidden shadow-2xs hover:border-zinc-400 transition-all flex flex-col justify-between"
-            >
-              {/* Image Container with Sharp Badges */}
-              <div className="relative w-full aspect-[16/10] bg-zinc-950 overflow-hidden rounded-none">
-                <Image
-                  src={item.image}
-                  alt={item.name}
-                  fill
-                  sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                  className="object-cover group-hover:scale-105 transition-transform duration-500"
+        {/* Mobile-Only Horizontal Swipe Carousel (Reduces vertical scroll by 80%) */}
+        <div className="md:hidden">
+          {/* Scrollable Container with Snap & Touch Events */}
+          <div
+            ref={carouselRef}
+            onScroll={handleScroll}
+            onTouchStart={() => {
+              isInteractingRef.current = true
+            }}
+            onTouchEnd={() => {
+              setTimeout(() => {
+                isInteractingRef.current = false
+              }, 4000)
+            }}
+            className="flex gap-3.5 overflow-x-auto snap-x snap-mandatory scrollbar-none pb-4 -mx-4 px-4 scroll-smooth"
+          >
+            {fleetItems.map((item) => renderFleetCard(item, true))}
+          </div>
+
+          {/* Carousel Telemetry & Step Controls */}
+          <div className="flex items-center justify-between mt-3 px-1">
+            {/* Step Indicators */}
+            <div className="flex items-center gap-1.5">
+              {fleetItems.map((_, idx) => (
+                <button
+                  key={idx}
+                  type="button"
+                  onClick={() => {
+                    isInteractingRef.current = true
+                    scrollToSlide(idx)
+                    setTimeout(() => (isInteractingRef.current = false), 4000)
+                  }}
+                  className={`h-1.5 transition-all duration-300 rounded-none cursor-pointer ${
+                    idx === activeSlide ? "w-6 bg-[#ea580c]" : "w-2 bg-zinc-300"
+                  }`}
+                  aria-label={`Go to slide ${idx + 1}`}
                 />
-                
-                {/* Technical Badge Overlay - Sharp Edged */}
-                <div className="absolute top-3 left-3 text-[10px] font-bold text-white bg-zinc-950/85 backdrop-blur-md px-2.5 py-1 rounded-none uppercase tracking-wider">
-                  {item.badge}
-                </div>
+              ))}
+            </div>
 
-                <div className="absolute top-3 right-3 text-[10px] font-bold text-zinc-900 bg-white/95 backdrop-blur-md px-2.5 py-1 rounded-none uppercase">
-                  {item.category}
-                </div>
-              </div>
+            {/* Monospace Counter + Navigation Arrows */}
+            <div className="flex items-center gap-2">
+              <span className="text-[11px] font-mono font-bold text-zinc-500 tabular-nums">
+                {String(activeSlide + 1).padStart(2, "0")} / {String(fleetItems.length).padStart(2, "0")}
+              </span>
 
-              {/* Bottom Card Content */}
-              <div className="p-4 sm:p-5 flex items-center justify-between gap-3">
-                <div className="min-w-0">
-                  <h3 className="text-base sm:text-lg font-black text-zinc-950 uppercase tracking-tight truncate">
-                    {item.name}
-                  </h3>
-                  <p className="text-xs sm:text-sm text-zinc-950 font-bold mt-0.5 truncate">
-                    {item.subtitle}
-                  </p>
-                </div>
-
-                <div className="text-right shrink-0">
-                  <span className="text-lg sm:text-xl font-black text-[#ea580c] block leading-none tabular-nums">
-                    {item.credits.toLocaleString("en-IN")}
-                  </span>
-                  <span className="text-[10px] text-zinc-950 font-bold block uppercase tracking-wider mt-1">
-                    Credits
-                  </span>
-                </div>
+              <div className="flex items-center gap-1">
+                <button
+                  type="button"
+                  onClick={() => {
+                    isInteractingRef.current = true
+                    const prev = (activeSlide - 1 + fleetItems.length) % fleetItems.length
+                    scrollToSlide(prev)
+                    setTimeout(() => (isInteractingRef.current = false), 4000)
+                  }}
+                  className="w-8 h-8 rounded-none bg-white border border-zinc-300 hover:border-zinc-950 flex items-center justify-center text-zinc-900 active:scale-95 transition-all cursor-pointer shadow-2xs"
+                  aria-label="Previous Car"
+                >
+                  <CaretLeft size={16} weight="bold" />
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    isInteractingRef.current = true
+                    const next = (activeSlide + 1) % fleetItems.length
+                    scrollToSlide(next)
+                    setTimeout(() => (isInteractingRef.current = false), 4000)
+                  }}
+                  className="w-8 h-8 rounded-none bg-white border border-zinc-300 hover:border-zinc-950 flex items-center justify-center text-zinc-900 active:scale-95 transition-all cursor-pointer shadow-2xs"
+                  aria-label="Next Car"
+                >
+                  <CaretRight size={16} weight="bold" />
+                </button>
               </div>
             </div>
-          ))}
+          </div>
+        </div>
+
+        {/* Desktop / Tablet: Clean 2 & 3 Column Grid */}
+        <div className="hidden md:grid md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+          {fleetItems.map((item) => renderFleetCard(item, false))}
         </div>
 
         {/* Sub-footer catalog link - Clean single line, sharp edged */}

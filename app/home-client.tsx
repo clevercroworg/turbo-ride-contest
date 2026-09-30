@@ -7,6 +7,7 @@ import { TireTrackDivider } from "@/components/tire-track-divider"
 import { EntryAllocation } from "@/components/entry-allocation"
 import { HowItWorks } from "@/components/how-it-works"
 import { ValueMatrix } from "@/components/value-matrix"
+import { CreditCalculator } from "@/components/credit-calculator"
 import { FleetShowcase } from "@/components/fleet-showcase"
 import { PrizePool } from "@/components/prize-pool"
 import { ReferralEngine } from "@/components/referral-engine"
@@ -80,7 +81,12 @@ export function HomeClient({ contest, memberEmail, userCredits = 0 }: HomeClient
           carName={contest.carName}
         />
 
-        {/* 4. The Fleet: Interactive Supercar Stage */}
+        {/* 4.5. Interactive Credit Experience Calculator */}
+        <CreditCalculator
+          onBuyTickets={(count) => handleOpenBuy(count)}
+        />
+
+        {/* 5. The Fleet: Interactive Supercar Stage with Mobile Carousel */}
         <FleetShowcase />
 
         {/* 5. Prize Pool: 3-Tier Architectural Spec */}
