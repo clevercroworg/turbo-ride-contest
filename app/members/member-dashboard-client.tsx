@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useMemo } from "react"
+import { useState, useMemo, useEffect } from "react"
 import Image from "next/image"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
@@ -112,8 +112,16 @@ export function MemberDashboardClient({
   const [cancellingVoucherId, setCancellingVoucherId] = useState<string | null>(null)
   const [copiedVoucherCode, setCopiedVoucherCode] = useState<string | null>(null)
 
+  const [activeOrigin, setActiveOrigin] = useState("")
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      setActiveOrigin(window.location.origin)
+    }
+  }, [])
+
   const referralCode = referralProfile?.referralCode || session.referralCode || "4821"
-  const referralUrl = `https://winmyporsche.in/r/${referralCode}`
+  const baseUrl = activeOrigin || (typeof window !== "undefined" ? window.location.origin : "https://turbo-ride-contest.vercel.app")
+  const referralUrl = `${baseUrl}/r/${referralCode}`
 
   const ticketsBoughtTotal = referralProfile?.ticketsBought || ticketStats.totalBought
   const isCashUnlocked = referralProfile?.isCashUnlocked || ticketsBoughtTotal >= 25

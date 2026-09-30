@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import Link from "next/link"
 import {
   LinkSimple,
@@ -19,6 +19,13 @@ export function ReferralEngine({ ticketPrice = 1000 }: ReferralEngineProps = {})
   const checkpoints = [5, 10, 25, 50, 100, 250, 500]
   const [checkpointIndex, setCheckpointIndex] = useState(2) // Default 25 tickets
   const [copied, setCopied] = useState(false)
+  const [siteOrigin, setSiteOrigin] = useState("turbo-ride-contest.vercel.app")
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      setSiteOrigin(window.location.host)
+    }
+  }, [])
 
   const activeTickets = checkpoints[checkpointIndex]
   // 25% of ticket value issued as credits & cash commission
@@ -26,8 +33,9 @@ export function ReferralEngine({ ticketPrice = 1000 }: ReferralEngineProps = {})
   const cashCommission = Math.round(activeTickets * (ticketPrice * 0.25))
 
   const handleCopy = () => {
+    const fullUrl = typeof window !== "undefined" ? `${window.location.origin}/r/4821` : "https://turbo-ride-contest.vercel.app/r/4821"
     if (typeof navigator !== "undefined" && navigator.clipboard) {
-      navigator.clipboard.writeText("https://winmyporsche.in/r/4821")
+      navigator.clipboard.writeText(fullUrl)
     }
     setCopied(true)
     setTimeout(() => setCopied(false), 2000)
@@ -80,7 +88,7 @@ export function ReferralEngine({ ticketPrice = 1000 }: ReferralEngineProps = {})
               {/* Input & Copy Button Bar */}
               <div className="bg-zinc-50 rounded-none p-1.5 pl-3 sm:pl-4 flex items-center justify-between gap-2 border border-zinc-200">
                 <span className="text-xs sm:text-sm text-zinc-950 font-bold truncate select-all">
-                  winmyporsche.in/r/4821
+                  {siteOrigin}/r/4821
                 </span>
                 <button
                   type="button"

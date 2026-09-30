@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import confetti from "canvas-confetti"
 import { X, Ticket, CheckCircle, ArrowRight, ShieldCheck } from "@phosphor-icons/react"
 import { buyContestTicketsAction } from "@/lib/credits"
@@ -34,6 +34,20 @@ export function TicketCheckoutModal({
   const [loading, setLoading] = useState<boolean>(false)
   const [error, setError] = useState<string | null>(null)
   const [successOrder, setSuccessOrder] = useState<{ orderId: string; credits: number } | null>(null)
+
+  useEffect(() => {
+    if (typeof window !== "undefined" && isOpen) {
+      const urlRef = new URLSearchParams(window.location.search).get("ref")
+      const savedRef = sessionStorage.getItem("turboride_ref")
+      const activeCode = urlRef || savedRef
+      if (activeCode && !referralCode) {
+        setReferralCode(activeCode.toUpperCase())
+      }
+      if (urlRef) {
+        sessionStorage.setItem("turboride_ref", urlRef.toUpperCase())
+      }
+    }
+  }, [isOpen])
 
   if (!isOpen) return null
 
