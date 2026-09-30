@@ -31,7 +31,7 @@ export function HowItWorks({
     {
       num: "03",
       icon: Broadcast,
-      action: "Live Stream Draw",
+      action: "Live Streamed Draw",
       detail: "Official draw broadcasted live on YouTube and Instagram.",
       badge: `${targetTickets.toLocaleString("en-IN")} Entry Cap`,
     },
@@ -39,7 +39,7 @@ export function HowItWorks({
       num: "04",
       icon: Gauge,
       action: "Zero Capital Loss",
-      detail: `Win the ${carName} or drive real circuit supercars.`,
+      detail: `Win the ${carName} or use credits for real circuit track drives.`,
       badge: "Permanent Credits",
     },
   ]
@@ -64,17 +64,17 @@ export function HowItWorks({
           </h2>
         </div>
 
-        {/* 4-Step Connected Telemetry Track - Balanced & Symmetrical */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5 lg:gap-5 xl:gap-6">
+        {/* 4-Step Connected Telemetry Track - Exact Mobile Styles + Enhanced Web Padding */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5 lg:gap-6">
           {steps.map((step) => {
             const Icon = step.icon
             return (
               <div
                 key={step.num}
-                className="relative rounded-none bg-zinc-50 border border-zinc-200 p-5 sm:p-5 lg:p-6 xl:p-7 flex flex-col justify-between hover:bg-white hover:border-zinc-400 hover:shadow-xs transition-all"
+                className="relative rounded-none bg-zinc-50 border border-zinc-200 p-5 sm:p-6 lg:p-7 xl:p-8 flex flex-col justify-between hover:bg-white hover:border-zinc-400 hover:shadow-xs transition-all"
               >
                 <div>
-                  <div className="flex items-center justify-between pb-3 mb-4 lg:mb-5 border-b border-zinc-200/70">
+                  <div className="flex items-center justify-between pb-3 mb-3.5 lg:mb-5 border-b border-zinc-200/60">
                     <span className="text-2xl sm:text-3xl font-black text-zinc-400 tabular-nums">
                       {step.num}
                     </span>
@@ -83,16 +83,14 @@ export function HowItWorks({
                     </span>
                   </div>
 
-                  {/* Title Block - Aligned and Calibrated for 1 Single Clean Line */}
-                  <div className="flex items-center gap-2 lg:gap-2.5 mb-2.5 lg:mb-3 min-h-[30px] lg:min-h-[34px]">
-                    <Icon size={22} weight="bold" className="text-zinc-950 shrink-0" />
-                    <h3 className="text-lg xs:text-xl sm:text-base lg:text-[15px] xl:text-[17px] font-black text-zinc-950 uppercase tracking-tight leading-tight whitespace-nowrap">
+                  <div className="flex items-center lg:items-start gap-2.5 lg:gap-3 mb-2.5 lg:mb-3.5 lg:min-h-[48px]">
+                    <Icon size={25} weight="bold" className="text-zinc-950 shrink-0 lg:mt-0.5" />
+                    <h3 className="text-[22px] xs:text-2xl sm:text-xl lg:text-[17px] xl:text-[19px] font-bold text-zinc-950 uppercase tracking-tight leading-tight lg:leading-snug">
                       {step.action}
                     </h3>
                   </div>
 
-                  {/* Description Block - Balanced 2-Line Rhythm */}
-                  <p className="text-[13px] sm:text-sm lg:text-[13px] xl:text-[13.5px] text-zinc-600 leading-relaxed font-medium min-h-[38px] lg:min-h-[42px]">
+                  <p className="text-[13px] sm:text-sm text-zinc-950 lg:text-zinc-600 leading-relaxed font-medium lg:pt-1">
                     {step.detail}
                   </p>
                 </div>
