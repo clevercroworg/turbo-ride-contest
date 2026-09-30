@@ -7,6 +7,7 @@ import { Ticket, ArrowRight, ShieldCheck } from "@phosphor-icons/react"
 
 interface CreditCalculatorProps {
   onBuyTickets: (count: number) => void
+  ticketPrice?: number
 }
 
 interface TierItem {
@@ -21,50 +22,62 @@ interface TierItem {
   isQuad?: boolean
 }
 
-export function CreditCalculator({ onBuyTickets }: CreditCalculatorProps) {
+export function CreditCalculator({ onBuyTickets, ticketPrice = 1000 }: CreditCalculatorProps) {
   const [activeIndex, setActiveIndex] = useState(0)
 
+  const calcTier = (
+    credits: number,
+    title: string,
+    description: string,
+    tickName: string,
+    image?: string,
+    isQuad?: boolean
+  ): TierItem => {
+    const tickets = Math.max(1, Math.round(credits / ticketPrice))
+    const cost = tickets * ticketPrice
+    return {
+      credits,
+      creditsDisplay: credits >= 100000 ? "1,00,000" : credits.toLocaleString("en-IN"),
+      tickets,
+      costDisplay: `₹${cost.toLocaleString("en-IN")}`,
+      title,
+      description,
+      tickName,
+      image,
+      isQuad,
+    }
+  }
+
   const tiers: TierItem[] = [
-    {
-      credits: 1000,
-      creditsDisplay: "1,000",
-      tickets: 1,
-      costDisplay: "₹1,000",
-      title: "Supercar Photoshoot",
-      description: "5 HD retouched photos posing with a supercar in studio.",
-      tickName: "Photoshoot",
-      image: "/fleet/photoshoot.jpg",
-    },
-    {
-      credits: 2000,
-      creditsDisplay: "2,000",
-      tickets: 2,
-      costDisplay: "₹2,000",
-      title: "30-Second Instagram Reel",
-      description: "A cinematic 30-second 4K reel with drone and cockpit footage.",
-      tickName: "Reel",
-      image: "/fleet/instagram-reel.jpg",
-    },
-    {
-      credits: 25000,
-      creditsDisplay: "25,000",
-      tickets: 25,
-      costDisplay: "₹25,000",
-      title: "Lamborghini Huracán Drive",
-      description: "5 adrenaline-fueled track laps on the Buddh Circuit (2 km per lap).",
-      tickName: "Lambo drive",
-      image: "/fleet/huracan.jpg",
-    },
-    {
-      credits: 100000,
-      creditsDisplay: "1,00,000",
-      tickets: 100,
-      costDisplay: "₹1,00,000",
-      title: "All 4 Supercars",
-      description: "Drive the Lamborghini, Ferrari, McLaren, and Porsche 911 across the full fleet.",
-      tickName: "All 4 cars",
-      isQuad: true,
-    },
+    calcTier(
+      1000,
+      "Supercar Photoshoot",
+      "5 HD retouched photos posing with a supercar in studio.",
+      "Photoshoot",
+      "/fleet/photoshoot.jpg"
+    ),
+    calcTier(
+      2000,
+      "30-Second Instagram Reel",
+      "A cinematic 30-second 4K reel with drone and cockpit footage.",
+      "Reel",
+      "/fleet/instagram-reel.jpg"
+    ),
+    calcTier(
+      25000,
+      "Lamborghini Huracán Drive",
+      "5 adrenaline-fueled track laps on the Buddh Circuit (2 km per lap).",
+      "Lambo drive",
+      "/fleet/huracan.jpg"
+    ),
+    calcTier(
+      100000,
+      "All 4 Supercars",
+      "Drive the Lamborghini, Ferrari, McLaren, and Porsche 911 across the full fleet.",
+      "All 4 cars",
+      undefined,
+      true
+    ),
   ]
 
   const activeTier = tiers[activeIndex]

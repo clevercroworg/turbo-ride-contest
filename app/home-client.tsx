@@ -84,6 +84,7 @@ export function HomeClient({ contest, memberEmail, userCredits = 0 }: HomeClient
         {/* 4.5. Interactive Credit Experience Calculator */}
         <CreditCalculator
           onBuyTickets={(count) => handleOpenBuy(count)}
+          ticketPrice={contest.ticketPrice}
         />
 
         {/* 5. The Fleet: Interactive Supercar Stage with Mobile Carousel */}
@@ -101,11 +102,15 @@ export function HomeClient({ contest, memberEmail, userCredits = 0 }: HomeClient
         />
 
         {/* 7. Clear FAQ */}
-        <FaqAccordion />
+        <FaqAccordion
+          ticketPrice={contest.ticketPrice}
+          targetTickets={contest.targetTickets}
+          carName={contest.carName}
+        />
       </main>
 
       {/* 8. Footer */}
-      <Footer />
+      <Footer ticketPrice={contest.ticketPrice} />
 
       {/* 9. Ticket Checkout Modal */}
       <TicketCheckoutModal

@@ -1,7 +1,11 @@
 import Link from "next/link"
 import { ShieldCheck, EnvelopeSimple, Phone, ArrowUpRight } from "@phosphor-icons/react/dist/ssr"
 
-export function Footer() {
+interface FooterProps {
+  ticketPrice?: number
+}
+
+export function Footer({ ticketPrice = 1000 }: FooterProps = {}) {
   return (
     <footer className="border-t border-zinc-200 bg-white text-zinc-950 text-xs">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-14">
@@ -102,7 +106,7 @@ export function Footer() {
               <span>+91 99880 01122</span>
             </a>
             <p className="text-[11px] text-zinc-500 font-normal leading-relaxed mt-1">
-              TurboRide operates as a commercial supercar club. Every ₹1,000 deposited is credited 1:1 into member drive accounts and is never forfeit.
+              TurboRide operates as a commercial supercar club. Every ₹{ticketPrice.toLocaleString("en-IN")} deposited is credited 1:1 into member drive accounts and is never forfeit.
             </p>
           </div>
         </div>

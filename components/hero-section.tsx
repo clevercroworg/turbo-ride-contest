@@ -44,6 +44,10 @@ export function HeroSection({
 
   const cleanWorth = worthDisplay ? worthDisplay.replace(/^Worth\s+(over\s+)?/i, "").trim() : "₹1.6 Crore"
 
+  const nameParts = (carName || "Porsche 718 Cayman").toUpperCase().trim().split(/\s+/)
+  const heroLine1 = nameParts.length > 2 ? `WIN A ${nameParts.slice(0, -1).join(" ")}` : `WIN A ${nameParts[0] || "PORSCHE"}`
+  const heroLine2Lead = nameParts.length > 2 ? `${nameParts[nameParts.length - 1]} ` : (nameParts[1] ? `${nameParts.slice(1).join(" ")} ` : "")
+
   return (
     <section className="relative pt-28 sm:pt-30 md:pt-30 lg:pt-32 pb-12 sm:pb-14 md:pb-12 lg:pb-14 flex flex-col justify-center overflow-hidden border-b border-orange-700 bg-[#ea580c]">
       
@@ -92,9 +96,9 @@ export function HeroSection({
 
             {/* Sharp, Well-Structured Headline - Fluid Clamp on Mobile, Scaled for Tablet Portrait (md:44px), Tablet Landscape (lg:36px), and Desktop (xl:48px, 2xl:52px) */}
             <h1 className="text-[clamp(27px,8.4vw,36.3px)] sm:text-[38px] md:text-[44px] lg:text-[36px] xl:text-[48px] 2xl:text-[52px] font-black tracking-tight uppercase leading-[1.05] text-white mb-3 sm:mb-3.5">
-              <span className="block whitespace-nowrap">WIN A PORSCHE 718</span>
+              <span className="block whitespace-nowrap">{heroLine1}</span>
               <span className="block whitespace-nowrap">
-                <span className="text-white">CAYMAN </span>
+                <span className="text-white">{heroLine2Lead}</span>
                 <span className="text-zinc-950">FOR ₹{ticketPrice.toLocaleString("en-IN")}.</span>
               </span>
             </h1>

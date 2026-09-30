@@ -4,14 +4,24 @@ import { useState } from "react"
 import { motion, AnimatePresence } from "motion/react"
 import { CaretDown } from "@phosphor-icons/react"
 
-export function FaqAccordion() {
+interface FaqAccordionProps {
+  ticketPrice?: number
+  targetTickets?: number
+  carName?: string
+}
+
+export function FaqAccordion({
+  ticketPrice = 1000,
+  targetTickets = 10000,
+  carName = "Porsche 718 Cayman",
+}: FaqAccordionProps = {}) {
   const [openIndex, setOpenIndex] = useState<number | null>(0)
 
   const faqs = [
     {
       num: "01",
-      q: "What happens to my ₹1,000 deposit when I enter?",
-      a: "Every ₹1,000 you deposit is 100% credited into your permanent TurboRide Drive Credits wallet. The contest ticket is completely complimentary. Your credits never expire and can be redeemed for real track drives, photoshoots, and reels on book.turboridesupercars.com.",
+      q: `What happens to my ₹${ticketPrice.toLocaleString("en-IN")} deposit when I enter?`,
+      a: `Every ₹${ticketPrice.toLocaleString("en-IN")} you deposit is 100% credited into your permanent TurboRide Drive Credits wallet. The contest ticket is completely complimentary. Your credits never expire and can be redeemed for real track drives, photoshoots, and reels on book.turboridesupercars.com.`,
     },
     {
       num: "02",
@@ -21,7 +31,7 @@ export function FaqAccordion() {
     {
       num: "03",
       q: "When and how will the winning ticket be selected?",
-      a: "The draw is streamed live across our official YouTube and Instagram handles as soon as the 10,000 ticket cap is reached. A certified cryptographic random generator will draw the winning 5-digit ticket number on live camera with public auditing.",
+      a: `The draw is streamed live across our official YouTube and Instagram handles as soon as the ${targetTickets.toLocaleString("en-IN")} ticket cap is reached. A certified cryptographic random generator will draw the winning 5-digit ticket number on live camera with public auditing.`,
     },
     {
       num: "04",
@@ -35,7 +45,7 @@ export function FaqAccordion() {
     },
     {
       num: "06",
-      q: "What happens if I do not win the Porsche?",
+      q: `What happens if I do not win the ${carName}?`,
       a: "You lose nothing. Your full deposit remains in your wallet as TurboRide Drive Credits, which you can use for supercar laps or media shoots at your convenience.",
     },
   ]
