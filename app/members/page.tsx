@@ -1,8 +1,9 @@
 import { redirect } from "next/navigation"
 import { getMemberSession, getMemberReferralProfile } from "@/lib/auth"
 import { getUserDriveCredits } from "@/lib/credits"
-import { getActiveContest, getUserTicketStats, getUserReferrals } from "@/lib/contests"
+import { getActiveContest, getContests, getUserTicketStats, getUserReferrals } from "@/lib/contests"
 import { getUserPendingVouchers } from "@/lib/rewards"
+import { getAdminSettingsAction } from "@/lib/admin"
 import { MemberDashboardClient } from "./member-dashboard-client"
 
 export const dynamic = "force-dynamic"
@@ -14,11 +15,13 @@ export default async function MembersPage() {
   }
 
   const contest = await getActiveContest()
-  const [credits, ticketStats, referralProfile, pendingVouchers] = await Promise.all([
+  const [allDbContests, credits, ticketStats, referralProfile, pendingVouchers, adminSettings] = await Promise.all([
+    getContests(),
     getUserDriveCredits(session.email, session.phone),
     getUserTicketStats(session.email, session.phone, contest?.id || "porsche-718"),
     getMemberReferralProfile(session.email, session.phone),
     getUserPendingVouchers(session.email, session.phone),
+    getAdminSettingsAction(),
   ])
 
   const refCode = referralProfile?.referralCode || session.referralCode || ""
@@ -29,10 +32,12 @@ export default async function MembersPage() {
       session={session}
       credits={credits}
       contest={contest}
+      allContests={allDbContests}
       ticketStats={ticketStats}
       referralProfile={referralProfile}
       initialReferrals={referrals}
       initialVouchers={pendingVouchers}
+      adminSettings={adminSettings}
     />
   )
 }

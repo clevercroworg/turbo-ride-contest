@@ -129,17 +129,27 @@ export async function buyContestTicketsAction(params: {
       }
     }
 
-    // 5. Update Buyer's Referral Profile
+    // 5. Query dynamic platform settings for referral economics and unlock thresholds
+    const settingsRes = await client.query(
+      `SELECT key, value FROM site_settings 
+       WHERE key IN ('contest_referral_drive_pct', 'contest_referral_cash_pct', 'contest_cash_unlock_threshold')`
+    )
+    const sMap = new Map(settingsRes.rows.map((r: { key: string; value: string }) => [r.key, r.value]))
+    const driveRewardPct = (Number(sMap.get("contest_referral_drive_pct")) || 25) / 100
+    const cashCommissionPct = (Number(sMap.get("contest_referral_cash_pct")) || 25) / 100
+    const cashUnlockThreshold = Number(sMap.get("contest_cash_unlock_threshold")) || 20
+
+    // 6. Update Buyer's Referral Profile
     await client.query(
       `UPDATE referral_profiles
        SET tickets_bought = tickets_bought + $1,
-           is_cash_unlocked = CASE WHEN (tickets_bought + $1) >= 25 THEN TRUE ELSE is_cash_unlocked END,
+           is_cash_unlocked = CASE WHEN (tickets_bought + $1) >= $2 THEN TRUE ELSE is_cash_unlocked END,
            updated_at = NOW()
-       WHERE LOWER(user_email) = $2 OR user_phone = $3`,
-      [ticketCount, userEmail.toLowerCase(), userPhone || "NONE"]
+       WHERE LOWER(user_email) = $3 OR user_phone = $4`,
+      [ticketCount, cashUnlockThreshold, userEmail.toLowerCase(), userPhone || "NONE"]
     )
 
-    // 6. Handle Referral Commission if referral code used
+    // 7. Handle Referral Commission if referral code used
     if (referralCodeUsed && referralCodeUsed.trim()) {
       const code = referralCodeUsed.trim().toUpperCase()
       const refQuery = await client.query(
@@ -149,8 +159,8 @@ export async function buyContestTicketsAction(params: {
 
       if (refQuery.rows.length > 0) {
         const referrer = refQuery.rows[0]
-        const bonusCredits = Math.round(creditsIssued * 0.25)
-        const cashCommission = referrer.is_cash_unlocked ? Math.round(cost * 0.25) : 0
+        const bonusCredits = Math.round(creditsIssued * driveRewardPct)
+        const cashCommission = referrer.is_cash_unlocked ? Math.round(cost * cashCommissionPct) : 0
         const refId = (referrer.user_email || referrer.user_phone || "referrer").toLowerCase()
 
         await client.query(
@@ -306,12 +316,29 @@ export async function autoPickTicketNumberAction(params: {
   return { ok: false, error: "Could not auto-generate an unclaimed ticket number. Please try manual entry." }
 }
 
+export interface SimulatedReferralResult {
+  ok: boolean
+  creditsAdded?: number
+  cashAdded?: number
+  error?: string
+  newReferral?: {
+    id: string
+    userName: string
+    userEmail: string
+    ticketCount: number
+    amountPaid: number
+    creditsEarned: number
+    cashEarned: number
+    createdAt: string
+  }
+}
+
 export async function simulateReferralAction(params: {
   referralCode: string
   friendName: string
   ticketCount: number
   referrerEmail: string
-}): Promise<{ ok: boolean; creditsAdded?: number; cashAdded?: number; error?: string }> {
+}): Promise<SimulatedReferralResult> {
   const { referralCode, friendName, ticketCount, referrerEmail } = params
   if (!friendName || !friendName.trim()) {
     return { ok: false, error: "Please enter your friend's name." }
@@ -324,16 +351,34 @@ export async function simulateReferralAction(params: {
   try {
     await client.query("BEGIN")
 
+    // Fetch dynamic contest ticket price & referral rates from site_settings & active contest
+    const [settingsRes, contestRes] = await Promise.all([
+      client.query(
+        `SELECT key, value FROM site_settings 
+         WHERE key IN ('contest_ticket_price', 'contest_credit_multiplier', 'contest_referral_drive_pct', 'contest_referral_cash_pct', 'contest_cash_unlock_threshold')`
+      ),
+      client.query(`SELECT id, ticket_price, credits_per_ticket FROM contests WHERE status = 'active' LIMIT 1`)
+    ])
+
+    const sMap = new Map(settingsRes.rows.map((r: { key: string; value: string }) => [r.key, r.value]))
+    const activeContest = contestRes.rows[0]
+    const unitPrice = Number(activeContest?.ticket_price) || Number(sMap.get("contest_ticket_price")) || 1000
+    const creditsMultiplier = Number(activeContest?.credits_per_ticket) || Number(sMap.get("contest_credit_multiplier")) || unitPrice
+    const drivePct = (Number(sMap.get("contest_referral_drive_pct")) || 25) / 100
+    const cashPct = (Number(sMap.get("contest_referral_cash_pct")) || 25) / 100
+    const cashThreshold = Number(sMap.get("contest_cash_unlock_threshold")) || 20
+    const targetContestId = activeContest?.id || "porsche-718"
+
     const orderId = `ORD-REF-${Date.now()}-${Math.floor(100 + Math.random() * 900)}`
-    const cost = ticketCount * 1000
-    const creditsIssued = ticketCount * 1000
+    const cost = ticketCount * unitPrice
+    const creditsIssued = ticketCount * creditsMultiplier
     const fakeFriendEmail = `${friendName.trim().toLowerCase().replace(/\s+/g, "")}.${Date.now().toString().slice(-4)}@example.com`
 
     // 1. Record friend order
     await client.query(
       `INSERT INTO contest_orders (id, user_phone, user_email, user_name, contest_id, ticket_count, amount_paid, credits_issued, referral_code_used, status, created_at)
-       VALUES ($1, '9999999999', $2, $3, 'porsche-718', $4, $5, $6, $7, 'completed', NOW())`,
-      [orderId, fakeFriendEmail, friendName.trim(), ticketCount, cost, creditsIssued, referralCode.trim()]
+       VALUES ($1, '9999999999', $2, $3, $4, $5, $6, $7, $8, 'completed', NOW())`,
+      [orderId, fakeFriendEmail, friendName.trim(), targetContestId, ticketCount, cost, creditsIssued, referralCode.trim()]
     )
 
     // 2. Check if referrer has unlocked cash commission
@@ -341,10 +386,10 @@ export async function simulateReferralAction(params: {
       `SELECT is_cash_unlocked, tickets_bought FROM referral_profiles WHERE UPPER(referral_code) = UPPER($1) LIMIT 1`,
       [referralCode.trim()]
     )
-    const isCashUnlocked = refProfile.rows[0]?.is_cash_unlocked || (Number(refProfile.rows[0]?.tickets_bought) >= 25)
+    const isCashUnlocked = refProfile.rows[0]?.is_cash_unlocked || (Number(refProfile.rows[0]?.tickets_bought) >= cashThreshold)
 
-    const bonusCredits = ticketCount * 250 // 25% of ₹1,000 spend
-    const cashCommission = isCashUnlocked ? ticketCount * 250 : 0
+    const bonusCredits = Math.round(cost * drivePct)
+    const cashCommission = isCashUnlocked ? Math.round(cost * cashPct) : 0
     const primaryId = referrerEmail.trim().toLowerCase()
 
     // 3. Grant credits to referrer in user_credits
@@ -368,7 +413,21 @@ export async function simulateReferralAction(params: {
 
     await client.query("COMMIT")
     safeRevalidate("/members")
-    return { ok: true, creditsAdded: bonusCredits, cashAdded: cashCommission }
+    return {
+      ok: true,
+      creditsAdded: bonusCredits,
+      cashAdded: cashCommission,
+      newReferral: {
+        id: orderId,
+        userName: friendName.trim(),
+        userEmail: fakeFriendEmail,
+        ticketCount,
+        amountPaid: cost,
+        creditsEarned: bonusCredits,
+        cashEarned: cashCommission,
+        createdAt: new Date().toISOString(),
+      },
+    }
   } catch (err) {
     await client.query("ROLLBACK")
     console.error("[simulateReferralAction error]:", err)

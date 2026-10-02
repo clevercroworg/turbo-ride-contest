@@ -145,7 +145,7 @@ export async function loginOrSignupMember(
          )
          VALUES ($1, $2, $3, $4, $5, 0, 0, 0, 0, false, NOW(), NOW(), 'active')
          ON CONFLICT (referral_code) DO NOTHING`,
-        [profileId, userPhone, userEmail.toLowerCase(), displayName, referralCode]
+        [profileId, userPhone || null, userEmail ? userEmail.toLowerCase() : null, displayName, referralCode]
       )
     }
 
