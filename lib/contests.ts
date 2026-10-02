@@ -8,6 +8,7 @@ export async function getContests(): Promise<Contest[]> {
     const res = await pool.query(`
       SELECT 
         id, title, subtitle, car_name as "carName", image_url as "imageUrl",
+        gallery_images as "galleryImages", youtube_url as "youtubeUrl",
         worth_display as "worthDisplay", target_tickets as "targetTickets",
         sold_tickets as "soldTickets", ticket_price as "ticketPrice",
         credits_per_ticket as "creditsPerTicket", status,
@@ -16,7 +17,15 @@ export async function getContests(): Promise<Contest[]> {
       FROM contests
       ORDER BY CASE WHEN status = 'active' THEN 0 ELSE 1 END, created_at ASC
     `)
-    return res.rows
+    return res.rows.map((r) => ({
+      ...r,
+      galleryImages: Array.isArray(r.galleryImages)
+        ? r.galleryImages
+        : typeof r.galleryImages === "string"
+        ? JSON.parse(r.galleryImages || "[]")
+        : [],
+      youtubeUrl: r.youtubeUrl || "",
+    }))
   } catch (err) {
     console.error("[getContests error]:", err)
     return [

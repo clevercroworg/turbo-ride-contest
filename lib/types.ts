@@ -10,6 +10,8 @@ export interface Contest {
   ticketPrice: number
   creditsPerTicket: number
   status: "active" | "upcoming" | "completed"
+  galleryImages?: string[]
+  youtubeUrl?: string
   drawDate?: string
   winnerTicketNumber?: string
   winnerName?: string

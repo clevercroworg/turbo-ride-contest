@@ -3,6 +3,7 @@
 import { pool } from "./db"
 import { revalidatePath } from "next/cache"
 import { loginOrSignupMember } from "./auth"
+import { cookies } from "next/headers"
 
 function safeRevalidate(path: string) {
   try {
@@ -63,6 +64,14 @@ export async function buyContestTicketsAction(params: {
     return { ok: false, error: "Please enter your email or phone to receive tickets." }
   }
 
+  let codeToUse = (referralCodeUsed || "").trim().toUpperCase()
+  if (!codeToUse) {
+    try {
+      const cookieStore = await cookies()
+      codeToUse = (cookieStore.get("referral_code")?.value || "").trim().toUpperCase()
+    } catch {}
+  }
+
   const client = await pool.connect()
   try {
     await client.query("BEGIN")
@@ -85,7 +94,7 @@ export async function buyContestTicketsAction(params: {
     await client.query(
       `INSERT INTO contest_orders (id, user_phone, user_email, user_name, contest_id, ticket_count, amount_paid, credits_issued, referral_code_used, status, created_at)
        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, 'completed', NOW())`,
-      [orderId, userPhone, userEmail.toLowerCase(), userName || "Member", contestId, ticketCount, cost, creditsIssued, referralCodeUsed || null]
+      [orderId, userPhone, userEmail.toLowerCase(), userName || "Member", contestId, ticketCount, cost, creditsIssued, codeToUse || null]
     )
 
     // 2. Deposit 1:1 Drive Credits in shared user_credits table matching booking-app schema
@@ -150,8 +159,8 @@ export async function buyContestTicketsAction(params: {
     )
 
     // 7. Handle Referral Commission if referral code used
-    if (referralCodeUsed && referralCodeUsed.trim()) {
-      const code = referralCodeUsed.trim().toUpperCase()
+    if (codeToUse) {
+      const code = codeToUse
       const refQuery = await client.query(
         `SELECT user_email, user_phone, is_cash_unlocked FROM referral_profiles WHERE UPPER(referral_code) = $1 LIMIT 1`,
         [code]

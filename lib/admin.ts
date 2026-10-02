@@ -18,6 +18,8 @@ export interface AdminContest {
   subtitle: string
   carName: string
   imageUrl: string
+  galleryImages?: string[]
+  youtubeUrl?: string
   worthDisplay: string
   targetTickets: number
   soldTickets: number
@@ -228,6 +230,12 @@ export async function getAdminContests(): Promise<AdminContest[]> {
       subtitle: r.subtitle,
       carName: r.car_name,
       imageUrl: r.image_url,
+      galleryImages: Array.isArray(r.gallery_images)
+        ? r.gallery_images
+        : typeof r.gallery_images === "string"
+        ? JSON.parse(r.gallery_images || "[]")
+        : [],
+      youtubeUrl: r.youtube_url || "",
       worthDisplay: r.worth_display,
       targetTickets: Number(r.target_tickets),
       soldTickets: Number(r.sold_tickets),
@@ -295,6 +303,14 @@ export async function updateContestAction(
       fields.push(`image_url = $${idx++}`)
       values.push(data.imageUrl)
     }
+    if (data.galleryImages !== undefined) {
+      fields.push(`gallery_images = $${idx++}::jsonb`)
+      values.push(JSON.stringify(data.galleryImages))
+    }
+    if (data.youtubeUrl !== undefined) {
+      fields.push(`youtube_url = $${idx++}`)
+      values.push(data.youtubeUrl)
+    }
     if (data.winnerName !== undefined) {
       fields.push(`winner_name = $${idx++}`)
       values.push(data.winnerName)
@@ -356,18 +372,22 @@ export async function createContestAction(data: {
   ticketPrice: number
   targetTickets: number
   imageUrl: string
+  galleryImages?: string[]
+  youtubeUrl?: string
   status: string
 }): Promise<{ ok: boolean; error?: string }> {
   try {
     await pool.query(
-      `INSERT INTO contests (id, car_name, title, subtitle, worth_display, ticket_price, credits_per_ticket, target_tickets, sold_tickets, image_url, status, created_at, updated_at)
-       VALUES ($1, $2, $3, $4, $5, $6, $6, $7, 0, $8, $9, NOW(), NOW())
+      `INSERT INTO contests (id, car_name, title, subtitle, worth_display, ticket_price, credits_per_ticket, target_tickets, sold_tickets, image_url, gallery_images, youtube_url, status, created_at, updated_at)
+       VALUES ($1, $2, $3, $4, $5, $6, $6, $7, 0, $8, $9::jsonb, $10, $11, NOW(), NOW())
        ON CONFLICT (id) DO UPDATE SET
          car_name = EXCLUDED.car_name,
          title = EXCLUDED.title,
          worth_display = EXCLUDED.worth_display,
          ticket_price = EXCLUDED.ticket_price,
          target_tickets = EXCLUDED.target_tickets,
+         gallery_images = EXCLUDED.gallery_images,
+         youtube_url = EXCLUDED.youtube_url,
          status = EXCLUDED.status,
          updated_at = NOW()`,
       [
@@ -379,6 +399,8 @@ export async function createContestAction(data: {
         data.ticketPrice,
         data.targetTickets,
         data.imageUrl,
+        JSON.stringify(data.galleryImages || []),
+        data.youtubeUrl || "",
         data.status,
       ]
     )

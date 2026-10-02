@@ -2,7 +2,6 @@ import { redirect } from "next/navigation"
 import { getMemberSession } from "@/lib/auth"
 import { getUserDriveCredits } from "@/lib/credits"
 import { REWARDS_CATALOG } from "@/lib/catalog"
-import { getUserPendingVouchers } from "@/lib/rewards"
 import { RewardsClient } from "./rewards-client"
 
 export const dynamic = "force-dynamic"
@@ -13,17 +12,13 @@ export default async function RewardsPage() {
     redirect("/login?redirect=/members/rewards")
   }
 
-  const [credits, pendingVouchers] = await Promise.all([
-    getUserDriveCredits(session.email, session.phone),
-    getUserPendingVouchers(session.email, session.phone),
-  ])
+  const credits = await getUserDriveCredits(session.email, session.phone)
 
   return (
     <RewardsClient
       session={session}
       credits={credits}
       catalog={REWARDS_CATALOG}
-      initialVouchers={pendingVouchers}
     />
   )
 }

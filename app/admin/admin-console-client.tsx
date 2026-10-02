@@ -303,7 +303,9 @@ export function AdminConsoleClient({
     worthDisplay: "",
     ticketPrice: 1000,
     targetTickets: 10000,
-    imageUrl: "/prizes/porsche-718.jpg",
+    imageUrl: "/cars/porsche-side.png",
+    galleryImages: ["", "", "", ""],
+    youtubeUrl: "",
     status: "upcoming",
   })
 
@@ -359,6 +361,8 @@ export function AdminConsoleClient({
       status: editingContest.status,
       drawDate: editingContest.drawDate,
       imageUrl: editingContest.imageUrl,
+      galleryImages: editingContest.galleryImages,
+      youtubeUrl: editingContest.youtubeUrl,
       winnerName: editingContest.winnerName,
       winnerTicketNumber: editingContest.winnerTicketNumber,
     })
@@ -527,6 +531,8 @@ export function AdminConsoleClient({
       ticketPrice: Number(newContest.ticketPrice),
       targetTickets: Number(newContest.targetTickets),
       imageUrl: newContest.imageUrl,
+      galleryImages: newContest.galleryImages,
+      youtubeUrl: newContest.youtubeUrl,
       status: newContest.status,
     })
 
@@ -3121,6 +3127,56 @@ export function AdminConsoleClient({
                 </div>
               </div>
 
+              {/* Media Section: 4 Images + 1 YouTube Video */}
+              <div className="pt-3 border-t border-zinc-100 space-y-3">
+                <div className="flex items-center justify-between">
+                  <label className="block text-xs font-bold text-zinc-900 uppercase tracking-wider">
+                    Gallery Images (4 Images for Showcase Carousel)
+                  </label>
+                  <span className="text-[10px] text-zinc-400">4 image URLs</span>
+                </div>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                  {[0, 1, 2, 3].map((idx) => {
+                    const currentImg = editingContest.galleryImages?.[idx] || ""
+                    return (
+                      <div key={idx} className="space-y-1">
+                        <label className="text-[11px] font-semibold text-zinc-500">
+                          Image {idx + 1} URL
+                        </label>
+                        <input
+                          type="text"
+                          value={currentImg}
+                          onChange={(e) => {
+                            const arr = [...(editingContest.galleryImages || ["", "", "", ""])]
+                            while (arr.length < 4) arr.push("")
+                            arr[idx] = e.target.value
+                            setEditingContest({ ...editingContest, galleryImages: arr })
+                          }}
+                          placeholder={idx === 0 ? "/images/porsche-yellow.png or https://..." : `/cars/car-side-${idx + 1}.png`}
+                          className="w-full h-9 px-3 rounded-xl border border-zinc-300 text-xs font-mono focus:outline-none focus:ring-2 focus:ring-[#ea580c]"
+                        />
+                      </div>
+                    )
+                  })}
+                </div>
+
+                <div className="space-y-1">
+                  <label className="block text-xs font-bold text-zinc-900 uppercase tracking-wider">
+                    YouTube Video URL
+                  </label>
+                  <input
+                    type="text"
+                    value={editingContest.youtubeUrl || ""}
+                    onChange={(e) => setEditingContest({ ...editingContest, youtubeUrl: e.target.value })}
+                    placeholder="https://www.youtube.com/watch?v=... or https://youtu.be/..."
+                    className="w-full h-9 px-3 rounded-xl border border-zinc-300 text-xs font-mono focus:outline-none focus:ring-2 focus:ring-[#ea580c]"
+                  />
+                  <p className="text-[10px] text-zinc-400">
+                    Paste YouTube URL or video link. Members can click the Video button to view it in the showcase.
+                  </p>
+                </div>
+              </div>
+
               <div className="flex items-center justify-end gap-2 pt-3 border-t border-zinc-100">
                 <button
                   type="button"
@@ -3226,6 +3282,56 @@ export function AdminConsoleClient({
                   className="w-full h-10 px-3.5 rounded-xl border border-zinc-300 text-xs focus:outline-none focus:ring-2 focus:ring-[#ea580c]"
                   required
                 />
+              </div>
+
+              {/* Media Section: 4 Images + 1 YouTube Video */}
+              <div className="pt-3 border-t border-zinc-100 space-y-3">
+                <div className="flex items-center justify-between">
+                  <label className="block text-xs font-bold text-zinc-900 uppercase tracking-wider">
+                    Gallery Images (4 Images for Showcase Carousel)
+                  </label>
+                  <span className="text-[10px] text-zinc-400">4 image URLs</span>
+                </div>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                  {[0, 1, 2, 3].map((idx) => {
+                    const currentImg = newContest.galleryImages?.[idx] || ""
+                    return (
+                      <div key={idx} className="space-y-1">
+                        <label className="text-[11px] font-semibold text-zinc-500">
+                          Image {idx + 1} URL
+                        </label>
+                        <input
+                          type="text"
+                          value={currentImg}
+                          onChange={(e) => {
+                            const arr = [...(newContest.galleryImages || ["", "", "", ""])]
+                            while (arr.length < 4) arr.push("")
+                            arr[idx] = e.target.value
+                            setNewContest({ ...newContest, galleryImages: arr })
+                          }}
+                          placeholder={idx === 0 ? "/images/porsche-yellow.png or https://..." : `/cars/car-side-${idx + 1}.png`}
+                          className="w-full h-9 px-3 rounded-xl border border-zinc-300 text-xs font-mono focus:outline-none focus:ring-2 focus:ring-[#ea580c]"
+                        />
+                      </div>
+                    )
+                  })}
+                </div>
+
+                <div className="space-y-1">
+                  <label className="block text-xs font-bold text-zinc-900 uppercase tracking-wider">
+                    YouTube Video URL
+                  </label>
+                  <input
+                    type="text"
+                    value={newContest.youtubeUrl || ""}
+                    onChange={(e) => setNewContest({ ...newContest, youtubeUrl: e.target.value })}
+                    placeholder="https://www.youtube.com/watch?v=... or https://youtu.be/..."
+                    className="w-full h-9 px-3 rounded-xl border border-zinc-300 text-xs font-mono focus:outline-none focus:ring-2 focus:ring-[#ea580c]"
+                  />
+                  <p className="text-[10px] text-zinc-400">
+                    Paste YouTube URL or video link. Members can click the Video button to view it in the showcase.
+                  </p>
+                </div>
               </div>
 
               <div className="flex items-center justify-end gap-2 pt-3 border-t border-zinc-100">

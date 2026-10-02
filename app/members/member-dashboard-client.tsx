@@ -37,11 +37,96 @@ import { MembersHeader } from "@/components/members/members-header"
 import { 
   buyContestTicketsAction, 
   assignTicketNumberAction, 
-  autoPickTicketNumberAction,
-  simulateReferralAction
+  autoPickTicketNumberAction
 } from "@/lib/credits"
+import { 
+  createRazorpayOrderAction, 
+  verifyAndCompleteRazorpayPaymentAction 
+} from "@/lib/razorpay"
 import { logoutMember } from "@/lib/auth"
-import { cancelRedemptionAction } from "@/lib/rewards"
+
+function loadRazorpayScript(): Promise<boolean> {
+  return new Promise((resolve) => {
+    if (typeof window === "undefined") return resolve(false)
+    if ((window as any).Razorpay) return resolve(true)
+    const script = document.createElement("script")
+    script.src = "https://checkout.razorpay.com/v1/checkout.js"
+    script.onload = () => resolve(true)
+    script.onerror = () => resolve(false)
+    document.body.appendChild(script)
+  })
+}
+
+function getYouTubeEmbedUrl(url: string): string {
+  if (!url) return ""
+  if (url.includes("embed/")) return url
+  const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/
+  const match = url.match(regExp)
+  return match && match[2].length === 11
+    ? `https://www.youtube.com/embed/${match[2]}?autoplay=1`
+    : url
+}
+
+function isYouTube(url: string): boolean {
+  return /youtube\.com|youtu\.be/.test(url || "")
+}
+
+function getCarSpecs(carName: string, id: string): Array<{ label: string; value: string }> {
+  const lower = (carName + " " + id).toLowerCase()
+  if (lower.includes("porsche") || lower.includes("718") || lower.includes("cayman")) {
+    return [
+      { label: "POWER", value: "300 BHP" },
+      { label: "0-100 KM/H", value: "4.9 Sec" },
+      { label: "TOP SPEED", value: "275 km/h" },
+      { label: "TRANSMISSION", value: "7-Speed PDK" },
+      { label: "ENGINE", value: "2.0L Turbo Flat-4" },
+      { label: "DELIVERY", value: "Pan-India" },
+    ]
+  }
+  if (lower.includes("mustang")) {
+    return [
+      { label: "POWER", value: "450 BHP" },
+      { label: "0-100 KM/H", value: "4.3 Sec" },
+      { label: "TOP SPEED", value: "250 km/h" },
+      { label: "TRANSMISSION", value: "10-Speed Automatic" },
+      { label: "ENGINE", value: "5.0L Coyote V8" },
+      { label: "DELIVERY", value: "Pan-India" },
+    ]
+  }
+  if (lower.includes("cyberster")) {
+    return [
+      { label: "POWER", value: "536 BHP" },
+      { label: "0-100 KM/H", value: "3.2 Sec" },
+      { label: "TOP SPEED", value: "200 km/h" },
+      { label: "TRANSMISSION", value: "Single-Speed EV" },
+      { label: "DOORS", value: "Scissor Doors" },
+      { label: "DELIVERY", value: "Pan-India" },
+    ]
+  }
+  return [
+    { label: "POWER", value: "Supercar Spec" },
+    { label: "DELIVERY", value: "Pan-India" },
+    { label: "TRACK ACCESS", value: "Full TurboRide Vault" },
+    { label: "VERIFICATION", value: "Government Registered" },
+  ]
+}
+
+function getCarImages(c: Contest): Array<{ label: string; src: string }> {
+  const images = (c.galleryImages || []).filter(Boolean)
+  if (images.length > 0) {
+    return images.map((src, i) => ({
+      label: `View ${i + 1}`,
+      src,
+    }))
+  }
+  const primary = c.imageUrl || "/cars/car-718.png"
+  return [
+    { label: "Front Angle", src: primary },
+    { label: "Side Profile", src: primary },
+    { label: "Track Spec", src: primary },
+    { label: "Cockpit", src: primary },
+  ]
+}
 import type { 
   MemberSession, 
   Contest, 
@@ -112,7 +197,6 @@ export function MemberDashboardClient({
   const [ticketStats, setTicketStats] = useState(initialTicketStats)
   const [referralProfile, setReferralProfile] = useState<ReferralProfile | null>(initialReferralProfile)
   const [referrals, setReferrals] = useState<ReferralRecord[]>(initialReferrals)
-  const [vouchers, setVouchers] = useState<ActiveVoucher[]>(initialVouchers)
 
   // Ticket Buying State
   const [ticketBuyCount, setTicketBuyCount] = useState<number>(1)
@@ -127,14 +211,6 @@ export function MemberDashboardClient({
   // Referral State
   const [copiedLink, setCopiedLink] = useState<boolean>(false)
   const [showReferralsList, setShowReferralsList] = useState<boolean>(false)
-  const [friendName, setFriendName] = useState<string>("")
-  const [simTickets, setSimTickets] = useState<number>(1)
-  const [simulating, setSimulating] = useState<boolean>(false)
-  const [simMsg, setSimMsg] = useState<{ type: "success" | "error"; text: string } | null>(null)
-
-  // Voucher Cancellation State
-  const [cancellingVoucherId, setCancellingVoucherId] = useState<string | null>(null)
-  const [voucherMsg, setVoucherMsg] = useState<{ type: "success" | "error"; text: string } | null>(null)
 
   // Video Modal State
   const [videoModalOpen, setVideoModalOpen] = useState<boolean>(false)
@@ -147,166 +223,22 @@ export function MemberDashboardClient({
     }
   }, [])
 
-  // Build the dynamic showcase by overlaying live DB contests managed by Admin Console
-  const BASE_CATALOG: ContestShowcase[] = [
-    {
-      id: contest.id || "contest-porsche-718",
-      title: contest.title || "PORSCHE 718 CAYMAN",
-      carName: contest.carName || "Porsche 718 Cayman",
-      worthDisplay: contest.worthDisplay || "₹1.6 Crore",
-      status: "live",
-      statusBadge: "LIVE CONTEST",
-      soldTickets: Number(contest.soldTickets || 6413),
-      targetTickets: Number(contest.targetTickets || 10000),
-      ticketPrice: Number(contest.ticketPrice || 1000),
-      images: [
-        { label: "Studio", src: "/images/porsche-yellow.png" },
-        { label: "Profile", src: "/cars/car-718.png" },
-        { label: "Cockpit", src: "/images/cockpit/porsche-cockpit.png" },
-        { label: "Track Rear", src: "/experience/hero-rear.png" },
-      ],
-      videoSrc: "/experience/teaser-video.mp4",
-      specs: [
-        { label: "POWER", value: "300 BHP" },
-        { label: "0-100 KM/H", value: "4.9 Sec" },
-        { label: "TOP SPEED", value: "275 km/h" },
-        { label: "TRANSMISSION", value: "7-Speed PDK" },
-        { label: "ENGINE", value: "2.0L Turbo Flat-4" },
-        { label: "DELIVERY", value: "Pan-India" },
-      ],
-    },
-    {
-      id: "contest-bmw-m340i",
-      title: "BMW M340i xDRIVE",
-      carName: "BMW M340i xDrive",
-      worthDisplay: "₹75 Lakh",
-      status: "coming",
-      statusBadge: "COMING SOON",
-      soldTickets: 0,
-      targetTickets: 7500,
-      ticketPrice: 1000,
-      images: [
-        { label: "Front Angle", src: "/cars/bmw-side.png" },
-        { label: "Track Spec", src: "/cars/car-ferrari-488.png" },
-      ],
-      specs: [
-        { label: "POWER", value: "382 BHP" },
-        { label: "0-100 KM/H", value: "4.4 Sec" },
-        { label: "TOP SPEED", value: "250 km/h" },
-        { label: "TRANSMISSION", value: "8-Speed Steptronic" },
-        { label: "ENGINE", value: "3.0L Turbo Inline-6" },
-        { label: "DELIVERY", value: "Pan-India" },
-      ],
-    },
-    {
-      id: "contest-mustang-gt",
-      title: "FORD MUSTANG GT 5.0 V8",
-      carName: "Ford Mustang GT",
-      worthDisplay: "₹85 Lakh",
-      status: "coming",
-      statusBadge: "COMING SOON",
-      soldTickets: 0,
-      targetTickets: 8500,
-      ticketPrice: 1000,
-      images: [
-        { label: "Profile", src: "/cars/car-mustang-gt.png" },
-        { label: "Track", src: "/cars/mustang-side.png" },
-      ],
-      specs: [
-        { label: "POWER", value: "450 BHP" },
-        { label: "0-100 KM/H", value: "4.3 Sec" },
-        { label: "TOP SPEED", value: "250 km/h" },
-        { label: "TRANSMISSION", value: "10-Speed Automatic" },
-        { label: "ENGINE", value: "5.0L Coyote V8" },
-        { label: "DELIVERY", value: "Pan-India" },
-      ],
-    },
-    {
-      id: "contest-lamborghini-huracan",
-      title: "LAMBORGHINI HURACÁN EVO",
-      carName: "Lamborghini Huracán Evo",
-      worthDisplay: "₹3.8 Crore",
-      status: "coming",
-      statusBadge: "COMING SOON",
-      soldTickets: 0,
-      targetTickets: 38000,
-      ticketPrice: 1000,
-      images: [
-        { label: "Hero Front", src: "/cars/car-huracan.png" },
-        { label: "Side View", src: "/cars/lambo-side.png" },
-      ],
-      specs: [
-        { label: "POWER", value: "640 BHP" },
-        { label: "0-100 KM/H", value: "2.9 Sec" },
-        { label: "TOP SPEED", value: "325 km/h" },
-        { label: "TRANSMISSION", value: "7-Speed Dual-Clutch" },
-        { label: "ENGINE", value: "5.2L V10 NA" },
-        { label: "DELIVERY", value: "Pan-India" },
-      ],
-    },
-    {
-      id: "contest-ferrari-488",
-      title: "FERRARI 488 GTB",
-      carName: "Ferrari 488 GTB",
-      worthDisplay: "₹3.5 Crore",
-      status: "coming",
-      statusBadge: "COMING SOON",
-      soldTickets: 0,
-      targetTickets: 35000,
-      ticketPrice: 1000,
-      images: [
-        { label: "Front Quarter", src: "/cars/car-ferrari-488.png" },
-        { label: "Side Profile", src: "/cars/ferrari-side.png" },
-      ],
-      specs: [
-        { label: "POWER", value: "661 BHP" },
-        { label: "0-100 KM/H", value: "3.0 Sec" },
-        { label: "TOP SPEED", value: "330 km/h" },
-        { label: "TRANSMISSION", value: "7-Speed F1 Dual-Clutch" },
-        { label: "ENGINE", value: "3.9L Twin-Turbo V8" },
-        { label: "DELIVERY", value: "Pan-India" },
-      ],
-    },
-    {
-      id: "contest-porsche-gt3",
-      title: "PORSCHE 911 GT3 RS",
-      carName: "Porsche 911 GT3 RS",
-      worthDisplay: "₹2.7 Crore",
-      status: "closed",
-      statusBadge: "DRAW COMPLETED",
-      soldTickets: 25000,
-      targetTickets: 25000,
-      ticketPrice: 1000,
-      images: [
-        { label: "Track Angle", src: "/cars/car-911-gt3.png" },
-        { label: "Side Aero", src: "/cars/gt3-side.png" },
-      ],
-      specs: [
-        { label: "POWER", value: "518 BHP" },
-        { label: "0-100 KM/H", value: "3.2 Sec" },
-        { label: "TOP SPEED", value: "296 km/h" },
-        { label: "WINNER", value: "Rahul M. (Bengaluru)" },
-        { label: "ENGINE", value: "4.0L Flat-6 NA" },
-        { label: "STATUS", value: "Delivered at BIC" },
-      ],
-    },
-  ]
-
-  // Merge live DB contests so any admin modifications to price, target, or sold tickets are reflected
-  const ALL_CONTESTS: ContestShowcase[] = BASE_CATALOG.map((base) => {
-    const dbMatch = allContests.find((c) => c.id === base.id || c.carName.toLowerCase() === base.carName.toLowerCase())
-    if (!dbMatch) return base
-    return {
-      ...base,
-      title: dbMatch.title || base.title,
-      carName: dbMatch.carName || base.carName,
-      worthDisplay: dbMatch.worthDisplay || base.worthDisplay,
-      ticketPrice: Number(dbMatch.ticketPrice) || base.ticketPrice,
-      targetTickets: Number(dbMatch.targetTickets) || base.targetTickets,
-      soldTickets: Number(dbMatch.soldTickets) || base.soldTickets,
-      status: dbMatch.status === "active" ? "live" : dbMatch.status === "completed" ? "closed" : "coming",
-    }
-  })
+  // Build the dynamic showcase strictly from the database contests (no mock cars)
+  const dbContests = allContests && allContests.length > 0 ? allContests : [contest]
+  const ALL_CONTESTS: ContestShowcase[] = dbContests.map((c) => ({
+    id: c.id,
+    title: c.title || c.carName,
+    carName: c.carName,
+    worthDisplay: c.worthDisplay || "Supercar Drop",
+    status: c.status === "active" ? "live" : c.status === "completed" ? "closed" : "coming",
+    statusBadge: c.status === "active" ? "LIVE CONTEST" : c.status === "completed" ? "DRAW COMPLETED" : "COMING SOON",
+    soldTickets: Number(c.soldTickets || 0),
+    targetTickets: Number(c.targetTickets || 10000),
+    ticketPrice: Number(c.ticketPrice || 1000),
+    images: getCarImages(c),
+    videoSrc: c.youtubeUrl || "",
+    specs: getCarSpecs(c.carName, c.id),
+  }))
 
   // Carousel & Filtering State
   const [contestFilter, setContestFilter] = useState<"all" | "live" | "coming" | "closed">("all")
@@ -356,48 +288,117 @@ export function MemberDashboardClient({
   const productionBaseUrl = process.env.NEXT_PUBLIC_APP_URL || "https://win.turboridesupercars.com"
   const referralLinkUrl = `${activeOrigin && !activeOrigin.includes("localhost") ? activeOrigin : productionBaseUrl}/r/${refCode}`
 
-  // 1. Buy Tickets Handler
+  // 1. Buy Tickets Handler (Live Razorpay Test Mode)
   const handleBuyTickets = async (countToBuy?: number) => {
     const qty = countToBuy || ticketBuyCount
     if (qty < 1) return
 
     setBuying(true)
     setBuyMsg(null)
-    try {
-      const res = await buyContestTicketsAction({
-        contestId: currentContest.id || contest.id,
-        ticketCount: qty,
-        userEmail: session.email,
-        userPhone: session.phone,
-        userName: session.name,
-      })
 
-      if (!res.ok) {
-        setBuyMsg({ type: "error", text: res.error || "Purchase failed. Please try again." })
-        setBuying(false)
-        return
+    try {
+      const isLoaded = await loadRazorpayScript()
+      if (!isLoaded) {
+        throw new Error("Unable to load Razorpay payment gateway. Please check your internet connection.")
       }
 
-      setCredits((prev) => prev + qty * unitPrice)
-      setTicketStats((prev) => ({
-        ...prev,
-        totalBought: prev.totalBought + qty,
-        availableToAssign: prev.availableToAssign + qty,
-      }))
+      const totalCost = qty * unitPrice
+      const receipt = `RCP-${Date.now()}`
 
-      setBuyMsg({
-        type: "success",
-        text: `Success! Added ${qty} ticket${qty > 1 ? "s" : ""} & ${(qty * unitPrice).toLocaleString("en-IN")} permanent Drive Credits to your garage.`,
+      // 1. Create Razorpay order on server
+      const orderRes = await createRazorpayOrderAction({
+        amountInINR: totalCost,
+        receipt,
+        notes: {
+          contestId: currentContest.id || contest.id,
+          ticketCount: String(qty),
+          userEmail: session.email,
+          userPhone: session.phone,
+        },
       })
 
-      try {
-        confetti({ particleCount: 75, spread: 60, origin: { y: 0.6 } })
-      } catch {}
+      if (!orderRes.ok || !orderRes.orderId) {
+        throw new Error(orderRes.error || "Failed to create payment order.")
+      }
 
-      router.refresh()
-    } catch {
-      setBuyMsg({ type: "error", text: "Network error. Please try again." })
-    } finally {
+      // 2. Open Razorpay Checkout Modal
+      const options = {
+        key: orderRes.keyId || "rzp_test_TVcBqxdRYHZ9A2",
+        amount: orderRes.amount,
+        currency: "INR",
+        name: "TurboRide Supercars",
+        description: `${qty} Contest Ticket${qty > 1 ? "s" : ""} + ${(qty * unitPrice).toLocaleString("en-IN")} Drive Credits`,
+        order_id: orderRes.orderId,
+        prefill: {
+          name: session.name || "Member",
+          email: session.email || "",
+          contact: session.phone || "",
+        },
+        theme: {
+          color: "#ea580c",
+        },
+        modal: {
+          ondismiss: () => {
+            setBuying(false)
+          },
+        },
+        handler: async function (response: any) {
+          try {
+            setBuyMsg({ type: "success", text: "Verifying payment with gateway..." })
+            const verifyRes = await verifyAndCompleteRazorpayPaymentAction({
+              razorpayOrderId: response.razorpay_order_id || orderRes.orderId,
+              razorpayPaymentId: response.razorpay_payment_id,
+              razorpaySignature: response.razorpay_signature,
+              contestId: currentContest.id || contest.id,
+              ticketCount: qty,
+              userEmail: session.email,
+              userPhone: session.phone,
+              userName: session.name,
+              referralCodeUsed: session.referralCode,
+            })
+
+            if (!verifyRes.ok) {
+              setBuyMsg({ type: "error", text: verifyRes.error || "Payment verification failed." })
+              setBuying(false)
+              return
+            }
+
+            setCredits((prev) => prev + qty * unitPrice)
+            setTicketStats((prev) => ({
+              ...prev,
+              totalBought: prev.totalBought + qty,
+              availableToAssign: prev.availableToAssign + qty,
+            }))
+
+            setBuyMsg({
+              type: "success",
+              text: `Payment Confirmed! Added ${qty} ticket${qty > 1 ? "s" : ""} & ${(qty * unitPrice).toLocaleString("en-IN")} permanent Drive Credits to your garage.`,
+            })
+
+            try {
+              confetti({ particleCount: 75, spread: 60, origin: { y: 0.6 } })
+            } catch {}
+
+            router.refresh()
+          } catch (err: any) {
+            setBuyMsg({ type: "error", text: err.message || "Failed to finalize tickets after payment." })
+          } finally {
+            setBuying(false)
+          }
+        },
+      }
+
+      const rzp = new (window as any).Razorpay(options)
+      rzp.on("payment.failed", function (response: any) {
+        setBuyMsg({
+          type: "error",
+          text: `Payment failed: ${response.error?.description || "Transaction was declined."}`,
+        })
+        setBuying(false)
+      })
+      rzp.open()
+    } catch (err: any) {
+      setBuyMsg({ type: "error", text: err.message || "Payment initiation failed." })
       setBuying(false)
     }
   }
@@ -594,103 +595,6 @@ export function MemberDashboardClient({
     setTimeout(() => setCopiedLink(false), 2500)
   }
 
-  // 6. Simulate Referral Handler
-  const handleSimulateReferral = async () => {
-    if (!referralProfile?.referralCode) {
-      setSimMsg({ type: "error", text: "Referral program not initialized for this account." })
-      return
-    }
-
-    setSimulating(true)
-    setSimMsg(null)
-    try {
-      const res = await simulateReferralAction({
-        referralCode: referralProfile.referralCode,
-        friendName: friendName.trim() || "Dave",
-        ticketCount: simTickets,
-        referrerEmail: session.email,
-      })
-
-      if (!res.ok) {
-        setSimMsg({ type: "error", text: res.error || "Simulation failed." })
-        setSimulating(false)
-        return
-      }
-
-      setReferralProfile((prev) =>
-        prev
-          ? {
-              ...prev,
-              totalCreditsEarned: prev.totalCreditsEarned + (res.creditsAdded || 0),
-              totalCashEarned: prev.totalCashEarned + (res.cashAdded || 0),
-              totalReferredUsers: prev.totalReferredUsers + 1,
-            }
-          : null
-      )
-
-      if (res.creditsAdded) {
-        setCredits((prev) => prev + res.creditsAdded!)
-      }
-
-      if (res.newReferral) {
-        setReferrals((prev) => [res.newReferral!, ...prev])
-        setShowReferralsList(true)
-      }
-
-      const friendLabel = friendName.trim() || "Dave"
-      const creditsGained = res.creditsAdded || simTickets * driveRewardPerTicket
-      const cashGained = res.cashAdded || 0
-
-      setSimMsg({
-        type: "success",
-        text: `Simulated! ${friendLabel} bought ${simTickets} ticket(s) → You earned ${creditsGained.toLocaleString("en-IN")} Drive Credits${cashGained > 0 ? ` + ₹${cashGained.toLocaleString("en-IN")} cash commission` : ""}!`,
-      })
-
-      try {
-        confetti({ particleCount: 70, spread: 60, origin: { y: 0.7 } })
-      } catch {}
-
-      setFriendName("")
-      setSimTickets(1)
-      router.refresh()
-    } catch {
-      setSimMsg({ type: "error", text: "Simulation request failed." })
-    } finally {
-      setSimulating(false)
-    }
-  }
-
-  // 7. Cancel Active Escrow Voucher
-  const handleCancelVoucher = async (voucherId: string) => {
-    setCancellingVoucherId(voucherId)
-    setVoucherMsg(null)
-    try {
-      const res = await cancelRedemptionAction({
-        redemptionId: voucherId,
-        userEmail: session.email,
-        userPhone: session.phone,
-      })
-      if (!res.ok) {
-        setVoucherMsg({ type: "error", text: res.error || "Could not cancel voucher." })
-        setCancellingVoucherId(null)
-        return
-      }
-
-      const returned = res.creditsRestored || 0
-      setCredits((prev) => prev + returned)
-      setVouchers((prev) => prev.filter((v) => v.id !== voucherId))
-      setVoucherMsg({
-        type: "success",
-        text: `Voucher cancelled! ${returned.toLocaleString("en-IN")} Drive Credits restored to your garage balance.`,
-      })
-      router.refresh()
-    } catch {
-      setVoucherMsg({ type: "error", text: "Failed to cancel voucher." })
-    } finally {
-      setCancellingVoucherId(null)
-    }
-  }
-
   // Quick preset pills for ticket purchase
   const PRESET_PILLS = [1, 5, 10, 25, 50]
 
@@ -714,55 +618,6 @@ export function MemberDashboardClient({
       <main className="flex-1">
         <div className="mx-auto max-w-5xl px-4 py-8 sm:px-6 space-y-6">
 
-          {/* Active Escrow Vouchers Banner (if any) */}
-          {vouchers.length > 0 && (
-            <div className="rounded-2xl border border-amber-300 bg-amber-50/60 p-5 sm:p-6 space-y-4 shadow-xs">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2 text-amber-900 font-bold text-sm uppercase tracking-wide">
-                  <Sparkles className="size-4 text-[#ea580c]" />
-                  Active Track Pass Vouchers · Reserved in Escrow
-                </div>
-                <span className="text-xs text-zinc-500 font-medium">Self-service refund available</span>
-              </div>
-
-              {voucherMsg && (
-                <div className={`p-3 rounded-lg text-xs font-semibold ${
-                  voucherMsg.type === "success" ? "bg-emerald-50 text-emerald-800 border border-emerald-200" : "bg-rose-50 text-rose-800 border border-rose-200"
-                }`}>
-                  {voucherMsg.text}
-                </div>
-              )}
-
-              <div className="space-y-3">
-                {vouchers.map((v) => (
-                  <div key={v.id} className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-4 rounded-xl border border-zinc-200 bg-white shadow-2xs">
-                    <div>
-                      <p className="text-sm font-bold text-zinc-900">{v.rewardTitle}</p>
-                      <p className="text-xs text-zinc-500 mt-0.5 font-mono">
-                        Code: <span className="font-bold text-[#ea580c]">{v.code}</span> · {v.creditsSpent.toLocaleString("en-IN")} Credits
-                      </p>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <a
-                        href={v.bookingUrl || `https://book.turboridesupercars.com/checkout?voucher=${v.code}`}
-                        className="px-3.5 py-1.5 rounded-lg bg-[#ea580c] hover:bg-[#c2410c] text-white text-xs font-bold transition-colors cursor-pointer shadow-xs"
-                      >
-                        Complete Booking →
-                      </a>
-                      <button
-                        type="button"
-                        disabled={cancellingVoucherId === v.id}
-                        onClick={() => handleCancelVoucher(v.id)}
-                        className="px-3.5 py-1.5 rounded-lg border border-zinc-200 hover:bg-zinc-50 text-xs font-semibold text-zinc-600 transition-colors cursor-pointer"
-                      >
-                        {cancellingVoucherId === v.id ? "Restoring..." : "Cancel & Restore Credits"}
-                      </button>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
 
           {/* 2. HOW IT WORKS / YOUR 3-STEP JOURNEY */}
           <section aria-labelledby="member-journey-title" className="rounded-2xl border border-zinc-200/90 bg-white p-5 sm:p-6 shadow-xs">
@@ -1174,12 +1029,22 @@ export function MemberDashboardClient({
                     </button>
                   </div>
                   <div className="aspect-video w-full bg-black">
-                    <video
-                      src={currentContest.videoSrc}
-                      controls
-                      autoPlay
-                      className="size-full"
-                    />
+                    {isYouTube(currentContest.videoSrc) ? (
+                      <iframe
+                        src={getYouTubeEmbedUrl(currentContest.videoSrc)}
+                        title={`${currentContest.carName} showcase video`}
+                        className="size-full border-0"
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                        allowFullScreen
+                      />
+                    ) : (
+                      <video
+                        src={currentContest.videoSrc}
+                        controls
+                        autoPlay
+                        className="size-full"
+                      />
+                    )}
                   </div>
                 </div>
               </div>
@@ -1506,77 +1371,6 @@ export function MemberDashboardClient({
               </p>
             </div>
 
-            {/* Referral Simulator (Interactive Demo) */}
-            <div className="rounded-2xl border border-zinc-200 bg-zinc-50/50 p-4 sm:p-5 space-y-3.5">
-              <span className="text-xs font-bold text-zinc-900 uppercase tracking-wider block">
-                SIMULATE A REFERRAL (DEMO)
-              </span>
-
-              {simMsg && (
-                <div className={`p-3 rounded-xl text-xs font-semibold ${
-                  simMsg.type === "success" ? "bg-emerald-50 text-emerald-800 border border-emerald-200" : "bg-rose-50 text-rose-800 border border-rose-200"
-                }`}>
-                  {simMsg.text}
-                </div>
-              )}
-
-              {/* Responsive Inputs Grid */}
-              <div className="grid grid-cols-1 sm:grid-cols-12 gap-2.5 sm:gap-3 items-end">
-                {/* Friend Name */}
-                <div className="sm:col-span-6 space-y-1">
-                  <label className="text-[11px] font-semibold text-zinc-500 uppercase tracking-wider block">
-                    Friend&apos;s name
-                  </label>
-                  <input
-                    type="text"
-                    placeholder="e.g. Dave"
-                    value={friendName}
-                    onChange={(e) => setFriendName(e.target.value)}
-                    className="w-full h-11 px-3.5 rounded-xl border border-zinc-200 bg-white text-sm text-zinc-900 placeholder:text-zinc-400 focus:outline-none focus:ring-1 focus:ring-zinc-950 shadow-2xs"
-                  />
-                </div>
-
-                {/* Tickets Bought & Button */}
-                <div className="grid grid-cols-2 sm:grid-cols-6 sm:col-span-6 gap-2.5 sm:gap-3 items-end">
-                  <div className="sm:col-span-3 space-y-1">
-                    <label className="text-[11px] font-semibold text-zinc-500 uppercase tracking-wider block">
-                      Tickets bought
-                    </label>
-                    <input
-                      type="number"
-                      min={1}
-                      max={50}
-                      value={simTickets}
-                      onChange={(e) => setSimTickets(Math.max(1, parseInt(e.target.value) || 1))}
-                      className="w-full h-11 px-3 rounded-xl border border-zinc-200 bg-white font-mono text-center text-sm font-bold text-zinc-900 focus:outline-none focus:ring-1 focus:ring-zinc-950 shadow-2xs"
-                    />
-                  </div>
-
-                  <div className="sm:col-span-3">
-                    <button
-                      type="button"
-                      disabled={simulating}
-                      onClick={handleSimulateReferral}
-                      className="w-full h-11 px-4 rounded-xl bg-[#c53030] hover:bg-[#9b2c2c] text-white text-xs font-bold uppercase tracking-wider transition-all disabled:opacity-50 cursor-pointer shadow-xs flex items-center justify-center gap-1.5"
-                    >
-                      {simulating ? "Adding..." : "Add referral"}
-                    </button>
-                  </div>
-                </div>
-              </div>
-
-              <p className="text-xs text-zinc-600">
-                {simTickets} × {platformTicketPrice.toLocaleString("en-IN")} → you earn{" "}
-                <span className="font-bold text-rose-600">
-                  {(simTickets * driveRewardPerTicket).toLocaleString("en-IN")} credits
-                </span>
-                {(referralProfile?.isCashUnlocked || ticketStats.totalBought >= cashUnlockThreshold) ? (
-                  <span className="font-bold text-rose-600 ml-1">
-                    + ₹{(simTickets * Math.round(platformTicketPrice * (cashCommissionPercent / 100))).toLocaleString("en-IN")} cash
-                  </span>
-                ) : null}
-              </p>
-            </div>
 
             {/* Expandable Referrals List */}
             <div>
