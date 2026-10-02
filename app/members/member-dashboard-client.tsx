@@ -514,6 +514,7 @@ export function MemberDashboardClient({
       }))
 
       setAssignMsg({ type: "success", text: `Auto-picked lucky ticket #${pickedNum} for you!` })
+      setTimeout(() => setAssignMsg(null), 5000)
 
       try {
         confetti({ particleCount: 60, spread: 50, origin: { y: 0.55 } })
@@ -1318,7 +1319,9 @@ export function MemberDashboardClient({
                       </div>
                       <div>
                         <h5 className="font-display font-bold text-xs sm:text-sm text-emerald-950 uppercase">
-                          All {ticketStats.totalAssigned} Lucky Numbers Allocated! 🎉
+                          {ticketStats.totalAssigned === 1 
+                            ? "1 Lucky Number Allocated! 🎉" 
+                            : `All ${ticketStats.totalAssigned} Lucky Numbers Allocated! 🎉`}
                         </h5>
                         <p className="text-xs text-emerald-700">
                           Every ticket entry you own is officially registered in the {currentContest.carName} draw.
