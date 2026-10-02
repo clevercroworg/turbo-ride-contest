@@ -4,7 +4,6 @@ import { useState, useRef, useEffect } from "react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { 
-  LayoutDashboard, 
   Gift, 
   Receipt, 
   UserRound, 
@@ -13,9 +12,6 @@ import {
   X, 
   LogOut,
   Gauge,
-  ArrowUpRight,
-  ShieldCheck,
-  ChevronDown,
   Coins
 } from "lucide-react"
 
@@ -27,14 +23,7 @@ interface MembersHeaderProps {
   onLogout?: () => void
 }
 
-const NAV_LINKS = [
-  { href: "/", label: "Home", external: false },
-  { href: "/members", label: "Dashboard", external: false },
-  { href: "/members/transactions", label: "Transactions", external: false },
-]
-
 const MENU_ITEMS = [
-  { href: "/", label: "Home", icon: LayoutDashboard },
   { href: "/members", label: "Dashboard", icon: Gauge },
   { href: "/members/rewards", label: "Redeem Credits", icon: Gift },
   { href: "/members/profile", label: "Your Profile", icon: UserRound },
@@ -77,34 +66,12 @@ export function MembersHeader({
     <header className="sticky top-0 z-50 border-b border-zinc-200/80 bg-white/95 backdrop-blur-md shadow-xs">
       <div className="mx-auto flex h-14 sm:h-16 max-w-6xl items-center justify-between gap-2 sm:gap-4 px-3 sm:px-6 lg:px-8">
         {/* Left: Brand Logo */}
-        <div className="flex items-center gap-4 sm:gap-8">
-          <Link href="/" className="flex items-center group py-2 shrink-0">
-            <span className="font-display text-lg sm:text-2xl font-black tracking-tight uppercase leading-none select-none">
-              <span className="text-zinc-950">WINMY</span>
-              <span className="text-[#ea580c]">PORSCHE</span>
-            </span>
-          </Link>
-
-          {/* Desktop Nav Links (Home, Dashboard, Transactions) */}
-          <nav className="hidden md:flex items-center gap-1 sm:gap-2">
-            {NAV_LINKS.map((link) => {
-              const isActive = pathname === link.href
-              return (
-                <Link
-                  key={link.label}
-                  href={link.href}
-                  className={`px-3 py-1.5 rounded-lg text-xs sm:text-sm font-semibold transition-colors ${
-                    isActive
-                      ? "bg-zinc-100 text-zinc-950 font-bold"
-                      : "text-zinc-600 hover:text-zinc-950 hover:bg-zinc-50"
-                  }`}
-                >
-                  {link.label}
-                </Link>
-              )
-            })}
-          </nav>
-        </div>
+        <Link href="/" className="flex items-center group py-2 shrink-0">
+          <span className="font-display text-lg sm:text-2xl font-black tracking-tight uppercase leading-none select-none">
+            <span className="text-zinc-950">WINMY</span>
+            <span className="text-[#ea580c]">PORSCHE</span>
+          </span>
+        </Link>
 
         {/* Right: Available Credit Pill + Hamburger MENU Button */}
         <div className="flex items-center gap-2 sm:gap-3 shrink-0">
@@ -143,17 +110,7 @@ export function MembersHeader({
                     <p className="text-xs font-bold text-zinc-900 truncate">
                       {userName || "Member"}
                     </p>
-                    <p className="text-[11px] text-zinc-500 truncate font-mono">
-                      {userEmail || userPhone || "Active Member"}
-                    </p>
                   </div>
-                </div>
-
-                <div className="mt-2.5 flex items-center justify-between pt-2 border-t border-zinc-200/60 text-xs">
-                  <span className="text-zinc-600 font-medium">Drive credits:</span>
-                  <span className="font-bold font-mono text-[#ea580c]">
-                    {credits.toLocaleString("en-IN")}
-                  </span>
                 </div>
               </div>
 
@@ -199,17 +156,6 @@ export function MembersHeader({
                   </button>
                 </div>
               )}
-
-              {/* Admin console link */}
-              <div className="mt-1 pt-1.5 border-t border-zinc-100 text-center">
-                <Link
-                  href="/admin"
-                  onClick={() => setIsOpen(false)}
-                  className="text-[11px] font-medium text-zinc-400 hover:text-zinc-600 transition-colors"
-                >
-                  Admin console
-                </Link>
-              </div>
             </div>
           )}
         </div>

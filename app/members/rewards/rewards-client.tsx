@@ -3,7 +3,7 @@
 import { useState } from "react"
 import Link from "next/link"
 import Image from "next/image"
-import { ShieldCheck, Warning, CheckCircle, ArrowCounterClockwise, Ticket, Copy, Coins, ArrowRight } from "@phosphor-icons/react"
+import { Warning, CheckCircle, ArrowCounterClockwise, Ticket, Copy, Coins, ArrowRight } from "@phosphor-icons/react"
 import { MembersHeader } from "@/components/members/members-header"
 import { logoutMember } from "@/lib/auth"
 import { redeemRewardAction, cancelRedemptionAction } from "@/lib/rewards"
@@ -289,38 +289,7 @@ export function RewardsClient({ session, credits: initialCredits, catalog, initi
           })}
         </div>
 
-        {/* Bottom Booking Guarantee */}
-        <div className="mt-12 p-5 sm:p-6 rounded-2xl bg-white border border-zinc-200 shadow-xs flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-zinc-600">
-          <div className="flex items-center gap-3">
-            <ShieldCheck size={24} className="text-emerald-600 shrink-0" />
-            <span>
-              All drives are conducted at certified tracks with professional instructors and in-car telemetry cameras.
-            </span>
-          </div>
-          <a
-            href="https://book.turboridesupercars.com"
-            target="_blank"
-            rel="noreferrer"
-            className="text-orange-600 hover:underline font-mono font-bold shrink-0"
-          >
-            Visit TurboRide Booking Portal
-          </a>
-        </div>
-
       </main>
-
-      {/* Rewards Clean Footer */}
-      <footer className="border-t border-zinc-200 bg-white py-6 px-4 text-xs text-zinc-500 font-mono">
-        <div className="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-3 text-[11px]">
-          <span>TurboRide Rewards Catalog · Verified Credits Engine</span>
-          <div className="flex items-center gap-4">
-            <Link href="/" className="hover:text-zinc-950 transition-colors">Drop Showcase</Link>
-            <Link href="/members" className="hover:text-zinc-950 transition-colors">Member Garage</Link>
-            <a href="mailto:vip@turboridesupercars.com" className="hover:text-zinc-950 transition-colors">Support</a>
-          </div>
-        </div>
-      </footer>
-
     </div>
   )
 }

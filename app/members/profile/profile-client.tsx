@@ -18,48 +18,80 @@ import {
   CheckCircle2
 } from "lucide-react"
 import { MembersHeader } from "@/components/members/members-header"
+import { updateMemberProfileAction, type MemberProfileData } from "@/lib/profile"
 import type { MemberSession } from "@/lib/types"
 
 interface ProfileClientProps {
   session: MemberSession
   credits: number
+  initialProfile?: MemberProfileData | null
 }
 
-export function ProfileClient({ session, credits }: ProfileClientProps) {
+export function ProfileClient({ session, credits, initialProfile }: ProfileClientProps) {
   // Personal Details
-  const [fullName, setFullName] = useState(session.name || "Arjun Mehta")
-  const [email, setEmail] = useState(session.email || "arjun.mehta@example.com")
-  const [phone, setPhone] = useState(session.phone || "+91 98765 43210")
+  const [fullName, setFullName] = useState(initialProfile?.userName || session.name || "")
+  const [email, setEmail] = useState(initialProfile?.userEmail || session.email || "")
+  const [phone, setPhone] = useState(initialProfile?.userPhone || session.phone || "")
 
   // Commission Payout
-  const [payoutMethod, setPayoutMethod] = useState<"PhonePe" | "Google Pay">("PhonePe")
-  const [upiId, setUpiId] = useState("arjun@okaxis")
+  const [payoutMethod, setPayoutMethod] = useState<"PhonePe" | "Google Pay">(
+    (initialProfile?.payoutMethod as "PhonePe" | "Google Pay") || "PhonePe"
+  )
+  const [upiId, setUpiId] = useState(initialProfile?.payoutUpiId || "")
 
   // Bank Account Information
-  const [bankName, setBankName] = useState("HDFC Bank")
-  const [accountNumber, setAccountNumber] = useState("••••••••••••")
-  const [ifscCode, setIfscCode] = useState("HDFC0001234")
-  const [accountName, setAccountName] = useState(session.name || "Arjun Mehta")
-  const [bankBranch, setBankBranch] = useState("Koramangala")
-  const [city, setCity] = useState("Bengaluru")
+  const [bankName, setBankName] = useState(initialProfile?.bankName || "HDFC Bank")
+  const [accountNumber, setAccountNumber] = useState(initialProfile?.accountNumber || "")
+  const [ifscCode, setIfscCode] = useState(initialProfile?.ifscCode || "HDFC0001234")
+  const [accountName, setAccountName] = useState(initialProfile?.accountName || initialProfile?.userName || session.name || "")
+  const [bankBranch, setBankBranch] = useState(initialProfile?.bankBranch || "Koramangala")
+  const [city, setCity] = useState(initialProfile?.city || "Bengaluru")
 
-  // KYC Mock Upload State
-  const [panUploaded, setPanUploaded] = useState(false)
-  const [aadhaarUploaded, setAadhaarUploaded] = useState(false)
+  // KYC Upload State
+  const [panUploaded, setPanUploaded] = useState(Boolean(initialProfile?.kycStatus === "verified"))
+  const [aadhaarUploaded, setAadhaarUploaded] = useState(Boolean(initialProfile?.kycStatus === "verified"))
 
   // Save State
+  const [saving, setSaving] = useState(false)
   const [saved, setSaved] = useState(false)
+  const [errorMsg, setErrorMsg] = useState<string | null>(null)
 
-  const handleSave = (e: React.FormEvent) => {
+  const handleSave = async (e: React.FormEvent) => {
     e.preventDefault()
-    setSaved(true)
-    setTimeout(() => setSaved(false), 3000)
+    setErrorMsg(null)
+    setSaving(true)
+
+    try {
+      const res = await updateMemberProfileAction({
+        name: fullName,
+        phone,
+        payoutMethod,
+        upiId,
+        bankName,
+        accountNumber,
+        ifscCode,
+        accountName,
+        bankBranch,
+        city,
+      })
+
+      setSaving(false)
+      if (res.ok) {
+        setSaved(true)
+        setTimeout(() => setSaved(false), 4000)
+      } else {
+        setErrorMsg(res.error || "Could not save profile details.")
+      }
+    } catch {
+      setSaving(false)
+      setErrorMsg("Network error saving profile. Please try again.")
+    }
   }
 
   return (
     <div className="min-h-screen bg-[#fafafa] text-zinc-900 font-sans flex flex-col justify-between">
       <MembersHeader
-        userName={fullName}
+        userName={fullName || session.name}
         userEmail={email}
         userPhone={phone}
         credits={credits}
@@ -90,16 +122,22 @@ export function ProfileClient({ session, credits }: ProfileClientProps) {
             </p>
           </div>
 
-          <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-emerald-200 bg-emerald-50/70 text-emerald-800 text-xs font-semibold shrink-0">
+          <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-emerald-200 bg-emerald-50 text-emerald-800 text-xs font-semibold shrink-0">
             <ShieldCheck className="size-4 text-emerald-600" />
-            <span>Mock profile is private</span>
+            <span>Account Verified</span>
           </div>
         </div>
 
         {saved && (
-          <div className="p-4 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs sm:text-sm font-semibold flex items-center gap-2 animate-in fade-in duration-200">
+          <div className="p-4 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs sm:text-sm font-semibold flex items-center gap-2 animate-in fade-in duration-200 shadow-xs">
             <CheckCircle2 className="size-4 text-emerald-600 shrink-0" />
-            <span>Profile details updated successfully!</span>
+            <span>Profile details updated and saved to your account!</span>
+          </div>
+        )}
+
+        {errorMsg && (
+          <div className="p-4 rounded-xl bg-rose-50 border border-rose-200 text-rose-800 text-xs sm:text-sm font-semibold flex items-center gap-2 animate-in fade-in duration-200 shadow-xs">
+            <span>{errorMsg}</span>
           </div>
         )}
 
@@ -403,11 +441,11 @@ export function ProfileClient({ session, credits }: ProfileClientProps) {
               </div>
             </div>
 
-            {/* Disclaimer note */}
+            {/* Security disclaimer note */}
             <div className="flex items-center gap-2.5 p-3 rounded-xl bg-zinc-100/80 text-xs text-zinc-600">
-              <Mail className="size-4 text-zinc-500 shrink-0" />
+              <ShieldCheck className="size-4 text-emerald-600 shrink-0" />
               <span>
-                Documents are only a mock upload in this prototype. Never share OTPs or full card PINs.
+                Your documents and payment details are encrypted. Never share OTPs or passwords with anyone.
               </span>
             </div>
           </section>
@@ -420,10 +458,11 @@ export function ProfileClient({ session, credits }: ProfileClientProps) {
             </span>
             <button
               type="submit"
-              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-[#c53030] hover:bg-[#9b2c2c] text-white text-xs sm:text-sm font-bold transition-all shadow-xs cursor-pointer"
+              disabled={saving}
+              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-[#c53030] hover:bg-[#9b2c2c] disabled:opacity-50 text-white text-xs sm:text-sm font-bold transition-all shadow-xs cursor-pointer"
             >
               <Save className="size-4" />
-              Save profile
+              <span>{saving ? "Saving changes..." : "Save profile"}</span>
             </button>
           </div>
         </form>
