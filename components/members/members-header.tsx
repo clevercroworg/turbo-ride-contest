@@ -15,7 +15,8 @@ import {
   Gauge,
   ArrowUpRight,
   ShieldCheck,
-  ChevronDown
+  ChevronDown,
+  Coins
 } from "lucide-react"
 
 interface MembersHeaderProps {
@@ -74,11 +75,11 @@ export function MembersHeader({
 
   return (
     <header className="sticky top-0 z-50 border-b border-zinc-200/80 bg-white/95 backdrop-blur-md shadow-xs">
-      <div className="mx-auto flex h-16 max-w-6xl items-center justify-between gap-4 px-4 sm:px-6 lg:px-8">
+      <div className="mx-auto flex h-14 sm:h-16 max-w-6xl items-center justify-between gap-2 sm:gap-4 px-3 sm:px-6 lg:px-8">
         {/* Left: Brand Logo */}
-        <div className="flex items-center gap-8">
+        <div className="flex items-center gap-4 sm:gap-8">
           <Link href="/" className="flex items-center group py-2 shrink-0">
-            <span className="font-display text-xl sm:text-2xl font-black tracking-tight uppercase leading-none select-none">
+            <span className="font-display text-lg sm:text-2xl font-black tracking-tight uppercase leading-none select-none">
               <span className="text-zinc-950">WINMY</span>
               <span className="text-[#ea580c]">PORSCHE</span>
             </span>
@@ -106,14 +107,15 @@ export function MembersHeader({
         </div>
 
         {/* Right: Available Credit Pill + Hamburger MENU Button */}
-        <div className="flex items-center gap-2 sm:gap-3">
+        <div className="flex items-center gap-2 sm:gap-3 shrink-0">
           {credits !== undefined && (
-            <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-zinc-100 border border-zinc-200 text-xs shadow-2xs">
-              <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse shrink-0" />
-              <span className="text-zinc-500 text-[11px] sm:text-xs font-medium">Available:</span>
-              <span className="font-bold text-emerald-600 font-mono text-xs sm:text-sm">
-                ₹{credits.toLocaleString("en-IN")}
+            <div className="inline-flex items-center gap-1.5 px-2.5 py-1 sm:px-3 sm:py-1.5 rounded-full bg-zinc-100 border border-zinc-200 text-xs shadow-2xs whitespace-nowrap shrink-0">
+              <Coins className="size-3.5 sm:size-4 text-[#c53030] shrink-0 animate-pulse" />
+              <span className="hidden sm:inline text-zinc-500 text-xs font-medium">Available:</span>
+              <span className="font-bold text-[#c53030] font-mono text-xs sm:text-sm">
+                {credits.toLocaleString("en-IN")}
               </span>
+              <span className="text-zinc-500 text-[11px] sm:text-xs font-normal">credits</span>
             </div>
           )}
 
@@ -123,9 +125,9 @@ export function MembersHeader({
               aria-label={isOpen ? "Close navigation menu" : "Open navigation menu"}
               aria-expanded={isOpen}
               onClick={() => setIsOpen((prev) => !prev)}
-              className="inline-flex items-center justify-center size-9 sm:size-10 rounded-xl border border-zinc-200 bg-white hover:bg-zinc-50 text-zinc-800 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-orange-500 cursor-pointer shadow-xs"
+              className="inline-flex items-center justify-center size-8 sm:size-10 rounded-xl border border-zinc-200 bg-white hover:bg-zinc-50 text-zinc-800 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-orange-500 cursor-pointer shadow-xs"
             >
-              {isOpen ? <X className="size-5 text-zinc-900" /> : <Menu className="size-5 text-zinc-900" />}
+              {isOpen ? <X className="size-4 sm:size-5 text-zinc-900" /> : <Menu className="size-4 sm:size-5 text-zinc-900" />}
             </button>
 
           {/* Dropdown Menu Card */}
@@ -148,9 +150,9 @@ export function MembersHeader({
                 </div>
 
                 <div className="mt-2.5 flex items-center justify-between pt-2 border-t border-zinc-200/60 text-xs">
-                  <span className="text-zinc-600 font-medium">Drive Credits:</span>
+                  <span className="text-zinc-600 font-medium">Drive credits:</span>
                   <span className="font-bold font-mono text-[#ea580c]">
-                    ₹{credits.toLocaleString("en-IN")}
+                    {credits.toLocaleString("en-IN")}
                   </span>
                 </div>
               </div>

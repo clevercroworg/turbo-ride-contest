@@ -92,7 +92,7 @@ export function RewardsClient({ session, credits: initialCredits, catalog, initi
       const restored = res.creditsRestored || voucher.creditsSpent
       setCredits((prev) => prev + restored)
       setVouchers((prev) => prev.filter((v) => v.id !== voucher.id))
-      setSuccessMsg(`Voucher ${voucher.code} cancelled. ₹${restored.toLocaleString("en-IN")} Drive Credits restored to your wallet!`)
+      setSuccessMsg(`Voucher ${voucher.code} cancelled. ${restored.toLocaleString("en-IN")} Drive Credits restored to your wallet!`)
     } catch {
       setErrorMsg("Network error cancelling voucher. Please try again.")
     } finally {
@@ -113,25 +113,25 @@ export function RewardsClient({ session, credits: initialCredits, catalog, initi
       />
 
       {/* Main Content */}
-      <main className="flex-1 max-w-6xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-8 sm:py-10 pb-20 space-y-6">
+      <main className="flex-1 max-w-6xl mx-auto w-full px-3.5 sm:px-6 lg:px-8 py-5 sm:py-10 pb-16 sm:pb-20 space-y-5 sm:space-y-6">
         
         {/* Intro Banner matching HK90D8.jpg */}
-        <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4 mb-2">
+        <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-3 sm:gap-4 mb-1 sm:mb-2">
           <div>
-            <p className="text-[11px] sm:text-xs font-bold uppercase tracking-wider text-[#c53030] mb-1">
+            <p className="text-[10px] sm:text-xs font-bold uppercase tracking-wider text-[#c53030] mb-0.5 sm:mb-1">
               POWERED BY TURBORIDE
             </p>
-            <h1 className="text-2xl sm:text-3xl lg:text-4xl font-black text-zinc-950 tracking-tight uppercase">
+            <h1 className="text-xl sm:text-3xl lg:text-4xl font-black text-zinc-950 tracking-tight uppercase">
               REDEEM CREDITS
             </h1>
-            <p className="text-xs sm:text-sm text-zinc-500 font-medium mt-1 leading-relaxed">
+            <p className="text-xs sm:text-sm text-zinc-500 font-medium mt-0.5 sm:mt-1 leading-relaxed">
               Spend your drive credits on supercar laps, photoshoots and reels.
             </p>
           </div>
 
           <Link
             href="/members"
-            className="inline-flex items-center gap-1.5 self-start px-3.5 py-2 rounded-xl bg-white hover:bg-zinc-50 border border-zinc-200 text-xs font-semibold text-zinc-800 transition-colors shadow-xs"
+            className="inline-flex items-center gap-1.5 self-start px-3 py-1.5 sm:px-3.5 sm:py-2 rounded-xl bg-white hover:bg-zinc-50 border border-zinc-200 text-xs font-semibold text-zinc-800 transition-colors shadow-xs"
           >
             <span>←</span>
             <span>Back to garage</span>
@@ -140,7 +140,7 @@ export function RewardsClient({ session, credits: initialCredits, catalog, initi
 
         {/* Status Alerts */}
         {errorMsg && (
-          <div className="p-4 rounded-xl bg-red-50 border border-red-200 text-red-700 text-xs flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-xs">
+          <div className="p-3.5 sm:p-4 rounded-xl bg-red-50 border border-red-200 text-red-700 text-xs flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-xs">
             <div className="flex items-center gap-2.5">
               <Warning size={18} className="shrink-0 text-red-600" />
               <span>{errorMsg}</span>
@@ -155,7 +155,7 @@ export function RewardsClient({ session, credits: initialCredits, catalog, initi
         )}
 
         {successMsg && (
-          <div className="p-4 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs flex items-center gap-3 shadow-xs">
+          <div className="p-3.5 sm:p-4 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs flex items-center gap-3 shadow-xs">
             <CheckCircle size={18} className="shrink-0 text-emerald-600" />
             <span className="font-semibold">{successMsg}</span>
           </div>
@@ -163,7 +163,7 @@ export function RewardsClient({ session, credits: initialCredits, catalog, initi
 
         {/* ACTIVE ESCROW VOUCHERS SECTION */}
         {vouchers.length > 0 && (
-          <div className="p-5 sm:p-6 rounded-2xl bg-amber-500/10 border border-amber-500/30">
+          <div className="p-4 sm:p-6 rounded-2xl bg-amber-500/10 border border-amber-500/30">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
               <div className="flex items-center gap-2">
                 <Ticket size={20} className="text-amber-600 shrink-0" weight="fill" />
@@ -231,18 +231,18 @@ export function RewardsClient({ session, credits: initialCredits, catalog, initi
         )}
 
         {/* Catalog Grid matching HK90D8.jpg */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 sm:gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
           {catalog.map((item) => {
             const isLoading = loadingRewardId === item.id
 
             return (
               <div
                 key={item.id}
-                className="rounded-2xl bg-white border border-zinc-200 p-4 sm:p-5 flex flex-col justify-between shadow-xs hover:border-zinc-300 transition-all group"
+                className="rounded-2xl bg-white border border-zinc-200 p-3.5 sm:p-5 flex flex-col justify-between shadow-xs hover:border-zinc-300 transition-all group"
               >
                 <div>
                   {/* Card Image with Floating Category Pill Badge */}
-                  <div className="relative w-full aspect-[1264/848] rounded-xl overflow-hidden bg-zinc-950 mb-3.5">
+                  <div className="relative w-full aspect-[1264/848] rounded-xl overflow-hidden bg-zinc-950 mb-3 sm:mb-3.5">
                     <Image
                       src={item.imageUrl}
                       alt={item.title}
