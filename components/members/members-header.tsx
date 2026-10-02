@@ -35,6 +35,7 @@ const NAV_LINKS = [
 const MENU_ITEMS = [
   { href: "/", label: "Home", icon: LayoutDashboard },
   { href: "/members", label: "Dashboard", icon: Gauge },
+  { href: "/members/rewards", label: "Redeem Credits", icon: Gift },
   { href: "/members/profile", label: "Your Profile", icon: UserRound },
   { href: "/members/support", label: "Support Centre", icon: HelpCircle },
   { href: "/members/transactions", label: "Transactions", icon: Receipt },
@@ -104,17 +105,28 @@ export function MembersHeader({
           </nav>
         </div>
 
-        {/* Right: Hamburger MENU Button */}
-        <div className="relative" ref={menuRef}>
-          <button
-            type="button"
-            aria-label={isOpen ? "Close navigation menu" : "Open navigation menu"}
-            aria-expanded={isOpen}
-            onClick={() => setIsOpen((prev) => !prev)}
-            className="inline-flex items-center justify-center size-9 sm:size-10 rounded-xl border border-zinc-200 bg-white hover:bg-zinc-50 text-zinc-800 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-orange-500 cursor-pointer shadow-xs"
-          >
-            {isOpen ? <X className="size-5 text-zinc-900" /> : <Menu className="size-5 text-zinc-900" />}
-          </button>
+        {/* Right: Available Credit Pill + Hamburger MENU Button */}
+        <div className="flex items-center gap-2 sm:gap-3">
+          {credits !== undefined && (
+            <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-zinc-100 border border-zinc-200 text-xs shadow-2xs">
+              <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse shrink-0" />
+              <span className="text-zinc-500 text-[11px] sm:text-xs font-medium">Available:</span>
+              <span className="font-bold text-emerald-600 font-mono text-xs sm:text-sm">
+                ₹{credits.toLocaleString("en-IN")}
+              </span>
+            </div>
+          )}
+
+          <div className="relative" ref={menuRef}>
+            <button
+              type="button"
+              aria-label={isOpen ? "Close navigation menu" : "Open navigation menu"}
+              aria-expanded={isOpen}
+              onClick={() => setIsOpen((prev) => !prev)}
+              className="inline-flex items-center justify-center size-9 sm:size-10 rounded-xl border border-zinc-200 bg-white hover:bg-zinc-50 text-zinc-800 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-orange-500 cursor-pointer shadow-xs"
+            >
+              {isOpen ? <X className="size-5 text-zinc-900" /> : <Menu className="size-5 text-zinc-900" />}
+            </button>
 
           {/* Dropdown Menu Card */}
           {isOpen && (
@@ -200,6 +212,7 @@ export function MembersHeader({
           )}
         </div>
       </div>
-    </header>
+    </div>
+  </header>
   )
 }
