@@ -29,16 +29,15 @@ interface MembersHeaderProps {
 const NAV_LINKS = [
   { href: "/", label: "Home", external: false },
   { href: "/members", label: "Dashboard", external: false },
-  { href: "/members/rewards", label: "Redeem Credits", external: false },
   { href: "/members/transactions", label: "Transactions", external: false },
 ]
 
 const MENU_ITEMS = [
-  { href: "/members", label: "Dashboard", icon: LayoutDashboard },
-  { href: "/members/rewards", label: "Redeem Track Credits", icon: Gift },
-  { href: "/members/transactions", label: "Transaction History", icon: Receipt },
-  { href: "/members/profile", label: "Profile & KYC", icon: UserRound, badge: "Coming soon" },
-  { href: "/members/support", label: "Concierge & Support", icon: HelpCircle, badge: "Coming soon" },
+  { href: "/", label: "Home", icon: LayoutDashboard },
+  { href: "/members", label: "Dashboard", icon: Gauge },
+  { href: "/members/profile", label: "Your Profile", icon: UserRound },
+  { href: "/members/support", label: "Support Centre", icon: HelpCircle },
+  { href: "/members/transactions", label: "Transactions", icon: Receipt },
 ]
 
 export function MembersHeader({
@@ -84,7 +83,7 @@ export function MembersHeader({
             </span>
           </Link>
 
-          {/* Desktop Nav Links */}
+          {/* Desktop Nav Links (Home, Dashboard, Transactions) */}
           <nav className="hidden md:flex items-center gap-1 sm:gap-2">
             {NAV_LINKS.map((link) => {
               const isActive = pathname === link.href
@@ -105,124 +104,100 @@ export function MembersHeader({
           </nav>
         </div>
 
-        {/* Right Action Area */}
-        <div className="flex items-center gap-2.5 sm:gap-3">
-          {/* Drive Credits Pill (Matching Home Page) */}
-          <Link
-            href="/members/rewards"
-            className="inline-flex items-center gap-2 px-3 sm:px-3.5 py-1.5 rounded-lg border border-orange-200 bg-orange-50/70 hover:bg-orange-100/70 text-xs font-bold text-orange-950 transition-all shadow-xs cursor-pointer"
-            title="Your available Buddh International Circuit track drive credits"
+        {/* Right: Hamburger MENU Button */}
+        <div className="relative" ref={menuRef}>
+          <button
+            type="button"
+            aria-label={isOpen ? "Close navigation menu" : "Open navigation menu"}
+            aria-expanded={isOpen}
+            onClick={() => setIsOpen((prev) => !prev)}
+            className="inline-flex items-center justify-center size-9 sm:size-10 rounded-xl border border-zinc-200 bg-white hover:bg-zinc-50 text-zinc-800 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-orange-500 cursor-pointer shadow-xs"
           >
-            <Gauge className="size-3.5 text-[#ea580c] shrink-0" />
-            <span className="hidden xs:inline text-zinc-600 font-medium">Credits:</span>
-            <span className="font-mono text-[#ea580c] font-black">
-              {credits.toLocaleString("en-IN")}
-            </span>
-          </Link>
+            {isOpen ? <X className="size-5 text-zinc-900" /> : <Menu className="size-5 text-zinc-900" />}
+          </button>
 
-          {/* User Menu Trigger */}
-          <div className="relative" ref={menuRef}>
-            <button
-              type="button"
-              aria-label={isOpen ? "Close navigation menu" : "Open navigation menu"}
-              aria-expanded={isOpen}
-              onClick={() => setIsOpen((prev) => !prev)}
-              className="inline-flex items-center gap-2 h-9 px-2.5 sm:px-3 rounded-lg border border-zinc-200 bg-white hover:bg-zinc-50 text-zinc-900 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-orange-500 cursor-pointer shadow-xs"
-            >
-              <div className="size-6 rounded-full bg-zinc-950 text-white font-mono text-[11px] font-bold flex items-center justify-center uppercase shrink-0">
-                {(userName || userEmail || "M")[0]}
-              </div>
-              <span className="hidden sm:inline text-xs font-semibold text-zinc-800 max-w-[110px] truncate">
-                {userName || userEmail?.split("@")[0] || "Member"}
-              </span>
-              <ChevronDown className={`size-3.5 text-zinc-400 transition-transform duration-200 ${isOpen ? "rotate-180" : ""}`} />
-            </button>
-
-            {/* Dropdown Menu Card */}
-            {isOpen && (
-              <div className="absolute right-0 top-12 z-50 w-64 rounded-xl border border-zinc-200 bg-white p-2.5 shadow-xl animate-in fade-in zoom-in-95 duration-100">
-                {/* User Info Header inside Dropdown */}
-                <div className="px-3 py-2 border-b border-zinc-100 mb-1">
-                  <p className="text-xs font-bold text-zinc-900 truncate">
-                    {userName || "Club Member"}
-                  </p>
-                  <p className="text-[11px] text-zinc-500 truncate font-mono mt-0.5">
-                    {userEmail || userPhone || "Active Member"}
-                  </p>
-                  <div className="mt-2 flex items-center justify-between pt-1 border-t border-zinc-100 text-[11px]">
-                    <span className="text-zinc-500">Track Credits:</span>
-                    <span className="font-bold font-mono text-[#ea580c]">
-                      {credits.toLocaleString("en-IN")}
-                    </span>
+          {/* Dropdown Menu Card */}
+          {isOpen && (
+            <div className="absolute right-0 top-12 z-50 w-72 rounded-2xl border border-zinc-200 bg-white p-3 shadow-xl animate-in fade-in zoom-in-95 duration-100">
+              {/* User Info Header inside Dropdown */}
+              <div className="px-3 py-2.5 bg-zinc-50 rounded-xl border border-zinc-100 mb-2">
+                <div className="flex items-center gap-2.5">
+                  <div className="size-8 rounded-full bg-zinc-950 text-white font-mono text-xs font-bold flex items-center justify-center uppercase shrink-0">
+                    {(userName || userEmail || "M")[0]}
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <p className="text-xs font-bold text-zinc-900 truncate">
+                      {userName || "Member"}
+                    </p>
+                    <p className="text-[11px] text-zinc-500 truncate font-mono">
+                      {userEmail || userPhone || "Active Member"}
+                    </p>
                   </div>
                 </div>
 
-                {/* Mobile Extra Navigation Links */}
-                <div className="md:hidden border-b border-zinc-100 pb-1 mb-1">
-                  {NAV_LINKS.map((link) => (
-                    <Link
-                      key={link.label}
-                      href={link.href}
-                      onClick={() => setIsOpen(false)}
-                      className={`flex items-center justify-between rounded-lg px-3 py-2 text-xs font-semibold transition-colors ${
-                        pathname === link.href ? "bg-orange-50 text-[#ea580c]" : "text-zinc-700 hover:bg-zinc-50"
-                      }`}
-                    >
-                      {link.label}
-                    </Link>
-                  ))}
+                <div className="mt-2.5 flex items-center justify-between pt-2 border-t border-zinc-200/60 text-xs">
+                  <span className="text-zinc-600 font-medium">Drive Credits:</span>
+                  <span className="font-bold font-mono text-[#ea580c]">
+                    ₹{credits.toLocaleString("en-IN")}
+                  </span>
                 </div>
-
-                {/* Main Member Options */}
-                <ul className="flex flex-col gap-0.5">
-                  {MENU_ITEMS.map((item) => {
-                    const isActive = pathname === item.href
-                    const Icon = item.icon
-                    return (
-                      <li key={item.label}>
-                        <Link
-                          href={item.href}
-                          onClick={() => setIsOpen(false)}
-                          className={`flex items-center justify-between rounded-lg px-3 py-2 text-xs font-semibold transition-colors ${
-                            isActive
-                              ? "bg-orange-50 text-[#ea580c] font-bold"
-                              : "text-zinc-700 hover:bg-zinc-50 hover:text-zinc-950"
-                          }`}
-                        >
-                          <span className="flex items-center gap-2.5">
-                            <Icon className={`size-4 ${isActive ? "text-[#ea580c]" : "text-zinc-400"}`} />
-                            {item.label}
-                          </span>
-                          {item.badge && (
-                            <span className="text-[10px] font-medium text-zinc-400 bg-zinc-100 px-1.5 py-0.5 rounded">
-                              {item.badge}
-                            </span>
-                          )}
-                        </Link>
-                      </li>
-                    )
-                  })}
-                </ul>
-
-                {/* Logout Option */}
-                {onLogout && (
-                  <div className="mt-1 pt-1.5 border-t border-zinc-100">
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setIsOpen(false)
-                        onLogout()
-                      }}
-                      className="flex w-full items-center gap-2.5 rounded-lg px-3 py-2 text-xs font-semibold text-rose-600 hover:bg-rose-50 transition-colors cursor-pointer"
-                    >
-                      <LogOut className="size-4" />
-                      Sign Out
-                    </button>
-                  </div>
-                )}
               </div>
-            )}
-          </div>
+
+              {/* Main Navigation Options */}
+              <ul className="flex flex-col gap-0.5">
+                {MENU_ITEMS.map((item) => {
+                  const isActive = pathname === item.href
+                  const Icon = item.icon
+                  return (
+                    <li key={item.label}>
+                      <Link
+                        href={item.href}
+                        onClick={() => setIsOpen(false)}
+                        className={`flex items-center justify-between rounded-xl px-3 py-2.5 text-xs font-semibold transition-colors ${
+                          isActive
+                            ? "bg-orange-50 text-[#ea580c] font-bold"
+                            : "text-zinc-700 hover:bg-zinc-50 hover:text-zinc-950"
+                        }`}
+                      >
+                        <span className="flex items-center gap-2.5">
+                          <Icon className={`size-4 ${isActive ? "text-[#ea580c]" : "text-zinc-500"}`} />
+                          {item.label}
+                        </span>
+                      </Link>
+                    </li>
+                  )
+                })}
+              </ul>
+
+              {/* Logout Option */}
+              {onLogout && (
+                <div className="mt-1.5 pt-2 border-t border-zinc-100">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setIsOpen(false)
+                      onLogout()
+                    }}
+                    className="flex w-full items-center gap-2.5 rounded-xl px-3 py-2 text-xs font-semibold text-rose-600 hover:bg-rose-50 transition-colors cursor-pointer"
+                  >
+                    <LogOut className="size-4" />
+                    Sign Out
+                  </button>
+                </div>
+              )}
+
+              {/* Admin console link */}
+              <div className="mt-1 pt-1.5 border-t border-zinc-100 text-center">
+                <Link
+                  href="/admin"
+                  onClick={() => setIsOpen(false)}
+                  className="text-[11px] font-medium text-zinc-400 hover:text-zinc-600 transition-colors"
+                >
+                  Admin console
+                </Link>
+              </div>
+            </div>
+          )}
         </div>
       </div>
     </header>

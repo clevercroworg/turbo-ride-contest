@@ -784,7 +784,7 @@ export function MemberDashboardClient({
                   </div>
                   <h3 className="mt-2.5 font-display text-base sm:text-lg font-bold text-zinc-900">Buy tickets</h3>
                   <p className="mt-1 text-xs sm:text-sm leading-relaxed text-zinc-600">
-                    Buy tickets for ₹1,000 each. 100% of your capital is credited back to your garage for track drives.
+                    Buy tickets for ₹{unitPrice.toLocaleString("en-IN")} each.
                   </p>
                 </div>
                 <span className="absolute -bottom-3 left-1/2 z-10 flex size-6 -translate-x-1/2 items-center justify-center rounded-full border border-zinc-200 bg-white text-zinc-400 md:-right-3 md:bottom-auto md:left-auto md:top-1/2 md:translate-x-1/2 md:-translate-y-1/2 shadow-xs">
@@ -824,7 +824,7 @@ export function MemberDashboardClient({
                   </div>
                   <h3 className="mt-2.5 font-display text-base sm:text-lg font-bold text-zinc-900">Refer or redeem</h3>
                   <p className="mt-1 text-xs sm:text-sm leading-relaxed text-zinc-600">
-                    Refer friends to earn drive credits & 25% cash. Spend credits on supercar driving experiences at BIC.
+                    Refer friends to earn drive credits & 25% cash. Spend credits on supercar driving experiences.
                   </p>
                 </div>
               </li>
@@ -841,7 +841,6 @@ export function MemberDashboardClient({
               <p className="mt-2 font-display text-3xl sm:text-4xl font-black text-zinc-950 tabular-nums">
                 {ticketStats.totalBought}
               </p>
-              <p className="mt-1 text-[11px] text-zinc-500">Total tickets purchased</p>
             </div>
 
             <div className="rounded-2xl border border-zinc-200/90 bg-white p-5 shadow-xs">
@@ -851,11 +850,6 @@ export function MemberDashboardClient({
               </div>
               <p className="mt-2 font-display text-3xl sm:text-4xl font-black text-zinc-950 tabular-nums">
                 {ticketStats.totalAssigned}
-              </p>
-              <p className="mt-1 text-[11px] text-zinc-500">
-                {ticketStats.availableToAssign > 0 
-                  ? `${ticketStats.availableToAssign} ready to allocate`
-                  : "All numbers assigned"}
               </p>
             </div>
 
@@ -867,7 +861,6 @@ export function MemberDashboardClient({
               <p className="mt-2 font-display text-3xl sm:text-4xl font-black text-[#ea580c] tabular-nums">
                 {credits.toLocaleString("en-IN")}
               </p>
-              <p className="mt-1 text-[11px] text-orange-900/80 font-medium">100% capital redeemable on track</p>
             </div>
           </div>
 
@@ -889,7 +882,7 @@ export function MemberDashboardClient({
                 )}
               </div>
               <p className="mt-1 text-sm text-zinc-600">
-                Tickets cost ₹{unitPrice.toLocaleString("en-IN")} each for {currentContest.carName}. Every ticket gives you 1 contest entry and {unitPrice.toLocaleString("en-IN")} Drive Credits.
+                Tickets cost ₹{unitPrice.toLocaleString("en-IN")} each. Every ticket gives you 1 contest entry and {unitPrice.toLocaleString("en-IN")} Drive Credits.
               </p>
             </div>
 
