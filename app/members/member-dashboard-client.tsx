@@ -1109,7 +1109,7 @@ export function MemberDashboardClient({
             </div>
 
             {/* Thumbnail Selector Strip + Video Button */}
-            <div className="flex items-center justify-center gap-2 pt-1 overflow-x-auto">
+            <div className="flex items-center justify-center gap-2 pt-2 pb-2 overflow-x-auto overflow-y-hidden [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
               <button
                 type="button"
                 onClick={() => setActiveImageIndex((prev) => (prev > 0 ? prev - 1 : currentContest.images.length - 1))}
@@ -1419,106 +1419,95 @@ export function MemberDashboardClient({
 
           {/* 6. REFER & EARN (DYNAMIC COMMISSION + DRIVE CREDITS) */}
           <section className="rounded-2xl border border-zinc-200/90 bg-white p-5 sm:p-7 space-y-6 shadow-xs">
-            {/* Header + Unlock Alert */}
+            {/* Header */}
             <div>
-              <div className="flex items-center justify-between gap-2">
-                <span className="text-xs font-bold uppercase tracking-wider text-[#ea580c]">
-                  Partner Program
-                </span>
-                <span className="inline-flex items-center gap-1 text-[11px] font-bold text-zinc-600 bg-zinc-100 px-2.5 py-1 rounded-md shrink-0">
-                  <Lock className="size-3 text-zinc-500" />
-                  {(referralProfile?.isCashUnlocked || ticketStats.totalBought >= cashUnlockThreshold)
-                    ? `${cashCommissionPercent}% Cash Commission Active`
-                    : `Unlock ${cashCommissionPercent}% Cash: ${cashUnlockThreshold} Tickets`}
-                </span>
+              <div className="flex items-center gap-2">
+                <Gift className="size-4 text-[#ea580c]" />
+                <h2 className="font-display text-xl sm:text-2xl font-bold uppercase tracking-tight text-zinc-950">
+                  Refer & earn
+                </h2>
               </div>
-              <h2 className="mt-1.5 font-display text-xl sm:text-2xl font-bold uppercase tracking-tight text-zinc-950">
-                Refer & earn
-              </h2>
               <p className="mt-1 text-xs sm:text-sm text-zinc-600">
-                Earn {driveRewardPerTicket.toLocaleString("en-IN")} Drive Credits per ticket bought by friends. Unlock {cashCommissionPercent}% direct cash commission once you hold {cashUnlockThreshold} tickets.
+                Every friend who buys at least 1 ticket earns you {creditRewardPercent}% of their drive credits. Buy {cashUnlockThreshold} tickets to also unlock a {cashCommissionPercent}% cash commission.
               </p>
             </div>
 
+            {/* Notification Banner: Cash Commission Unlocked */}
+            {(referralProfile?.isCashUnlocked || ticketStats.totalBought >= cashUnlockThreshold) && (
+              <div className="rounded-2xl border border-rose-200/80 bg-rose-50/50 p-3.5 sm:p-4 flex items-center gap-3">
+                <div className="size-6 sm:size-7 rounded-full border border-rose-300 bg-white flex items-center justify-center text-rose-600 text-xs font-bold shrink-0 font-mono">
+                  ₹
+                </div>
+                <div>
+                  <p className="text-xs sm:text-sm font-bold text-zinc-950">
+                    Cash commission unlocked
+                  </p>
+                  <p className="text-xs text-zinc-600 mt-0.5">
+                    You now earn {cashCommissionPercent}% cash plus {creditRewardPercent}% drive credits on every referral.
+                  </p>
+                </div>
+              </div>
+            )}
+
             {/* Referrals Stats Banner */}
             <div className="grid grid-cols-2 gap-3 sm:gap-4">
-              <div className="rounded-xl border border-zinc-200 bg-zinc-50/70 p-4 sm:p-5">
+              <div className="rounded-xl border border-zinc-200 bg-white p-4 sm:p-5 shadow-2xs">
                 <span className="text-xs text-zinc-500 font-medium block">Drive credits earned</span>
-                <span className="font-display text-2xl sm:text-3xl font-black text-[#ea580c] tabular-nums mt-1 block">
+                <span className="font-display text-2xl sm:text-3xl font-black text-zinc-950 tabular-nums mt-1 block">
                   {(referralProfile?.totalCreditsEarned || 0).toLocaleString("en-IN")}
                 </span>
               </div>
-              <div className="rounded-xl border border-zinc-200 bg-zinc-50/70 p-4 sm:p-5">
+              <div className="rounded-xl border border-zinc-200 bg-white p-4 sm:p-5 shadow-2xs">
                 <span className="text-xs text-zinc-500 font-medium block">Cash commission</span>
-                <span className="font-display text-2xl sm:text-3xl font-black text-zinc-950 tabular-nums mt-1 block">
+                <span className="font-display text-2xl sm:text-3xl font-black text-rose-600 tabular-nums mt-1 block">
                   ₹{(referralProfile?.totalCashEarned || 0).toLocaleString("en-IN")}
                 </span>
               </div>
             </div>
 
-            {/* Copy Link Row - Beautiful integrated container */}
+            {/* Copy Link Row */}
             <div className="space-y-2">
-              <div className="flex items-center justify-between">
-                <label className="text-xs font-bold text-zinc-700 uppercase tracking-wider block">
-                  Your referral link
-                </label>
-                <span className="text-[11px] text-zinc-500 font-medium">
-                  Your code: <strong className="font-mono font-bold text-zinc-900 px-1.5 py-0.5 rounded bg-zinc-100 border border-zinc-200">{refCode}</strong>
-                </span>
-              </div>
+              <label className="text-xs font-bold text-zinc-700 block">
+                Your referral link
+              </label>
 
-              {/* Integrated Single-Card Copy Container */}
-              <div className="relative flex items-center w-full min-h-[48px] rounded-xl border border-zinc-200 bg-zinc-50/90 p-1.5 focus-within:border-orange-500 focus-within:bg-white focus-within:ring-2 focus-within:ring-orange-500/20 transition-all shadow-2xs">
-                <div className="pl-3 pr-2 text-zinc-400 shrink-0">
-                  <Link2 className="size-4 text-[#ea580c]" />
-                </div>
+              <div className="flex items-center gap-2">
                 <input
                   type="text"
                   readOnly
                   value={referralLinkUrl}
                   onClick={(e) => (e.target as HTMLInputElement).select()}
-                  className="w-full bg-transparent font-mono text-xs sm:text-sm text-zinc-900 font-semibold focus:outline-none select-all truncate pr-2 tracking-tight"
+                  className="w-full h-11 px-3.5 rounded-xl border border-zinc-200 bg-zinc-50 font-mono text-xs sm:text-sm text-zinc-900 font-semibold focus:outline-none focus:bg-white focus:ring-1 focus:ring-zinc-950 select-all truncate"
                 />
                 <button
                   type="button"
                   onClick={handleCopyLink}
-                  className="shrink-0 h-9 px-4 rounded-lg bg-zinc-950 hover:bg-zinc-800 text-white text-xs font-bold uppercase tracking-wider transition-all flex items-center justify-center gap-1.5 cursor-pointer shadow-xs active:scale-95"
+                  className="shrink-0 h-11 px-4 sm:px-5 rounded-xl border border-zinc-200 bg-white hover:bg-zinc-50 text-zinc-800 text-xs sm:text-sm font-semibold transition-all flex items-center justify-center gap-2 cursor-pointer shadow-xs active:scale-95"
                 >
                   {copiedLink ? (
                     <>
-                      <Check className="size-3.5 text-emerald-400" />
-                      <span className="text-emerald-400 font-bold">Copied!</span>
+                      <Check className="size-4 text-emerald-600" />
+                      <span className="text-emerald-600 font-bold">Copied!</span>
                     </>
                   ) : (
                     <>
-                      <Copy className="size-3.5 text-zinc-300" />
-                      <span>Copy link</span>
+                      <Copy className="size-4 text-zinc-500" />
+                      <span>Copy</span>
                     </>
                   )}
                 </button>
               </div>
 
-              <div className="flex items-center justify-between text-[11px] text-zinc-500 pt-0.5">
-                <span>Share this link with friends to earn Drive Credits & cash commissions</span>
-                {copiedLink && (
-                  <span className="text-emerald-600 font-semibold flex items-center gap-1">
-                    <CheckCircle2 className="size-3 text-emerald-600" />
-                    Copied to clipboard
-                  </span>
-                )}
-              </div>
+              <p className="text-[11px] text-zinc-500">
+                Your code: <strong className="font-mono text-zinc-800 font-bold">{refCode}</strong>
+              </p>
             </div>
 
             {/* Referral Simulator (Interactive Demo) */}
-            <div className="rounded-xl border border-zinc-200 bg-zinc-50/70 p-4 sm:p-5 space-y-3.5">
-              <div className="flex items-center justify-between">
-                <span className="text-xs font-bold text-zinc-900 uppercase tracking-wider block">
-                  Simulate a referral (live demo)
-                </span>
-                <span className="text-[11px] text-zinc-500 hidden sm:inline">
-                  Interactive calculator
-                </span>
-              </div>
+            <div className="rounded-2xl border border-zinc-200 bg-zinc-50/50 p-4 sm:p-5 space-y-3.5">
+              <span className="text-xs font-bold text-zinc-900 uppercase tracking-wider block">
+                SIMULATE A REFERRAL (DEMO)
+              </span>
 
               {simMsg && (
                 <div className={`p-3 rounded-xl text-xs font-semibold ${
@@ -1528,7 +1517,7 @@ export function MemberDashboardClient({
                 </div>
               )}
 
-              {/* Responsive Inputs Grid with balanced padding and heights */}
+              {/* Responsive Inputs Grid */}
               <div className="grid grid-cols-1 sm:grid-cols-12 gap-2.5 sm:gap-3 items-end">
                 {/* Friend Name */}
                 <div className="sm:col-span-6 space-y-1">
@@ -1540,11 +1529,11 @@ export function MemberDashboardClient({
                     placeholder="e.g. Dave"
                     value={friendName}
                     onChange={(e) => setFriendName(e.target.value)}
-                    className="w-full h-11 px-3.5 rounded-xl border border-zinc-200 bg-white text-sm text-zinc-900 placeholder:text-zinc-400 focus:outline-none focus:ring-2 focus:ring-orange-500 shadow-2xs"
+                    className="w-full h-11 px-3.5 rounded-xl border border-zinc-200 bg-white text-sm text-zinc-900 placeholder:text-zinc-400 focus:outline-none focus:ring-1 focus:ring-zinc-950 shadow-2xs"
                   />
                 </div>
 
-                {/* Tickets Bought & Button in side-by-side columns on mobile */}
+                {/* Tickets Bought & Button */}
                 <div className="grid grid-cols-2 sm:grid-cols-6 sm:col-span-6 gap-2.5 sm:gap-3 items-end">
                   <div className="sm:col-span-3 space-y-1">
                     <label className="text-[11px] font-semibold text-zinc-500 uppercase tracking-wider block">
@@ -1556,7 +1545,7 @@ export function MemberDashboardClient({
                       max={50}
                       value={simTickets}
                       onChange={(e) => setSimTickets(Math.max(1, parseInt(e.target.value) || 1))}
-                      className="w-full h-11 px-3 rounded-xl border border-zinc-200 bg-white font-mono text-center text-sm font-bold text-zinc-900 focus:outline-none focus:ring-2 focus:ring-orange-500 shadow-2xs"
+                      className="w-full h-11 px-3 rounded-xl border border-zinc-200 bg-white font-mono text-center text-sm font-bold text-zinc-900 focus:outline-none focus:ring-1 focus:ring-zinc-950 shadow-2xs"
                     />
                   </div>
 
@@ -1565,7 +1554,7 @@ export function MemberDashboardClient({
                       type="button"
                       disabled={simulating}
                       onClick={handleSimulateReferral}
-                      className="w-full h-11 px-4 rounded-xl bg-[#ea580c] hover:bg-[#c2410c] text-white text-xs font-bold uppercase tracking-wider transition-all disabled:opacity-50 cursor-pointer shadow-xs flex items-center justify-center gap-1.5"
+                      className="w-full h-11 px-4 rounded-xl bg-[#c53030] hover:bg-[#9b2c2c] text-white text-xs font-bold uppercase tracking-wider transition-all disabled:opacity-50 cursor-pointer shadow-xs flex items-center justify-center gap-1.5"
                     >
                       {simulating ? "Adding..." : "Add referral"}
                     </button>
@@ -1573,17 +1562,16 @@ export function MemberDashboardClient({
                 </div>
               </div>
 
-              <p className="text-xs text-zinc-500">
-                {simTickets} × ₹{platformTicketPrice.toLocaleString("en-IN")} → you earn{" "}
-                <span className="font-bold text-[#ea580c]">
+              <p className="text-xs text-zinc-600">
+                {simTickets} × {platformTicketPrice.toLocaleString("en-IN")} → you earn{" "}
+                <span className="font-bold text-rose-600">
                   {(simTickets * driveRewardPerTicket).toLocaleString("en-IN")} credits
-                </span>{" "}
-                ({creditRewardPercent}% power)
-                {(referralProfile?.isCashUnlocked || ticketStats.totalBought >= cashUnlockThreshold) && (
-                  <span className="font-bold text-emerald-600 ml-1">
+                </span>
+                {(referralProfile?.isCashUnlocked || ticketStats.totalBought >= cashUnlockThreshold) ? (
+                  <span className="font-bold text-rose-600 ml-1">
                     + ₹{(simTickets * Math.round(platformTicketPrice * (cashCommissionPercent / 100))).toLocaleString("en-IN")} cash
                   </span>
-                )}
+                ) : null}
               </p>
             </div>
 
