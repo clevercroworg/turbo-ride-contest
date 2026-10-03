@@ -58,24 +58,14 @@ Both your booking site and contest site run on the same Vercel account for unifi
 
 ---
 
-## 🛡️ 3. Safe Credit Escrow & 1-Click Refund System
+## 🛡️ 3. Direct Shared Database Credits Architecture
 
-### The Dilemma:
-*What happens if a member redeems credits on the contest app, gets redirected to the booking engine to pick a track date, but returns to the contest dashboard without finishing?*
-
-### The Solution:
-1. **Status = `pending_booking` (Escrow State)**:
-   - When a member redeems, credits are held in escrow by creating a Track Pass Voucher (`TR-[CAR]-XXXXX`) in `reward_redemptions` and `vouchers`.
-2. **Prominent Active Voucher Card on `/members` and `/members/rewards`**:
-   - If the member returns without booking, an **"Active Track Pass Vouchers · Reserved in Escrow"** card is displayed with:
-     - The Track Pass code
-     - The experience title
-     - The credits held
-     - **"Complete Booking on Track Engine →"** button (resumes booking immediately with voucher pre-applied)
-     - **"Cancel & Restore Credits"** button (1-click immediate self-service refund!)
-3. **1-Click Self-Service Refund**:
-   - Calling `cancelRedemptionAction()` immediately voids the voucher, restores the exact debited credits back to `user_credits`, logs a refund transaction in `credit_transactions`, and updates the user's wallet in real-time.
-   - **Zero lost credits, zero user support tickets.**
+### The Workflow:
+- Both `turboride-contest-app` and `turboride-booking-app` connect to the **exact same Neon PostgreSQL database** (`user_credits` table).
+- When a user purchases contest tickets or earns referral bonuses, credits are deposited directly into `user_credits` under their mobile number and email.
+- When clicking **"Redeem"** on `/members/rewards`, the member is routed straight to `https://book.turboridesupercars.com/experience` with pre-filled identification parameters (`email`, `phone`, `car`).
+- At booking checkout on `book.turboridesupercars.com`, the customer's live credit balance is automatically recognized by email/phone and applied to their reservation.
+- **Zero vouchers or coupons needed, zero escrow confusion, zero lost credits.**
 
 ---
 
@@ -85,9 +75,9 @@ Both your booking site and contest site run on the same Vercel account for unifi
 - **Demo Credentials**: `admin@turboride.com` / `TurboAdmin!2026`
 - **Console Routes**:
   - `/admin`: KPI Overview (Tickets, Gross Revenue, Drive Credits Issued/Redeemed, Fill Rate)
-  - `/admin/contests`: Drop status, Live Homepage Showcase & Pricing Control Center (update headline, valuation, ticket price, target/sold counts)
+  - `/admin/contests`: Live Homepage Showcase & Pricing Control Center (update headline, valuation, ticket price, target/sold counts, plus **4 Gallery Image URLs + 1 YouTube Video URL**)
   - `/admin/members`: Member list, KYC status, tickets bought, credits balance
   - `/admin/orders`: Complete order ledger with search and pagination
   - `/admin/referrals`: Commission payouts (Mark Paid / Hold) and payout history
-  - `/admin/redemptions`: Track pass redemptions, pending vouchers, mark fulfilled
+  - `/admin/redemptions`: Track pass redemptions, fulfillment status
   - `/admin/settings`: Pricing & credit multipliers, referral economics, gateway toggle (persisted directly to Neon PostgreSQL `site_settings` table)
