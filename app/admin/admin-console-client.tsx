@@ -29,6 +29,7 @@ import {
   Ticket,
   List,
   SignOut,
+  ChatText,
 } from "@phosphor-icons/react"
 import {
   type AdminContest,
@@ -37,6 +38,7 @@ import {
   type AdminPayout,
   type AdminRedemption,
   type AdminTicket,
+  type AdminSupportTicket,
   updateContestAction,
   setActiveContestAction,
   createContestAction,
@@ -45,6 +47,8 @@ import {
   processPayoutAction,
   updateRedemptionStatusAction,
   saveAdminSettingsAction,
+  replyToSupportTicketAction,
+  updateSupportTicketStatusAction,
 } from "@/lib/admin"
 import { logoutAdminAction, type AdminSession } from "@/lib/auth"
 import type { AdminPlatformSettings } from "@/lib/types"
@@ -62,11 +66,12 @@ interface AdminConsoleProps {
   initialRedemptions: AdminRedemption[]
   initialTickets?: AdminTicket[]
   initialSettings?: AdminPlatformSettings
+  initialSupportTickets?: AdminSupportTicket[]
   initialTab?: TabType
   adminSession?: AdminSession
 }
 
-type TabType = "overview" | "contests" | "members" | "orders" | "referrals" | "redemptions" | "settings"
+type TabType = "overview" | "contests" | "members" | "orders" | "referrals" | "redemptions" | "support" | "settings"
 
 const routeMap: Record<TabType, string> = {
   overview: "/admin",
@@ -75,6 +80,7 @@ const routeMap: Record<TabType, string> = {
   orders: "/admin/orders",
   referrals: "/admin/referrals",
   redemptions: "/admin/redemptions",
+  support: "/admin/support",
   settings: "/admin/settings",
 }
 
@@ -175,6 +181,21 @@ function formatMemberName(name?: string) {
   return name
 }
 
+function formatRelativeTime(dateInput: string | Date | null | undefined): string {
+  if (!dateInput) return "Recently"
+  const d = new Date(dateInput)
+  const diffSec = Math.max(0, Math.floor((Date.now() - d.getTime()) / 1000))
+  if (diffSec < 60) return "Just now"
+  const diffMin = Math.floor(diffSec / 60)
+  if (diffMin < 60) return `${diffMin} min ago`
+  const diffHours = Math.floor(diffMin / 60)
+  if (diffHours < 24) return `${diffHours} hr ago`
+  const diffDays = Math.floor(diffHours / 24)
+  if (diffDays === 1) return "Yesterday"
+  if (diffDays < 30) return `${diffDays} days ago`
+  return d.toLocaleDateString("en-IN", { month: "short", day: "numeric" })
+}
+
 export function AdminConsoleClient({
   initialOverview,
   initialContests,
@@ -184,6 +205,7 @@ export function AdminConsoleClient({
   initialRedemptions,
   initialTickets = [],
   initialSettings,
+  initialSupportTickets = [],
   initialTab = "overview",
   adminSession,
 }: AdminConsoleProps) {
@@ -228,6 +250,15 @@ export function AdminConsoleClient({
   const [payoutsData, setPayoutsData] = useState(initialPayouts)
   const [redemptions, setRedemptions] = useState<AdminRedemption[]>(initialRedemptions)
   const [tickets, setTickets] = useState<AdminTicket[]>(initialTickets)
+
+  // Support Tickets States
+  const [supportTickets, setSupportTickets] = useState<AdminSupportTicket[]>(initialSupportTickets)
+  const [selectedTicketId, setSelectedTicketId] = useState<string | null>(
+    initialSupportTickets.length > 0 ? initialSupportTickets[0].id : null
+  )
+  const [replyInput, setReplyInput] = useState("")
+  const [isSubmittingReply, setIsSubmittingReply] = useState(false)
+  const [supportFilter, setSupportFilter] = useState<"all" | "open" | "resolved">("all")
 
   // Contest Management & Tickets Ledger States
   const [contestViewMode, setContestViewMode] = useState<"cards" | "tickets">("cards")
@@ -756,6 +787,81 @@ export function AdminConsoleClient({
   const scheduledCount = useMemo(() => redemptions.filter((r) => r.status.toLowerCase() === "scheduled").length, [redemptions])
   const fulfilledCount = useMemo(() => redemptions.filter((r) => r.status.toLowerCase() === "fulfilled").length, [redemptions])
 
+  // Support Tickets Memo & Handlers
+  const openTicketsCount = useMemo(
+    () => supportTickets.filter((t) => t.status.toLowerCase() === "open").length,
+    [supportTickets]
+  )
+
+  const filteredSupportTickets = useMemo(() => {
+    return supportTickets.filter((t) => {
+      if (supportFilter === "open") return t.status.toLowerCase() === "open"
+      if (supportFilter === "resolved") return t.status.toLowerCase() === "resolved"
+      return true
+    })
+  }, [supportTickets, supportFilter])
+
+  const selectedTicket = useMemo(
+    () => supportTickets.find((t) => t.id === selectedTicketId) || filteredSupportTickets[0] || null,
+    [supportTickets, selectedTicketId, filteredSupportTickets]
+  )
+
+  const handleSendTicketReply = async (ticketId: string) => {
+    if (!replyInput.trim()) return
+    setIsSubmittingReply(true)
+    try {
+      const res = await replyToSupportTicketAction(
+        ticketId,
+        replyInput.trim(),
+        adminSession?.email === "admin@turboride.com" ? "WINMYPORSCHE Support" : adminSession?.name || "WINMYPORSCHE Support"
+      )
+      if (res.ok) {
+        const newReply = {
+          id: `rep_${Date.now()}`,
+          sender: "support" as const,
+          senderName: "WINMYPORSCHE Support",
+          content: replyInput.trim(),
+          createdAt: new Date().toISOString(),
+        }
+        setSupportTickets((prev) =>
+          prev.map((t) =>
+            t.id === ticketId
+              ? { ...t, replies: [...t.replies, newReply], updatedAt: new Date().toISOString() }
+              : t
+          )
+        )
+        setReplyInput("")
+        showToast("Reply sent to customer.", "success")
+      } else {
+        showToast(res.error || "Failed to send reply.", "error")
+      }
+    } catch {
+      showToast("An error occurred while sending reply.", "error")
+    } finally {
+      setIsSubmittingReply(false)
+    }
+  }
+
+  const handleToggleTicketStatus = async (ticketId: string, currentStatus: string) => {
+    const newStatus = currentStatus === "resolved" ? "open" : "resolved"
+    setActionLoading(true)
+    try {
+      const res = await updateSupportTicketStatusAction(ticketId, newStatus)
+      if (res.ok) {
+        setSupportTickets((prev) =>
+          prev.map((t) => (t.id === ticketId ? { ...t, status: newStatus } : t))
+        )
+        showToast(`Ticket marked as ${newStatus}.`, "success")
+      } else {
+        showToast(res.error || "Failed to update status.", "error")
+      }
+    } catch {
+      showToast("An error occurred.", "error")
+    } finally {
+      setActionLoading(false)
+    }
+  }
+
   const navItems = [
     { id: "overview", label: "Overview", icon: SquaresFour },
     { id: "contests", label: "Contests", icon: Trophy },
@@ -763,6 +869,7 @@ export function AdminConsoleClient({
     { id: "orders", label: "Orders", icon: Receipt },
     { id: "referrals", label: "Referral payouts", icon: ArrowsClockwise },
     { id: "redemptions", label: "Redemptions", icon: Gift },
+    { id: "support", label: "Support tickets", icon: ChatText },
     { id: "settings", label: "Settings", icon: Gear },
   ]
 
@@ -1007,7 +1114,7 @@ export function AdminConsoleClient({
                     <span className="truncate">Active members</span>
                   </div>
                   <span className="text-xl sm:text-2xl lg:text-3xl font-black text-zinc-950 block tracking-tight">
-                    {(initialOverview?.stats?.activeMembersCount ?? initialOverview?.stats?.activeMembers ?? 2184).toLocaleString("en-IN")}
+                    {(initialOverview?.stats?.activeMembersCount ?? initialOverview?.stats?.activeMembers ?? members.length).toLocaleString("en-IN")}
                   </span>
                 </div>
                 <span className="text-[11px] text-zinc-400 font-medium mt-2 block">Registered garages</span>
@@ -1156,223 +1263,6 @@ export function AdminConsoleClient({
                 >
                   <Plus size={16} weight="bold" />
                   <span>New Contest Drop</span>
-                </button>
-              </div>
-            </div>
-
-            {/* HOMEPAGE DISPLAY & LIVE PRICING CONTROL CENTER */}
-            <div className="rounded-2xl bg-white border border-zinc-200 p-4 sm:p-6 shadow-2xs space-y-4 sm:space-y-5">
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 sm:pb-4 border-b border-zinc-100">
-                <div>
-                  <div className="flex items-center gap-2">
-                    <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse shrink-0" />
-                    <h2 className="text-xs sm:text-sm font-bold uppercase tracking-wider text-zinc-950">
-                      Live Homepage Showcase & Pricing Control
-                    </h2>
-                  </div>
-                  <p className="text-xs text-zinc-500 mt-0.5">
-                    Instantly tune what visitors see on the homepage hero, live ticket price, and pool progress.
-                  </p>
-                </div>
-
-                <div className="relative w-full sm:w-auto">
-                  <div className="flex items-center justify-between sm:justify-start gap-2">
-                    <span className="text-[11px] font-bold text-zinc-400 uppercase tracking-wider shrink-0">
-                      Live Vehicle:
-                    </span>
-                    <button
-                      type="button"
-                      onClick={() => setIsVehicleDropdownOpen(!isVehicleDropdownOpen)}
-                      disabled={actionLoading}
-                      className="flex-1 sm:flex-initial flex items-center justify-between gap-2.5 bg-zinc-100 hover:bg-zinc-200/80 border border-zinc-200 rounded-xl px-3 py-2 text-xs font-bold text-zinc-900 transition-all cursor-pointer shadow-2xs focus:outline-none focus:ring-2 focus:ring-[#ea580c]"
-                    >
-                      <div className="flex items-center gap-2 truncate">
-                        <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse shrink-0" />
-                        <span className="truncate">{activeContest?.carName || "Select Vehicle"}</span>
-                        <span className="text-[10px] font-bold bg-emerald-100 text-emerald-800 px-1.5 py-0.5 rounded-full shrink-0">
-                          Active Live
-                        </span>
-                      </div>
-                      <CaretDown size={14} className={`text-zinc-500 transition-transform shrink-0 ${isVehicleDropdownOpen ? "rotate-180" : ""}`} />
-                    </button>
-                  </div>
-
-                  {/* Custom Dropdown Popover */}
-                  {isVehicleDropdownOpen && (
-                    <>
-                      {/* Transparent backdrop to close on outside tap */}
-                      <div
-                        className="fixed inset-0 z-40"
-                        onClick={() => setIsVehicleDropdownOpen(false)}
-                      />
-                      <div className="absolute right-0 top-full mt-2 w-full sm:w-80 bg-white rounded-2xl border border-zinc-200/90 shadow-2xl p-1.5 z-50 space-y-1 animate-in fade-in zoom-in-95">
-                        <div className="px-3 py-1.5 border-b border-zinc-100 text-[10px] font-bold text-zinc-400 uppercase tracking-wider">
-                          Select Homepage Showcase Vehicle
-                        </div>
-                        {contests.map((c) => {
-                          const isSelected = activeContest?.id === c.id
-                          return (
-                            <button
-                              key={c.id}
-                              type="button"
-                              onClick={() => {
-                                handleSetActiveContest(c.id)
-                                setIsVehicleDropdownOpen(false)
-                              }}
-                              className={`w-full flex items-center justify-between p-2.5 rounded-xl text-left transition-all cursor-pointer ${isSelected
-                                ? "bg-orange-50/80 border border-orange-200/80 text-zinc-950 font-bold"
-                                : "hover:bg-zinc-50 text-zinc-700"
-                                }`}
-                            >
-                              <div className="flex items-center gap-2.5 truncate">
-                                <div className={`w-4 h-4 rounded-full flex items-center justify-center shrink-0 border ${isSelected ? "border-[#ea580c] bg-[#ea580c] text-white" : "border-zinc-300"
-                                  }`}>
-                                  {isSelected && <Check size={10} weight="bold" />}
-                                </div>
-                                <div className="truncate">
-                                  <div className="text-xs font-bold text-zinc-900 truncate">{c.carName}</div>
-                                  <div className="text-[11px] text-zinc-400">{c.worthDisplay} · ₹{c.ticketPrice.toLocaleString("en-IN")}/tkt</div>
-                                </div>
-                              </div>
-
-                              <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold shrink-0 ml-2 ${c.status === "active"
-                                ? "bg-emerald-100 text-emerald-800"
-                                : "bg-zinc-100 text-zinc-600"
-                                }`}>
-                                {c.status === "active" ? "Active Live" : c.status}
-                              </span>
-                            </button>
-                          )
-                        })}
-                      </div>
-                    </>
-                  )}
-                </div>
-              </div>
-
-              {/* Quick Pricing Control Strip */}
-              <div className="p-3.5 sm:p-4 rounded-xl bg-zinc-50 border border-zinc-200/80 space-y-3">
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
-                  <div>
-                    <span className="text-xs font-bold text-zinc-900 block">
-                      Ticket Price & Credit Multiplier
-                    </span>
-                    <span className="text-[11px] text-zinc-500">
-                      1 Ticket = ₹{Number(hpPrice).toLocaleString("en-IN")} + {Number(hpPrice).toLocaleString("en-IN")} permanent Drive Credits
-                    </span>
-                  </div>
-
-                  {/* 1-Click Price Presets */}
-                  <div className="flex flex-wrap items-center gap-1.5 pt-1 sm:pt-0">
-                    {[500, 1000, 1500, 2000, 2500].map((preset) => (
-                      <button
-                        key={preset}
-                        type="button"
-                        onClick={() => {
-                          setHpPrice(preset)
-                          if (activeContest) handleQuickUpdatePrice(activeContest.id, preset)
-                        }}
-                        className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${Number(hpPrice) === preset
-                          ? "bg-[#ea580c] text-white shadow-2xs"
-                          : "bg-white border border-zinc-200 text-zinc-700 hover:bg-zinc-100"
-                          }`}
-                      >
-                        ₹{preset.toLocaleString("en-IN")}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-3 border-t border-zinc-200/60">
-                  <div>
-                    <label className="text-[10px] uppercase font-bold text-zinc-500 block mb-1">
-                      Custom Ticket Price (₹)
-                    </label>
-                    <input
-                      type="number"
-                      value={hpPrice}
-                      onChange={(e) => setHpPrice(Number(e.target.value))}
-                      className="w-full h-10 px-3 rounded-lg border border-zinc-300 bg-white text-xs font-bold text-zinc-900 focus:outline-none focus:ring-1 focus:ring-orange-500"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="text-[10px] uppercase font-bold text-zinc-500 block mb-1">
-                      Target Pool Tickets
-                    </label>
-                    <input
-                      type="number"
-                      value={hpTarget}
-                      onChange={(e) => setHpTarget(Number(e.target.value))}
-                      className="w-full h-10 px-3 rounded-lg border border-zinc-300 bg-white text-xs font-bold text-zinc-900 focus:outline-none focus:ring-1 focus:ring-orange-500"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="text-[10px] uppercase font-bold text-zinc-500 block mb-1">
-                      Sold Tickets Counter
-                    </label>
-                    <input
-                      type="number"
-                      value={hpSold}
-                      onChange={(e) => setHpSold(Number(e.target.value))}
-                      className="w-full h-10 px-3 rounded-lg border border-zinc-300 bg-white text-xs font-bold text-zinc-900 focus:outline-none focus:ring-1 focus:ring-orange-500"
-                    />
-                  </div>
-                </div>
-              </div>
-
-              {/* Homepage Hero Texts Form */}
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                <div>
-                  <label className="text-[10px] uppercase font-bold text-zinc-500 block mb-1">
-                    Homepage Title / Headline
-                  </label>
-                  <input
-                    type="text"
-                    value={hpTitle}
-                    onChange={(e) => setHpTitle(e.target.value)}
-                    placeholder="e.g. PORSCHE 718 CAYMAN"
-                    className="w-full h-10 px-3 rounded-lg border border-zinc-300 bg-white text-xs font-bold text-zinc-900 focus:outline-none focus:ring-1 focus:ring-orange-500"
-                  />
-                </div>
-
-                <div>
-                  <label className="text-[10px] uppercase font-bold text-zinc-500 block mb-1">
-                    Homepage Tagline / Subtitle
-                  </label>
-                  <input
-                    type="text"
-                    value={hpSubtitle}
-                    onChange={(e) => setHpSubtitle(e.target.value)}
-                    placeholder="e.g. The yellow mid-engine legend..."
-                    className="w-full h-10 px-3 rounded-lg border border-zinc-300 bg-white text-xs text-zinc-900 focus:outline-none focus:ring-1 focus:ring-orange-500"
-                  />
-                </div>
-
-                <div>
-                  <label className="text-[10px] uppercase font-bold text-zinc-500 block mb-1">
-                    Market Valuation Text
-                  </label>
-                  <input
-                    type="text"
-                    value={hpWorth}
-                    onChange={(e) => setHpWorth(e.target.value)}
-                    placeholder="e.g. Worth over ₹1.6 Crore"
-                    className="w-full h-10 px-3 rounded-lg border border-zinc-300 bg-white text-xs font-bold text-orange-600 focus:outline-none focus:ring-1 focus:ring-orange-500"
-                  />
-                </div>
-              </div>
-
-              <div className="flex items-center justify-end gap-3 pt-2">
-                <button
-                  type="button"
-                  onClick={handleSaveHomepageSettings}
-                  disabled={actionLoading}
-                  className="w-full sm:w-auto px-5 py-2.5 rounded-xl bg-zinc-950 hover:bg-zinc-800 disabled:opacity-50 text-white text-xs font-bold flex items-center justify-center gap-1.5 cursor-pointer transition-colors shadow-2xs"
-                >
-                  <Check size={16} weight="bold" />
-                  <span>{actionLoading ? "Updating..." : "Save Homepage & Price Settings"}</span>
                 </button>
               </div>
             </div>
@@ -2701,7 +2591,288 @@ export function AdminConsoleClient({
           </main>
         )}
 
-        {/* TAB 7: SETTINGS */}
+        {/* TAB: SUPPORT TICKETS */}
+        {activeTab === "support" && (
+          <main className="p-3.5 sm:p-6 lg:p-8 max-w-7xl w-full mx-auto space-y-5 sm:space-y-6">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4">
+              <div>
+                <h1 className="text-xl sm:text-2xl lg:text-3xl font-black text-zinc-950 uppercase tracking-tight">
+                  SUPPORT TICKETS
+                </h1>
+                <p className="text-xs text-zinc-500 mt-1">
+                  Read customer questions and send replies that appear in their member dashboard.
+                </p>
+              </div>
+
+              {/* Status Filter Pills */}
+              <div className="flex items-center gap-1.5 p-1 rounded-xl bg-zinc-100 w-fit">
+                {(["all", "open", "resolved"] as const).map((filter) => {
+                  const count =
+                    filter === "all"
+                      ? supportTickets.length
+                      : supportTickets.filter((t) => t.status.toLowerCase() === filter).length
+                  return (
+                    <button
+                      key={filter}
+                      type="button"
+                      onClick={() => setSupportFilter(filter)}
+                      className={`px-3 py-1.5 rounded-lg text-xs font-bold capitalize transition-all cursor-pointer flex items-center gap-1.5 ${
+                        supportFilter === filter
+                          ? "bg-white text-zinc-950 shadow-xs"
+                          : "text-zinc-600 hover:text-zinc-900"
+                      }`}
+                    >
+                      <span>{filter}</span>
+                      <span
+                        className={`text-[10px] px-1.5 py-0.2 rounded-full font-bold ${
+                          supportFilter === filter
+                            ? "bg-zinc-100 text-zinc-800"
+                            : "bg-zinc-200/60 text-zinc-600"
+                        }`}
+                      >
+                        {count}
+                      </span>
+                    </button>
+                  )
+                })}
+              </div>
+            </div>
+
+            {/* 2-Column Interface: Inbox on Left, Detail & Reply on Right */}
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 sm:gap-6 items-start">
+              {/* Left Column: Inbox List */}
+              <div className="lg:col-span-5 rounded-2xl bg-white border border-zinc-200/90 shadow-2xs overflow-hidden flex flex-col">
+                <div className="flex items-center justify-between px-4 py-3.5 border-b border-zinc-100">
+                  <div className="flex items-center gap-2">
+                    <ChatText size={16} weight="bold" className="text-[#ea580c]" />
+                    <span className="text-xs font-bold uppercase tracking-wider text-zinc-900">
+                      Inbox
+                    </span>
+                  </div>
+                  <span className="text-[11px] font-bold px-2 py-0.5 rounded-full bg-amber-50 text-amber-800 border border-amber-200/60">
+                    {openTicketsCount} open
+                  </span>
+                </div>
+
+                <div className="divide-y divide-zinc-100 max-h-[620px] overflow-y-auto">
+                  {filteredSupportTickets.length === 0 ? (
+                    <div className="p-8 text-center text-xs text-zinc-400">
+                      No support tickets found in this view.
+                    </div>
+                  ) : (
+                    filteredSupportTickets.map((t) => {
+                      const isSelected = selectedTicket?.id === t.id
+                      const isOpen = t.status.toLowerCase() === "open"
+                      const replyCount = t.replies?.length || 0
+
+                      return (
+                        <button
+                          key={t.id}
+                          type="button"
+                          onClick={() => setSelectedTicketId(t.id)}
+                          className={`w-full text-left p-4 transition-all cursor-pointer flex flex-col gap-1.5 relative ${
+                            isSelected
+                              ? "bg-orange-50/70 border-l-4 border-l-[#ea580c]"
+                              : "hover:bg-zinc-50"
+                          }`}
+                        >
+                          <div className="flex items-start justify-between gap-2">
+                            <div className="flex items-center gap-2 min-w-0">
+                              <span
+                                className={`w-2 h-2 rounded-full shrink-0 ${
+                                  isOpen ? "bg-amber-500 animate-pulse" : "bg-emerald-500"
+                                }`}
+                              />
+                              <h4
+                                className={`text-xs font-bold truncate ${
+                                  isSelected ? "text-zinc-950 font-black" : "text-zinc-900"
+                                }`}
+                              >
+                                {t.subject}
+                              </h4>
+                            </div>
+
+                            <span
+                              className={`text-[10px] font-bold px-2 py-0.5 rounded-md shrink-0 uppercase tracking-wider ${
+                                isOpen
+                                  ? "bg-amber-100/90 text-amber-800"
+                                  : "bg-emerald-100/90 text-emerald-800"
+                              }`}
+                            >
+                              {isOpen ? "Open" : "Resolved"}
+                            </span>
+                          </div>
+
+                          <p className="text-[11px] text-zinc-500 line-clamp-1 pl-4">
+                            {t.description}
+                          </p>
+
+                          <div className="flex items-center justify-between text-[11px] text-zinc-400 pl-4 pt-0.5">
+                            <span className="font-medium text-zinc-600 truncate">
+                              {t.userName} · {formatRelativeTime(t.createdAt)}
+                            </span>
+                            {replyCount > 0 && (
+                              <span className="text-[10px] font-semibold text-zinc-500 bg-zinc-100 px-1.5 py-0.2 rounded">
+                                {replyCount} {replyCount === 1 ? "reply" : "replies"}
+                              </span>
+                            )}
+                          </div>
+                        </button>
+                      )
+                    })
+                  )}
+                </div>
+              </div>
+
+              {/* Right Column: Ticket Detail & Reply Console */}
+              <div className="lg:col-span-7">
+                {selectedTicket ? (
+                  <div className="rounded-2xl bg-white border border-zinc-200/90 shadow-2xs p-5 sm:p-6 space-y-5">
+                    {/* Header */}
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-zinc-100">
+                      <div>
+                        <div className="flex items-center gap-2">
+                          <h2 className="text-sm sm:text-base font-black uppercase tracking-tight text-zinc-950">
+                            {selectedTicket.subject}
+                          </h2>
+                        </div>
+                        <div className="flex items-center gap-2 text-xs text-zinc-500 mt-1">
+                          <span className="font-bold text-zinc-800">{selectedTicket.userName}</span>
+                          <span>·</span>
+                          <span className="font-mono text-[11px] text-zinc-500">{selectedTicket.userEmail}</span>
+                          {selectedTicket.userPhone && (
+                            <>
+                              <span>·</span>
+                              <span className="font-mono text-[11px] text-zinc-500">{selectedTicket.userPhone}</span>
+                            </>
+                          )}
+                        </div>
+                      </div>
+
+                      <div className="flex items-center gap-2 shrink-0">
+                        <div className="flex items-center gap-1.5 text-xs font-mono font-bold text-zinc-500 bg-zinc-100 px-2.5 py-1 rounded-lg">
+                          <Clock size={13} />
+                          <span>{selectedTicket.ticketCode}</span>
+                        </div>
+
+                        <button
+                          type="button"
+                          onClick={() => handleToggleTicketStatus(selectedTicket.id, selectedTicket.status)}
+                          disabled={actionLoading}
+                          className={`px-3 py-1 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+                            selectedTicket.status.toLowerCase() === "resolved"
+                              ? "bg-amber-100 hover:bg-amber-200 text-amber-800"
+                              : "bg-emerald-100 hover:bg-emerald-200 text-emerald-800"
+                          }`}
+                        >
+                          {selectedTicket.status.toLowerCase() === "resolved" ? "Reopen" : "Mark Resolved"}
+                        </button>
+                      </div>
+                    </div>
+
+                    {/* Customer's Initial Question */}
+                    <div>
+                      <div className="text-[10px] font-bold uppercase tracking-wider text-zinc-400 mb-1.5">
+                        Customer Message
+                      </div>
+                      <div className="bg-[#f5f5f4] rounded-2xl p-4 sm:p-5 text-xs text-zinc-800 leading-relaxed font-medium">
+                        {selectedTicket.description}
+                      </div>
+                    </div>
+
+                    {/* Replies Thread */}
+                    {selectedTicket.replies && selectedTicket.replies.length > 0 && (
+                      <div className="space-y-3 pt-2">
+                        <div className="text-[10px] font-bold uppercase tracking-wider text-zinc-400">
+                          Conversation History
+                        </div>
+                        <div className="space-y-2.5 max-h-[300px] overflow-y-auto pr-1">
+                          {selectedTicket.replies.map((reply) => {
+                            const isSupport = reply.sender === "support" || reply.sender === "admin"
+                            return (
+                              <div
+                                key={reply.id}
+                                className={`rounded-xl p-3.5 text-xs leading-relaxed ${
+                                  isSupport
+                                    ? "bg-orange-50/80 border border-orange-200/70 text-zinc-900 ml-4 sm:ml-8"
+                                    : "bg-zinc-100 border border-zinc-200/70 text-zinc-800 mr-4 sm:mr-8"
+                                }`}
+                              >
+                                <div className="flex items-center justify-between text-[11px] mb-1">
+                                  <span
+                                    className={`font-bold ${
+                                      isSupport ? "text-[#ea580c]" : "text-zinc-700"
+                                    }`}
+                                  >
+                                    {reply.senderName || (isSupport ? "WINMYPORSCHE Support" : selectedTicket.userName)}
+                                  </span>
+                                  <span className="text-[10px] text-zinc-400">
+                                    {formatRelativeTime(reply.createdAt)}
+                                  </span>
+                                </div>
+                                <p className="whitespace-pre-wrap">{reply.content}</p>
+                              </div>
+                            )
+                          })}
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Reply To Customer Form */}
+                    <div className="pt-3 border-t border-zinc-100 space-y-3">
+                      <div className="flex items-center justify-between">
+                        <label className="text-[11px] font-black uppercase tracking-wider text-red-600">
+                          REPLY TO CUSTOMER
+                        </label>
+                        <span className="text-[11px] text-zinc-400">
+                          Appears in member support portal
+                        </span>
+                      </div>
+
+                      <textarea
+                        value={replyInput}
+                        onChange={(e) => setReplyInput(e.target.value)}
+                        placeholder="Write a helpful reply..."
+                        rows={4}
+                        className="w-full rounded-2xl border border-zinc-300 bg-white p-3.5 text-xs text-zinc-900 focus:outline-none focus:ring-1 focus:ring-[#ea580c] resize-none"
+                      />
+
+                      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pt-1">
+                        <span className="text-[11px] text-zinc-400 font-medium">
+                          Customer will see an alert for this reply.
+                        </span>
+
+                        <button
+                          type="button"
+                          onClick={() => handleSendTicketReply(selectedTicket.id)}
+                          disabled={isSubmittingReply || !replyInput.trim()}
+                          className="w-full sm:w-auto px-5 py-2.5 rounded-xl bg-[#c2410c] hover:bg-[#9a3412] disabled:opacity-50 text-white font-bold text-xs flex items-center justify-center gap-1.5 transition-colors cursor-pointer shadow-xs"
+                        >
+                          {isSubmittingReply ? (
+                            <>
+                              <ArrowsClockwise size={14} className="animate-spin" />
+                              <span>Sending...</span>
+                            </>
+                          ) : (
+                            <>
+                              <span>Send reply</span>
+                            </>
+                          )}
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="rounded-2xl bg-white border border-zinc-200/90 shadow-2xs p-12 text-center text-zinc-400 text-xs">
+                    Select a ticket from the inbox to read and send replies.
+                  </div>
+                )}
+              </div>
+            </div>
+          </main>
+        )}
+
+        {/* TAB 8: SETTINGS */}
         {activeTab === "settings" && (
           <main className="p-3.5 sm:p-6 lg:p-8 max-w-7xl w-full mx-auto space-y-5 sm:space-y-6">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">

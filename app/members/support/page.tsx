@@ -1,6 +1,7 @@
 import { redirect } from "next/navigation"
 import { getMemberSession } from "@/lib/auth"
 import { getUserDriveCredits } from "@/lib/credits"
+import { getMemberSupportTickets } from "@/lib/admin"
 import { SupportClient } from "./support-client"
 
 export const dynamic = "force-dynamic"
@@ -11,9 +12,13 @@ export default async function SupportPage() {
     redirect("/login?redirect=/members/support")
   }
 
-  const credits = await getUserDriveCredits(session.email, session.phone)
+  const [credits, tickets] = await Promise.all([
+    getUserDriveCredits(session.email, session.phone),
+    getMemberSupportTickets(session.email),
+  ])
 
   return (
-    <SupportClient session={session} credits={credits} />
+    <SupportClient session={session} credits={credits} initialTickets={tickets} />
   )
 }
+

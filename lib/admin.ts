@@ -103,6 +103,44 @@ export interface AdminTicket {
   isWinner?: boolean
 }
 
+export interface SupportReply {
+  id: string
+  sender: "user" | "admin" | "support"
+  senderName: string
+  content: string
+  createdAt: string
+}
+
+export interface AdminSupportTicket {
+  id: string
+  ticketCode: string
+  userEmail: string
+  userName: string
+  userPhone: string
+  subject: string
+  description: string
+  status: "open" | "resolved" | "in_progress"
+  category: string
+  replies: SupportReply[]
+  createdAt: string
+  updatedAt: string
+}
+
+function formatRelativeTime(dateInput: string | Date | null | undefined): string {
+  if (!dateInput) return "Recently"
+  const d = new Date(dateInput)
+  const diffSec = Math.max(0, Math.floor((Date.now() - d.getTime()) / 1000))
+  if (diffSec < 60) return "Just now"
+  const diffMin = Math.floor(diffSec / 60)
+  if (diffMin < 60) return `${diffMin} min ago`
+  const diffHours = Math.floor(diffMin / 60)
+  if (diffHours < 24) return `${diffHours} hr ago`
+  const diffDays = Math.floor(diffHours / 24)
+  if (diffDays === 1) return "Yesterday"
+  if (diffDays < 30) return `${diffDays} days ago`
+  return d.toLocaleDateString("en-IN", { month: "short", day: "numeric" })
+}
+
 export async function getAdminOverviewData() {
   try {
     const [
@@ -131,67 +169,72 @@ export async function getAdminOverviewData() {
 
     const activeContest = contests.find((c) => c.status === "active") || contests[0]
 
-    // Calculations
+    // 100% Real DB Calculations - Zero mock fallbacks
     const ticketsSoldFromOrders = orders
       .filter((o) => o.status === "completed")
       .reduce((sum, o) => sum + Number(o.ticket_count || 0), 0)
-    const ticketsSold = Math.max(ticketsSoldFromOrders, Number(activeContest?.sold_tickets || 6350))
+    const ticketsSoldFromContests = contests.reduce((sum, c) => sum + Number(c.sold_tickets || 0), 0)
+    const ticketsSold = Math.max(ticketsSoldFromOrders, ticketsSoldFromContests)
 
     const revenueFromOrders = orders
       .filter((o) => o.status === "completed")
       .reduce((sum, o) => sum + Number(o.amount_paid || 0), 0)
-    const grossRevenue = revenueFromOrders > 0 ? revenueFromOrders : ticketsSold * Number(activeContest?.ticket_price || 1000)
+    const grossRevenue = revenueFromOrders > 0
+      ? revenueFromOrders
+      : contests.reduce((sum, c) => sum + Number(c.sold_tickets || 0) * Number(c.ticket_price || 1000), 0)
 
-    const activeMembersCount = Math.max(members.length, 2184)
+    const activeMembersCount = members.length
 
     const duePayouts = payouts.filter((p) => p.status === "due")
-    const cashCommissionOwed = duePayouts.reduce((sum, p) => sum + Number(p.amount || 0), 0) || 138500
+    const cashCommissionOwed = duePayouts.reduce((sum, p) => sum + Number(p.amount || 0), 0)
 
-    const totalCreditsIssued = Math.max(Number(creditsRes.rows[0]?.issued || 0), grossRevenue)
-    const totalCreditsRedeemed = Math.max(
-      redemptions.reduce((sum, r) => sum + Number(r.credits_spent || 0), 0),
-      Math.round(totalCreditsIssued * 0.29)
-    )
+    const totalCreditsIssued = Number(creditsRes.rows[0]?.issued || 0)
+    const totalCreditsRedeemed = redemptions.reduce((sum, r) => sum + Number(r.credits_spent || 0), 0)
 
-    const contestFill = activeContest
+    const contestFill = activeContest && Number(activeContest.target_tickets) > 0
       ? Math.round((Number(activeContest.sold_tickets) / Number(activeContest.target_tickets)) * 100)
-      : 63
+      : 0
 
     const liveContestsCount = contests.filter((c) => c.status === "active").length
 
-    // Activity Feed
-    const activities = [
-      {
-        id: "act-1",
-        title: "Rohan Mehta purchased 25 tickets (₹25,000)",
-        time: "2 min ago",
-        type: "order",
-      },
-      {
-        id: "act-2",
-        title: "Payout PO-4455 marked paid to Meera Joshi (₹27,500)",
-        time: "18 min ago",
+    // Dynamic Live Activity Feed generated 100% from actual database events
+    const liveEvents: Array<{ id: string; title: string; time: string; type: string; timestamp: number }> = []
+
+    for (const o of orders) {
+      if (o.status === "completed") {
+        liveEvents.push({
+          id: `act-ord-${o.id}`,
+          title: `${o.user_name || "Customer"} purchased ${o.ticket_count || 1} tickets (₹${Number(o.amount_paid || 0).toLocaleString("en-IN")})`,
+          time: formatRelativeTime(o.created_at),
+          type: "order",
+          timestamp: new Date(o.created_at).getTime(),
+        })
+      }
+    }
+
+    for (const p of payouts) {
+      liveEvents.push({
+        id: `act-pay-${p.id}`,
+        title: `Payout ${p.payout_code || p.id} marked ${p.status} to ${p.user_name || "Member"} (₹${Number(p.amount || 0).toLocaleString("en-IN")})`,
+        time: formatRelativeTime(p.requested_at),
         type: "payout",
-      },
-      {
-        id: "act-3",
-        title: "Ananya Iyer flagged for manual review",
-        time: "41 min ago",
-        type: "member",
-      },
-      {
-        id: "act-4",
-        title: "Redemption RD-9018 fulfilled — Supercar Photoshoot",
-        time: "1 hr ago",
+        timestamp: new Date(p.requested_at).getTime(),
+      })
+    }
+
+    for (const r of redemptions) {
+      liveEvents.push({
+        id: `act-red-${r.id}`,
+        title: `Redemption ${r.ref_code || r.id} (${r.status}) — ${r.reward_title || "Experience"}`,
+        time: formatRelativeTime(r.created_at),
         type: "redemption",
-      },
-      {
-        id: "act-5",
-        title: `Contest "${activeContest?.car_name || "Porsche 718 Cayman"}" crossed ${contestFill}% fill`,
-        time: "3 hr ago",
-        type: "milestone",
-      },
-    ]
+        timestamp: new Date(r.created_at).getTime(),
+      })
+    }
+
+    // Sort by most recent timestamp
+    liveEvents.sort((a, b) => b.timestamp - a.timestamp)
+    const activities = liveEvents.slice(0, 7)
 
     return {
       stats: {
@@ -206,6 +249,7 @@ export async function getAdminOverviewData() {
         totalCreditsRedeemed: totalCreditsRedeemed || 0,
         contestFill: contestFill || 0,
         liveContests: liveContestsCount || 0,
+        liveContestsCount: liveContestsCount || 0,
       },
       recentOrders: orders.slice(0, 7),
       activity: activities,
@@ -814,6 +858,218 @@ export async function updateContestShowcaseAction(data: {
   }
 }
 
+// SUPPORT TICKETS MANAGEMENT
+export async function getAdminSupportTickets(): Promise<AdminSupportTicket[]> {
+  try {
+    const res = await pool.query(`SELECT * FROM support_tickets ORDER BY created_at DESC`)
+    return res.rows.map((r) => ({
+      id: r.id,
+      ticketCode: r.ticket_code,
+      userEmail: r.user_email,
+      userName: r.user_name || "Member",
+      userPhone: r.user_phone || "",
+      subject: r.subject,
+      description: r.description,
+      status: (r.status as any) || "open",
+      category: r.category || "general",
+      replies: Array.isArray(r.replies)
+        ? r.replies
+        : typeof r.replies === "string"
+        ? JSON.parse(r.replies || "[]")
+        : [],
+      createdAt: r.created_at ? new Date(r.created_at).toISOString() : new Date().toISOString(),
+      updatedAt: r.updated_at ? new Date(r.updated_at).toISOString() : new Date().toISOString(),
+    }))
+  } catch (err) {
+    console.error("[getAdminSupportTickets error]:", err)
+    return []
+  }
+}
+
+export async function replyToSupportTicketAction(
+  ticketId: string,
+  replyText: string,
+  adminName: string = "TurboRide Support"
+): Promise<{ ok: boolean; error?: string }> {
+  try {
+    if (!replyText || !replyText.trim()) {
+      return { ok: false, error: "Reply text cannot be empty." }
+    }
+    const ticketRes = await pool.query(`SELECT replies FROM support_tickets WHERE id = $1`, [ticketId])
+    if (ticketRes.rows.length === 0) {
+      return { ok: false, error: "Ticket not found." }
+    }
+    const currentReplies: SupportReply[] = Array.isArray(ticketRes.rows[0].replies)
+      ? ticketRes.rows[0].replies
+      : typeof ticketRes.rows[0].replies === "string"
+      ? JSON.parse(ticketRes.rows[0].replies || "[]")
+      : []
+
+    const newReply: SupportReply = {
+      id: `rep_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`,
+      sender: "support",
+      senderName: adminName,
+      content: replyText.trim(),
+      createdAt: new Date().toISOString(),
+    }
+
+    const updatedReplies = [...currentReplies, newReply]
+
+    await pool.query(
+      `UPDATE support_tickets 
+       SET replies = $2::jsonb, updated_at = NOW() 
+       WHERE id = $1`,
+      [ticketId, JSON.stringify(updatedReplies)]
+    )
+
+    safeRevalidate("/admin")
+    safeRevalidate("/admin/support")
+    safeRevalidate("/members/support")
+    return { ok: true }
+  } catch (err: any) {
+    console.error("[replyToSupportTicketAction error]:", err)
+    return { ok: false, error: err.message || "Failed to post reply." }
+  }
+}
+
+export async function updateSupportTicketStatusAction(
+  ticketId: string,
+  status: "open" | "resolved"
+): Promise<{ ok: boolean; error?: string }> {
+  try {
+    await pool.query(
+      `UPDATE support_tickets 
+       SET status = $2, updated_at = NOW() 
+       WHERE id = $1`,
+      [ticketId, status]
+    )
+    safeRevalidate("/admin")
+    safeRevalidate("/admin/support")
+    safeRevalidate("/members/support")
+    return { ok: true }
+  } catch (err: any) {
+    console.error("[updateSupportTicketStatusAction error]:", err)
+    return { ok: false, error: err.message || "Failed to update status." }
+  }
+}
+
+export async function createSupportTicketAction(data: {
+  userEmail: string
+  userName: string
+  userPhone?: string
+  subject: string
+  description: string
+  category?: string
+}): Promise<{ ok: boolean; ticketCode?: string; error?: string }> {
+  try {
+    const id = `tkt_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`
+    const randNum = Math.floor(1000 + Math.random() * 9000)
+    const ticketCode = `WM-${randNum}`
+
+    await pool.query(
+      `INSERT INTO support_tickets 
+        (id, ticket_code, user_email, user_name, user_phone, subject, description, status, category, replies, created_at, updated_at)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, 'open', $8, '[]'::jsonb, NOW(), NOW())`,
+      [
+        id,
+        ticketCode,
+        data.userEmail.toLowerCase().trim(),
+        data.userName.trim(),
+        data.userPhone || "",
+        data.subject.trim(),
+        data.description.trim(),
+        data.category || "general",
+      ]
+    )
+
+    safeRevalidate("/admin")
+    safeRevalidate("/admin/support")
+    safeRevalidate("/members/support")
+    return { ok: true, ticketCode }
+  } catch (err: any) {
+    console.error("[createSupportTicketAction error]:", err)
+    return { ok: false, error: err.message || "Failed to create support ticket." }
+  }
+}
+
+export async function getMemberSupportTickets(userEmail: string): Promise<AdminSupportTicket[]> {
+  try {
+    const res = await pool.query(
+      `SELECT * FROM support_tickets WHERE LOWER(user_email) = LOWER($1) ORDER BY created_at DESC`,
+      [userEmail.trim()]
+    )
+    return res.rows.map((r) => ({
+      id: r.id,
+      ticketCode: r.ticket_code,
+      userEmail: r.user_email,
+      userName: r.user_name || "Member",
+      userPhone: r.user_phone || "",
+      subject: r.subject,
+      description: r.description,
+      status: (r.status as any) || "open",
+      category: r.category || "general",
+      replies: Array.isArray(r.replies)
+        ? r.replies
+        : typeof r.replies === "string"
+        ? JSON.parse(r.replies || "[]")
+        : [],
+      createdAt: r.created_at ? new Date(r.created_at).toISOString() : new Date().toISOString(),
+      updatedAt: r.updated_at ? new Date(r.updated_at).toISOString() : new Date().toISOString(),
+    }))
+  } catch (err) {
+    console.error("[getMemberSupportTickets error]:", err)
+    return []
+  }
+}
+
+export async function addMemberReplyAction(
+  ticketId: string,
+  userEmail: string,
+  replyText: string,
+  userName?: string
+): Promise<{ ok: boolean; error?: string }> {
+  try {
+    if (!replyText || !replyText.trim()) return { ok: false, error: "Reply cannot be empty." }
+    const ticketRes = await pool.query(
+      `SELECT replies, user_email FROM support_tickets WHERE id = $1`,
+      [ticketId]
+    )
+    if (ticketRes.rows.length === 0) return { ok: false, error: "Ticket not found." }
+    if (ticketRes.rows[0].user_email.toLowerCase() !== userEmail.toLowerCase()) {
+      return { ok: false, error: "Unauthorized." }
+    }
+
+    const currentReplies: SupportReply[] = Array.isArray(ticketRes.rows[0].replies)
+      ? ticketRes.rows[0].replies
+      : typeof ticketRes.rows[0].replies === "string"
+      ? JSON.parse(ticketRes.rows[0].replies || "[]")
+      : []
+
+    const newReply: SupportReply = {
+      id: `rep_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`,
+      sender: "user",
+      senderName: userName || "You",
+      content: replyText.trim(),
+      createdAt: new Date().toISOString(),
+    }
+
+    await pool.query(
+      `UPDATE support_tickets 
+       SET replies = $2::jsonb, updated_at = NOW(), status = 'open' 
+       WHERE id = $1`,
+      [ticketId, JSON.stringify([...currentReplies, newReply])]
+    )
+
+    safeRevalidate("/admin")
+    safeRevalidate("/admin/support")
+    safeRevalidate("/members/support")
+    return { ok: true }
+  } catch (err: any) {
+    console.error("[addMemberReplyAction error]:", err)
+    return { ok: false, error: err.message || "Failed to add reply." }
+  }
+}
+
 export async function loadAdminFullProps() {
   const [
     overviewData,
@@ -824,6 +1080,7 @@ export async function loadAdminFullProps() {
     redemptions,
     tickets,
     settings,
+    supportTickets,
   ] = await Promise.all([
     getAdminOverviewData(),
     getAdminContests(),
@@ -833,6 +1090,7 @@ export async function loadAdminFullProps() {
     getAdminRedemptions(),
     getAdminTickets(),
     getAdminSettingsAction(),
+    getAdminSupportTickets(),
   ])
 
   return {
@@ -844,6 +1102,7 @@ export async function loadAdminFullProps() {
     initialRedemptions: redemptions,
     initialTickets: tickets,
     initialSettings: settings,
+    initialSupportTickets: supportTickets,
   }
 }
 
