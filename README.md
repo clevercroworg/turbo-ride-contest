@@ -23,14 +23,17 @@ The official **Zero-Loss Guarantee** Supercar Contest & Member Garage platform f
 
 ## 🗺️ Route Structure
 
-*   `/`: Public contest landing page (Hero with fluid +17% headline, live allocation progress, Entry Allocation terminal, How It Works, Porsche Specs, Fleet showcase, Prize tiers, Referral engine, FAQs, and ticket checkout modal).
+*   `/`: Public contest landing page (Hero with fluid +17% headline, live allocation progress, Entry Allocation terminal, How It Works, Porsche Specs, Fleet showcase, Prize tiers, Referral engine, FAQs, and live Razorpay Test Mode checkout modal).
+*   `/r/[code]`: Live referral entry (sets 30-day tracking cookie and redirects seamlessly to `/?ref=[code]`).
 *   `/terms`: Statutory Terms & Conditions (Section 194B TDS, 10,000 Cap, Buddh Delivery, ₹75 Lakh Cash Option).
 *   `/draw-regulations`: Cryptographic Seed Verification, Live Draw Protocol & Audit Logs.
 *   `/privacy`: Privacy Policy & Digital Personal Data Protection (DPDP) Act 2023 compliance.
 *   `/login`: Passwordless phone / email login to Member Garage.
-*   `/members`: Member Garage Dashboard (Ticket numbers list, manual/auto-pick, Drive Credits wallet, referral affiliate link & metrics, cash payout claims).
-*   `/members/rewards`: Rewards garage for redeeming Drive Credits for Lamborghini, Ferrari, McLaren, Porsche track runs, or 4K drone reels.
-*   `/admin`: Superadmin Console (Overview metrics, `/contests`, `/members`, `/orders`, `/referrals`, `/redemptions`, `/settings`).
+*   `/members`: Member Garage Dashboard (Database-driven supercar showcase, YouTube video showcase modal, 5-digit number allocation, Drive Credits wallet, referral affiliate link & metrics, cash payout claims).
+*   `/members/profile`: Persistent profile editor for updating name, phone number, UPI ID, and bank account details.
+*   `/members/transactions`: Categorized transaction ledger (All activity, Tickets, Entries, Referrals, Wallet) with clear timestamps and transaction IDs.
+*   `/members/rewards`: Direct Drive Credits redemption to `book.turboridesupercars.com/experience` (no intermediate vouchers; credits available directly at booking checkout).
+*   `/admin`: Superadmin Console (Overview metrics, `/contests` with 4 gallery images + 1 YouTube video URL, `/members`, `/orders`, `/referrals`, `/redemptions`, `/settings`).
 
 ---
 
