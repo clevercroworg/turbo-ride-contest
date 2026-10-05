@@ -345,6 +345,7 @@ export function AdminConsoleClient({
     initialSettings || {
       ticketPrice: 1000,
       creditsPerTicket: 1000,
+      maxCustomerPurchaseLimit: 100000,
       creditRewardPercent: 25,
       cashCommissionPercent: 25,
       cashUnlockThreshold: 25,
@@ -2926,7 +2927,7 @@ export function AdminConsoleClient({
                           className="w-full bg-transparent text-xs sm:text-sm font-bold text-zinc-900 focus:outline-none"
                         />
                       </div>
-                      <span className="block text-[11px] text-zinc-400 mt-1">Per ticket</span>
+                      <span className="block text-[11px] text-zinc-400 mt-1">Single source of truth</span>
                     </div>
 
                     <div>
@@ -2942,7 +2943,26 @@ export function AdminConsoleClient({
                         />
                         <span className="text-zinc-500 text-xs font-bold ml-2">cr</span>
                       </div>
+                      <span className="block text-[11px] text-zinc-400 mt-1">1:1 Drive credit parity</span>
                     </div>
+                  </div>
+
+                  <div className="mt-4 pt-3.5 border-t border-zinc-100">
+                    <label className="block text-xs font-semibold text-zinc-700 mb-1.5">
+                      Max Customer Purchase Limit (₹)
+                    </label>
+                    <div className="flex items-center bg-zinc-100 rounded-xl px-3.5 py-2.5">
+                      <span className="text-zinc-500 text-xs font-bold mr-2">₹</span>
+                      <input
+                        type="number"
+                        value={settings.maxCustomerPurchaseLimit || 100000}
+                        onChange={(e) => setSettings({ ...settings, maxCustomerPurchaseLimit: Number(e.target.value) })}
+                        className="w-full bg-transparent text-xs sm:text-sm font-bold text-zinc-900 focus:outline-none"
+                      />
+                    </div>
+                    <span className="block text-[11px] text-zinc-400 mt-1">
+                      Max lifetime purchase limit per customer (Default: ₹1,00,000 / 1 Lakh)
+                    </span>
                   </div>
                 </div>
               </div>
@@ -3229,16 +3249,20 @@ export function AdminConsoleClient({
                   />
                 </div>
                 <div>
-                  <label className="block text-xs font-bold text-zinc-700 mb-1">
-                    Ticket Price (₹)
-                  </label>
+                  <div className="flex items-center justify-between mb-1">
+                    <label className="block text-xs font-bold text-zinc-700">
+                      Ticket Price (₹)
+                    </label>
+                    <span className="text-[10px] text-zinc-400 font-medium">From Admin Settings</span>
+                  </div>
                   <input
                     type="number"
-                    value={editingContest.ticketPrice}
-                    onChange={(e) => setEditingContest({ ...editingContest, ticketPrice: Number(e.target.value) })}
-                    className="w-full h-10 px-3.5 rounded-xl border border-zinc-300 text-xs focus:outline-none focus:ring-2 focus:ring-[#ea580c]"
-                    required
+                    value={settings.ticketPrice || editingContest.ticketPrice}
+                    readOnly
+                    disabled
+                    className="w-full h-10 px-3.5 rounded-xl border border-zinc-200 bg-zinc-100 text-zinc-600 text-xs cursor-not-allowed font-semibold"
                   />
+                  <span className="block text-[10px] text-zinc-400 mt-1">Configured centrally in Settings</span>
                 </div>
               </div>
 
@@ -3429,16 +3453,20 @@ export function AdminConsoleClient({
                   />
                 </div>
                 <div>
-                  <label className="block text-xs font-bold text-zinc-700 mb-1">
-                    Ticket Price (₹)
-                  </label>
+                  <div className="flex items-center justify-between mb-1">
+                    <label className="block text-xs font-bold text-zinc-700">
+                      Ticket Price (₹)
+                    </label>
+                    <span className="text-[10px] text-zinc-400 font-medium">From Admin Settings</span>
+                  </div>
                   <input
                     type="number"
-                    value={newContest.ticketPrice}
-                    onChange={(e) => setNewContest({ ...newContest, ticketPrice: Number(e.target.value) })}
-                    className="w-full h-10 px-3.5 rounded-xl border border-zinc-300 text-xs focus:outline-none focus:ring-2 focus:ring-[#ea580c]"
-                    required
+                    value={settings.ticketPrice || newContest.ticketPrice}
+                    readOnly
+                    disabled
+                    className="w-full h-10 px-3.5 rounded-xl border border-zinc-200 bg-zinc-100 text-zinc-600 text-xs cursor-not-allowed font-semibold"
                   />
+                  <span className="block text-[10px] text-zinc-400 mt-1">Configured centrally in Settings</span>
                 </div>
               </div>
 

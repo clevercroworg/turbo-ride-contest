@@ -374,6 +374,13 @@ export async function updateContestAction(
       values
     )
 
+    if (data.status === "active") {
+      await pool.query(
+        `UPDATE contests SET status = 'upcoming', updated_at = NOW() WHERE id != $1 AND status != 'completed'`,
+        [contestId]
+      )
+    }
+
     revalidatePath("/")
     revalidatePath("/members")
     revalidatePath("/admin")
@@ -388,10 +395,17 @@ export async function setActiveContestAction(contestId: string): Promise<{ ok: b
   const client = await pool.connect()
   try {
     await client.query("BEGIN")
-    // Set all others to upcoming
-    await client.query(`UPDATE contests SET status = 'upcoming', updated_at = NOW() WHERE id != $1`, [contestId])
+    // Set all others to upcoming (preserving completed contests)
+    await client.query(`UPDATE contests SET status = 'upcoming', updated_at = NOW() WHERE id != $1 AND status != 'completed'`, [contestId])
     // Set selected to active
     await client.query(`UPDATE contests SET status = 'active', updated_at = NOW() WHERE id = $1`, [contestId])
+    
+    // Sync ticket price from site_settings to ensure price consistency
+    const priceRes = await client.query(`SELECT value FROM site_settings WHERE key = 'contest_ticket_price' LIMIT 1`)
+    if (priceRes.rows.length > 0 && Number(priceRes.rows[0].value)) {
+      const activePrice = Number(priceRes.rows[0].value)
+      await client.query(`UPDATE contests SET ticket_price = $1, credits_per_ticket = $1 WHERE id = $2`, [activePrice, contestId])
+    }
     await client.query("COMMIT")
 
     revalidatePath("/")
@@ -729,6 +743,7 @@ export async function getAdminSettingsAction(): Promise<AdminPlatformSettings> {
        WHERE key IN (
          'contest_ticket_price',
          'contest_credit_multiplier',
+         'contest_max_customer_limit',
          'contest_referral_drive_pct',
          'contest_referral_cash_pct',
          'contest_cash_unlock_threshold',
@@ -742,6 +757,7 @@ export async function getAdminSettingsAction(): Promise<AdminPlatformSettings> {
     return {
       ticketPrice: Number(map.get("contest_ticket_price")) || 1000,
       creditsPerTicket: Number(map.get("contest_credit_multiplier")) || 1000,
+      maxCustomerPurchaseLimit: Number(map.get("contest_max_customer_limit")) || 100000,
       creditRewardPercent: Number(map.get("contest_referral_drive_pct")) || 25,
       cashCommissionPercent: Number(map.get("contest_referral_cash_pct")) || 25,
       cashUnlockThreshold: Number(map.get("contest_cash_unlock_threshold")) || 25,
@@ -755,6 +771,7 @@ export async function getAdminSettingsAction(): Promise<AdminPlatformSettings> {
     return {
       ticketPrice: 1000,
       creditsPerTicket: 1000,
+      maxCustomerPurchaseLimit: 100000,
       creditRewardPercent: 25,
       cashCommissionPercent: 25,
       cashUnlockThreshold: 25,
@@ -783,6 +800,7 @@ export async function saveAdminSettingsAction(settings: AdminPlatformSettings): 
 
     await upsertSetting("contest_ticket_price", String(settings.ticketPrice))
     await upsertSetting("contest_credit_multiplier", String(settings.creditsPerTicket))
+    await upsertSetting("contest_max_customer_limit", String(settings.maxCustomerPurchaseLimit || 100000))
     await upsertSetting("contest_referral_drive_pct", String(settings.creditRewardPercent))
     await upsertSetting("contest_referral_cash_pct", String(settings.cashCommissionPercent))
     await upsertSetting("contest_cash_unlock_threshold", String(settings.cashUnlockThreshold))

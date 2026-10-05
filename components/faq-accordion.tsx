@@ -35,8 +35,8 @@ export function FaqAccordion({
     },
     {
       num: "04",
-      q: "Can I choose my own 5-digit ticket number?",
-      a: "Yes. In your Member Garage dashboard, you can type in any available 5-digit number (e.g. 77718 or your birthday) or click Auto-Pick to generate verified unclaimed numbers instantly.",
+      q: "How do game vouchers and Turboride Coin Rush work?",
+      a: "For each ₹1,000 you deposit, you receive a 12-digit game voucher (e.g. 7KQ4-M2XD-9PHA) along with ₹1,000 in permanent Drive Credits. You can input this code in Turboride Coin Rush to play online races. Every race adds points to your player total and keeps your rank updated on the live public leaderboard.",
     },
     {
       num: "05",

@@ -24,9 +24,9 @@ export function HowItWorks({
     {
       num: "02",
       icon: Hash,
-      action: "Choose 5-Digits",
-      detail: "Pick your lucky sequence or trigger cryptographic Auto-Pick.",
-      badge: "Verifiable Seed",
+      action: "Get Game Voucher",
+      detail: "Receive a 12-digit code for Turboride Coin Rush to race and score points.",
+      badge: "Coin Rush Game",
     },
     {
       num: "03",

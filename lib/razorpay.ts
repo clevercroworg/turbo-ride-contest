@@ -5,6 +5,7 @@ import { pool } from "./db"
 import { revalidatePath } from "next/cache"
 import { loginOrSignupMember } from "./auth"
 import { cookies } from "next/headers"
+import { generateSingleVoucherCode, formatPlayerId, sanitizePlayerName } from "./vouchers"
 
 function safeRevalidate(path: string) {
   try {
@@ -95,7 +96,7 @@ export async function verifyAndCompleteRazorpayPaymentAction(params: {
   userPhone: string
   userName?: string
   referralCodeUsed?: string
-}): Promise<{ ok: boolean; orderId?: string; creditsAdded?: number; error?: string }> {
+}): Promise<{ ok: boolean; orderId?: string; creditsAdded?: number; vouchers?: string[]; error?: string }> {
   const {
     razorpayOrderId,
     razorpayPaymentId,
@@ -202,6 +203,42 @@ export async function verifyAndCompleteRazorpayPaymentAction(params: {
       [ticketCount, contestId]
     )
 
+    // 3b. Generate 12-digit Turboride Coin Rush game vouchers (1 per ₹1,000 / ticket)
+    const cleanEmail = userEmail?.trim().toLowerCase() || ""
+    const cleanDigits = userPhone?.replace(/\D/g, "").slice(-10) || ""
+    const profRes = await client.query(
+      `SELECT id, user_name FROM referral_profiles 
+       WHERE (LOWER(user_email) = $1 AND $1 != '') OR (user_phone IS NOT NULL AND user_phone LIKE $2) LIMIT 1`,
+      [cleanEmail || "NOMATCH", cleanDigits ? `%${cleanDigits}` : "NOMATCH"]
+    )
+    const profileId = profRes.rows[0]?.id || primaryId
+    const resolvedPlayerName = sanitizePlayerName(profRes.rows[0]?.user_name || userName)
+    const resolvedPlayerId = formatPlayerId(profileId)
+
+    const generatedVouchers: string[] = []
+    for (let i = 0; i < ticketCount; i++) {
+      let inserted = false
+      let attempts = 0
+      while (!inserted && attempts < 15) {
+        attempts++
+        const { code, normalizedCode } = generateSingleVoucherCode()
+        try {
+          await client.query(
+            `INSERT INTO game_vouchers (
+              code, normalized_code, user_id, player_id, player_name,
+              contest_id, order_id, status, created_at
+            ) VALUES ($1, $2, $3, $4, $5, $6, $7, 'active', NOW())`,
+            [code, normalizedCode, profileId, resolvedPlayerId, resolvedPlayerName, contestId, razorpayOrderId]
+          )
+          generatedVouchers.push(code)
+          inserted = true
+        } catch (insertErr: any) {
+          if (insertErr.code === "23505") continue
+          throw insertErr
+        }
+      }
+    }
+
     // 4. Query dynamic platform settings for referral economics and unlock thresholds
     const settingsRes = await client.query(
       `SELECT key, value FROM site_settings 
@@ -263,7 +300,7 @@ export async function verifyAndCompleteRazorpayPaymentAction(params: {
     safeRevalidate("/")
     safeRevalidate("/members")
     safeRevalidate("/members/transactions")
-    return { ok: true, orderId: razorpayOrderId, creditsAdded: creditsIssued }
+    return { ok: true, orderId: razorpayOrderId, creditsAdded: creditsIssued, vouchers: generatedVouchers }
   } catch (err: any) {
     await client.query("ROLLBACK")
     console.error("[verifyAndCompleteRazorpayPaymentAction error]:", err)

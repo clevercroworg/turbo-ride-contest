@@ -93,6 +93,7 @@ export interface ActiveVoucher {
 export interface AdminPlatformSettings {
   ticketPrice: number
   creditsPerTicket: number
+  maxCustomerPurchaseLimit: number
   creditRewardPercent: number
   cashCommissionPercent: number
   cashUnlockThreshold: number

@@ -135,6 +135,7 @@ import type {
   ReferralRecord, 
   ActiveVoucher 
 } from "@/lib/types"
+import type { GameVoucherRecord } from "@/lib/vouchers"
 
 interface MemberDashboardClientProps {
   session: MemberSession
@@ -150,9 +151,11 @@ interface MemberDashboardClientProps {
   referralProfile: ReferralProfile | null
   initialReferrals: ReferralRecord[]
   initialVouchers?: ActiveVoucher[]
+  gameVouchers?: GameVoucherRecord[]
   adminSettings?: {
     ticketPrice: number
     creditsPerTicket: number
+    maxCustomerPurchaseLimit?: number
     creditRewardPercent: number
     cashCommissionPercent: number
     cashUnlockThreshold: number
@@ -188,6 +191,7 @@ export function MemberDashboardClient({
   referralProfile: initialReferralProfile,
   initialReferrals,
   initialVouchers = [],
+  gameVouchers: initialGameVouchers = [],
   adminSettings,
 }: MemberDashboardClientProps) {
   const router = useRouter()
@@ -197,6 +201,8 @@ export function MemberDashboardClient({
   const [ticketStats, setTicketStats] = useState(initialTicketStats)
   const [referralProfile, setReferralProfile] = useState<ReferralProfile | null>(initialReferralProfile)
   const [referrals, setReferrals] = useState<ReferralRecord[]>(initialReferrals)
+  const [gameVouchers, setGameVouchers] = useState<GameVoucherRecord[]>(initialGameVouchers)
+  const [copiedVoucher, setCopiedVoucher] = useState<string | null>(null)
 
   // Ticket Buying State
   const [ticketBuyCount, setTicketBuyCount] = useState<number>(1)
@@ -1103,184 +1109,161 @@ export function MemberDashboardClient({
               </div>
             </div>
 
-            {/* Ticket Allocator: 5-Digit Number Entry & Auto-Pick */}
+            {/* Turboride Coin Rush Game Vouchers Section */}
             <div className="border-t border-zinc-100 pt-5 space-y-4">
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                 <div>
-                  <h4 className="font-display font-bold text-base sm:text-lg text-zinc-950 uppercase">
-                    Allocate Lucky Numbers
-                  </h4>
-                  <p className="text-xs text-zinc-500">
-                    Pick your 5-digit lucky ticket numbers (00000 - 99999) for the {currentContest.carName} draw.
+                  <div className="flex items-center gap-2">
+                    <span className="text-base sm:text-lg">🎮</span>
+                    <h4 className="font-display font-bold text-base sm:text-lg text-zinc-950 uppercase tracking-tight">
+                      Coin Rush Game Vouchers
+                    </h4>
+                  </div>
+                  <p className="text-xs text-zinc-500 mt-0.5">
+                    For every ₹1,000 drive credits deposit, you get 1 race voucher. Play Turboride Coin Rush to score points and rank on the leaderboard!
                   </p>
                 </div>
-                <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-orange-100 border border-orange-200 text-[#ea580c] text-xs font-bold shrink-0 self-start sm:self-auto">
-                  <Zap className="size-3.5" />
-                  <span>{ticketStats.availableToAssign} entries available</span>
+                <div className="flex items-center gap-2 shrink-0">
+                  <a
+                    href="https://teal-macaron-2f4a5c.netlify.app/leaderboard"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-zinc-200 bg-white hover:bg-zinc-50 text-xs font-bold text-zinc-700 transition-colors shadow-2xs"
+                  >
+                    <span>Leaderboard</span>
+                    <ExternalLink className="size-3" />
+                  </a>
+                  <a
+                    href="https://teal-macaron-2f4a5c.netlify.app/"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-[#ea580c] hover:bg-[#c2410c] text-white text-xs font-bold uppercase tracking-wider transition-colors shadow-xs"
+                  >
+                    <Play className="size-3 fill-current" />
+                    <span>Launch Game</span>
+                  </a>
                 </div>
               </div>
 
-              {assignMsg && (
-                <div className={`p-3.5 rounded-xl text-xs sm:text-sm font-semibold flex items-center gap-2 ${
-                  assignMsg.type === "success" 
-                    ? "bg-emerald-50 text-emerald-800 border border-emerald-200" 
-                    : "bg-rose-50 text-rose-800 border border-rose-200"
-                }`}>
-                  {assignMsg.type === "success" ? <CheckCircle2 className="size-4 shrink-0 text-emerald-600" /> : <AlertCircle className="size-4 shrink-0 text-rose-600" />}
-                  <span>{assignMsg.text}</span>
-                </div>
-              )}
+              {/* Vouchers Grid / Empty State */}
+              {gameVouchers && gameVouchers.length > 0 ? (
+                <div className="space-y-3">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
+                    {gameVouchers.map((v) => {
+                      const isActive = v.status === "active"
+                      const isUsed = v.status === "used"
+                      const isCopied = copiedVoucher === v.code
 
-              {/* Conditional Display: Empty States vs Active Form */}
-              {currentContest.status === "coming" ? (
-                <div className="rounded-xl border border-dashed border-zinc-200 bg-zinc-50/70 p-5 text-center space-y-2">
-                  <span className="inline-block px-2.5 py-1 rounded-md text-[11px] font-bold bg-zinc-200 text-zinc-700 uppercase tracking-wider">
-                    Draw Launches Soon
-                  </span>
-                  <p className="text-xs text-zinc-600">
-                    Lucky number allocation for the {currentContest.carName} will open once official ticket sales go live.
-                  </p>
-                </div>
-              ) : currentContest.status === "closed" ? (
-                <div className="rounded-xl border border-zinc-200 bg-zinc-100/70 p-5 text-center space-y-2">
-                  <span className="inline-block px-2.5 py-1 rounded-md text-[11px] font-bold bg-zinc-800 text-zinc-200 uppercase tracking-wider">
-                    Contest Concluded
-                  </span>
-                  <p className="text-xs text-zinc-600">
-                    This contest draw has concluded and lucky ticket entries are permanently locked.
-                  </p>
-                </div>
-              ) : ticketStats.availableToAssign <= 0 ? (
-                ticketStats.totalBought === 0 ? (
-                  <div className="rounded-xl border border-dashed border-orange-200 bg-orange-50/40 p-5 sm:p-6 text-center space-y-3">
-                    <div className="size-10 mx-auto rounded-xl bg-orange-100 border border-orange-200 flex items-center justify-center text-[#ea580c]">
-                      <Ticket className="size-5" />
-                    </div>
-                    <div className="space-y-1 max-w-sm mx-auto">
-                      <h5 className="font-display font-bold text-sm text-zinc-950 uppercase">
-                        No Entries to Allocate Yet
-                      </h5>
-                      <p className="text-xs text-zinc-600">
-                        Purchase tickets above to pick your custom 5-digit lucky numbers (00000 - 99999) or use 1-click Auto-Pick.
-                      </p>
-                    </div>
-                    <button
-                      type="button"
-                      onClick={() => {
-                        const el = document.getElementById("ticket-selector")
-                        if (el) el.scrollIntoView({ behavior: "smooth" })
-                      }}
-                      className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-[#ea580c] hover:bg-[#c2410c] text-white text-xs font-bold uppercase tracking-wider transition-all cursor-pointer shadow-xs"
-                    >
-                      <Ticket className="size-3.5" />
-                      <span>Select Tickets Above (₹{unitPrice.toLocaleString("en-IN")})</span>
-                    </button>
+                      return (
+                        <div
+                          key={v.id}
+                          className={`p-3.5 rounded-xl border transition-all ${
+                            isActive
+                              ? "bg-amber-50/40 border-amber-200 hover:border-amber-300 shadow-2xs"
+                              : "bg-zinc-50/80 border-zinc-200 opacity-80"
+                          }`}
+                        >
+                          <div className="flex items-center justify-between gap-1 mb-2">
+                            <span
+                              className={`text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-md ${
+                                isActive
+                                  ? "bg-emerald-100 text-emerald-800"
+                                  : isUsed
+                                  ? "bg-zinc-200 text-zinc-700"
+                                  : "bg-rose-100 text-rose-800"
+                              }`}
+                            >
+                              {isActive ? "Ready to Race" : isUsed ? "Race Completed" : v.status}
+                            </span>
+                            {v.usedAt && (
+                              <span className="text-[10px] text-zinc-400 font-mono">
+                                {new Date(v.usedAt).toLocaleDateString("en-IN", { month: "short", day: "numeric" })}
+                              </span>
+                            )}
+                          </div>
+
+                          <div className="flex items-center justify-between bg-white border border-zinc-200 rounded-lg px-2.5 py-1.5 mb-2.5">
+                            <span className="font-mono text-xs sm:text-sm font-black tracking-wider text-zinc-950">
+                              {v.code}
+                            </span>
+                            <button
+                              type="button"
+                              onClick={() => {
+                                navigator.clipboard.writeText(v.code)
+                                setCopiedVoucher(v.code)
+                                setTimeout(() => setCopiedVoucher(null), 2000)
+                              }}
+                              className="text-[11px] font-bold text-zinc-600 hover:text-zinc-950 px-2 py-0.5 rounded bg-zinc-100 hover:bg-zinc-200 transition-colors cursor-pointer"
+                              title="Copy code"
+                            >
+                              {isCopied ? "✓ Copied" : "Copy"}
+                            </button>
+                          </div>
+
+                          {isActive ? (
+                            <a
+                              href="https://teal-macaron-2f4a5c.netlify.app/"
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="w-full py-1.5 rounded-lg bg-zinc-950 hover:bg-zinc-800 text-white font-bold text-[11px] uppercase tracking-wider flex items-center justify-center gap-1.5 transition-colors cursor-pointer"
+                            >
+                              <span>Play Race</span>
+                              <ExternalLink className="size-3" />
+                            </a>
+                          ) : (
+                            <div className="text-[11px] text-zinc-400 font-medium text-center py-1">
+                              Points added to leaderboard
+                            </div>
+                          )}
+                        </div>
+                      )
+                    })}
                   </div>
-                ) : (
-                  <div className="rounded-xl border border-emerald-200 bg-emerald-50/40 p-4 sm:p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-                    <div className="flex items-center gap-3">
-                      <div className="size-9 rounded-xl bg-emerald-100 border border-emerald-200 flex items-center justify-center text-emerald-700 shrink-0">
-                        <CheckCircle2 className="size-5" />
-                      </div>
-                      <div>
-                        <h5 className="font-display font-bold text-xs sm:text-sm text-emerald-950 uppercase">
-                          {ticketStats.totalAssigned === 1 
-                            ? "1 Lucky Number Allocated! 🎉" 
-                            : `All ${ticketStats.totalAssigned} Lucky Numbers Allocated! 🎉`}
-                        </h5>
-                        <p className="text-xs text-emerald-700">
-                          Every ticket entry you own is officially registered in the {currentContest.carName} draw.
-                        </p>
-                      </div>
-                    </div>
-                    <button
-                      type="button"
-                      onClick={() => {
-                        const el = document.getElementById("ticket-selector")
-                        if (el) el.scrollIntoView({ behavior: "smooth" })
-                      }}
-                      className="inline-flex items-center justify-center gap-1.5 px-4 py-2 rounded-xl bg-zinc-950 hover:bg-zinc-800 text-white text-xs font-bold uppercase tracking-wider cursor-pointer shadow-xs shrink-0 self-start sm:self-auto"
-                    >
-                      <Ticket className="size-3.5" />
-                      <span>Buy More Tickets</span>
-                    </button>
-                  </div>
-                )
+                </div>
               ) : (
-                /* Active Lucky Number Input & Auto-Pick */
-                <>
-                  <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5">
-                    <div className="relative flex-1">
-                      <input
-                        type="text"
-                        maxLength={5}
-                        placeholder="Enter 5-digit number e.g. 74829"
-                        value={customNumber}
-                        onChange={(e) => setCustomNumber(e.target.value.replace(/\D/g, "").slice(0, 5))}
-                        className="w-full h-11 px-3.5 rounded-xl border border-zinc-200 bg-white font-mono text-sm tracking-wider text-zinc-900 focus:outline-none focus:ring-2 focus:ring-orange-500 shadow-2xs"
-                      />
-                      {customNumber.length === 5 && (
-                        <span className="absolute right-3 top-3 text-emerald-600">
-                          <Check className="size-4" />
-                        </span>
-                      )}
-                    </div>
-
-                    <button
-                      type="button"
-                      disabled={assigning || customNumber.length !== 5 || ticketStats.availableToAssign <= 0}
-                      onClick={handleAssignManualNumber}
-                      className="h-11 px-6 rounded-xl bg-zinc-950 hover:bg-zinc-800 text-white text-xs font-bold uppercase tracking-wider transition-all disabled:opacity-40 cursor-pointer shadow-xs shrink-0 flex items-center justify-center gap-1.5"
-                    >
-                      {assigning ? "Registering..." : "Confirm Number"}
-                    </button>
+                <div className="rounded-xl border border-dashed border-amber-200 bg-amber-50/40 p-5 sm:p-6 text-center space-y-3">
+                  <div className="size-10 mx-auto rounded-xl bg-amber-100 border border-amber-200 flex items-center justify-center text-[#ea580c]">
+                    <Ticket className="size-5" />
                   </div>
-
-                  {/* Auto-Pick Helper Buttons */}
-                  <div className="flex flex-wrap items-center gap-2 pt-1">
-                    <button
-                      type="button"
-                      disabled={assigning || ticketStats.availableToAssign <= 0}
-                      onClick={handleAutoPickOne}
-                      className="h-10 px-4 rounded-xl border border-zinc-200 bg-white hover:bg-zinc-50 text-xs font-semibold text-zinc-800 transition-colors disabled:opacity-40 cursor-pointer shadow-2xs flex items-center gap-1.5"
-                    >
-                      <Sparkles className="size-3.5 text-[#ea580c]" />
-                      <span>Auto-pick 1 number</span>
-                    </button>
-
-                    {ticketStats.availableToAssign > 1 && (
-                      <button
-                        type="button"
-                        disabled={assigning}
-                        onClick={handleAutoPickAll}
-                        className="h-10 px-4 rounded-xl border border-orange-200 bg-orange-50/70 hover:bg-orange-100 text-xs font-bold text-orange-950 transition-colors disabled:opacity-40 cursor-pointer shadow-2xs flex items-center gap-1.5"
-                      >
-                        <Zap className="size-3.5 text-[#ea580c]" />
-                        <span>Auto-pick ALL ({ticketStats.availableToAssign}) numbers</span>
-                      </button>
-                    )}
+                  <div className="space-y-1 max-w-sm mx-auto">
+                    <h5 className="font-display font-bold text-sm text-zinc-950 uppercase">
+                      No Coin Rush Vouchers Yet
+                    </h5>
+                    <p className="text-xs text-zinc-600">
+                      Deposit ₹1,000 above to get ₹1,000 permanent Drive Credits + 1 free Coin Rush race voucher!
+                    </p>
                   </div>
-                </>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const el = document.getElementById("ticket-selector")
+                      if (el) el.scrollIntoView({ behavior: "smooth" })
+                    }}
+                    className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-[#ea580c] hover:bg-[#c2410c] text-white text-xs font-bold uppercase tracking-wider transition-all cursor-pointer shadow-xs"
+                  >
+                    <Ticket className="size-3.5" />
+                    <span>Get Vouchers Above (₹{unitPrice.toLocaleString("en-IN")})</span>
+                  </button>
+                </div>
               )}
 
-              {/* Assigned Tickets List */}
+              {/* Legacy 5-digit Lucky Tickets summary (if member had historical lucky numbers) */}
               {ticketStats.tickets.length > 0 && (
-                <div className="pt-3 border-t border-zinc-100 space-y-2">
-                  <span className="text-xs font-semibold text-zinc-500 uppercase tracking-wider">
-                    Your Assigned Lucky Tickets ({ticketStats.tickets.length})
-                  </span>
-                  <div className="flex flex-wrap gap-2 max-h-36 overflow-y-auto p-1">
+                <details className="pt-2 text-xs text-zinc-500">
+                  <summary className="cursor-pointer font-bold hover:text-zinc-800 transition-colors">
+                    Historical Lucky Numbers Archive ({ticketStats.tickets.length})
+                  </summary>
+                  <div className="flex flex-wrap gap-1.5 mt-2 max-h-28 overflow-y-auto">
                     {ticketStats.tickets.map((t) => (
-                      <div
+                      <span
                         key={t.id}
-                        className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-zinc-200 bg-white text-xs font-mono font-bold text-zinc-900 shadow-2xs"
+                        className="inline-flex items-center px-2 py-1 rounded bg-zinc-100 text-zinc-700 font-mono text-[11px] font-bold"
                       >
-                        <Ticket className="size-3 text-[#ea580c]" />
-                        <span>#{t.ticketNumber}</span>
-                      </div>
+                        #{t.ticketNumber}
+                      </span>
                     ))}
                   </div>
-                </div>
+                </details>
               )}
             </div>
           </section>

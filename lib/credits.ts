@@ -4,6 +4,7 @@ import { pool } from "./db"
 import { revalidatePath } from "next/cache"
 import { loginOrSignupMember } from "./auth"
 import { cookies } from "next/headers"
+import { generateSingleVoucherCode, formatPlayerId, sanitizePlayerName } from "./vouchers"
 
 function safeRevalidate(path: string) {
   try {
@@ -55,7 +56,7 @@ export async function buyContestTicketsAction(params: {
   userName?: string
   referralCodeUsed?: string
   autoAssign?: boolean
-}): Promise<{ ok: boolean; orderId?: string; creditsAdded?: number; error?: string }> {
+}): Promise<{ ok: boolean; orderId?: string; creditsAdded?: number; vouchers?: string[]; error?: string }> {
   const { contestId, ticketCount, userEmail, userPhone, userName, referralCodeUsed, autoAssign = false } = params
   if (!ticketCount || ticketCount < 1) {
     return { ok: false, error: "Please select at least 1 ticket." }
@@ -90,6 +91,37 @@ export async function buyContestTicketsAction(params: {
     const creditsIssued = ticketCount * creditsPerTicket
     const primaryId = userEmail ? userEmail.trim().toLowerCase() : userPhone.trim()
 
+    // 0. Query platform settings for max customer limit & referral percentages
+    const settingsRes = await client.query(
+      `SELECT key, value FROM site_settings 
+       WHERE key IN ('contest_max_customer_limit', 'contest_referral_drive_pct', 'contest_referral_cash_pct', 'contest_cash_unlock_threshold')`
+    )
+    const sMap = new Map(settingsRes.rows.map((r: { key: string; value: string }) => [r.key, r.value]))
+    const maxCustomerLimit = Number(sMap.get("contest_max_customer_limit")) || 100000
+
+    // Enforce Max Customer Lifetime Purchase Limit (default: ₹1,00,000 / 1 Lakh)
+    const cleanEmail = userEmail?.trim().toLowerCase() || ""
+    const cleanDigits = userPhone?.replace(/\D/g, "").slice(-10) || ""
+    const priorOrdersRes = await client.query(
+      `SELECT COALESCE(SUM(amount_paid), 0) as total_spent
+       FROM contest_orders
+       WHERE status = 'completed'
+         AND (
+           (user_email IS NOT NULL AND LOWER(user_email) = $1 AND $1 != '')
+           OR (user_phone IS NOT NULL AND user_phone LIKE $2 AND $2 != '')
+         )`,
+      [cleanEmail || "NOMATCH", cleanDigits ? `%${cleanDigits}` : "NOMATCH"]
+    )
+    const priorSpent = Number(priorOrdersRes.rows[0]?.total_spent) || 0
+    if (priorSpent + cost > maxCustomerLimit) {
+      const remainingAllowed = Math.max(0, maxCustomerLimit - priorSpent)
+      await client.query("ROLLBACK")
+      return {
+        ok: false,
+        error: `Purchase limit exceeded. Each member can purchase a maximum of ₹${maxCustomerLimit.toLocaleString("en-IN")} worth of drive credits. Your current remaining headroom is ₹${remainingAllowed.toLocaleString("en-IN")}.`,
+      }
+    }
+
     // 1. Record Order in contest_orders
     await client.query(
       `INSERT INTO contest_orders (id, user_phone, user_email, user_name, contest_id, ticket_count, amount_paid, credits_issued, referral_code_used, status, created_at)
@@ -113,7 +145,41 @@ export async function buyContestTicketsAction(params: {
       [ticketCount, contestId]
     )
 
-    // 4. Auto-generate tickets ONLY if autoAssign is true (e.g. from public guest checkout)
+    // 4. Generate 12-digit Turboride Coin Rush game vouchers (1 per ₹1,000 / ticket)
+    const profRes = await client.query(
+      `SELECT id, user_name FROM referral_profiles 
+       WHERE (LOWER(user_email) = $1 AND $1 != '') OR (user_phone IS NOT NULL AND user_phone LIKE $2) LIMIT 1`,
+      [cleanEmail || "NOMATCH", cleanDigits ? `%${cleanDigits}` : "NOMATCH"]
+    )
+    const profileId = profRes.rows[0]?.id || primaryId
+    const resolvedPlayerName = sanitizePlayerName(profRes.rows[0]?.user_name || userName)
+    const resolvedPlayerId = formatPlayerId(profileId)
+
+    const generatedVouchers: string[] = []
+    for (let i = 0; i < ticketCount; i++) {
+      let inserted = false
+      let attempts = 0
+      while (!inserted && attempts < 15) {
+        attempts++
+        const { code, normalizedCode } = generateSingleVoucherCode()
+        try {
+          await client.query(
+            `INSERT INTO game_vouchers (
+              code, normalized_code, user_id, player_id, player_name,
+              contest_id, order_id, status, created_at
+            ) VALUES ($1, $2, $3, $4, $5, $6, $7, 'active', NOW())`,
+            [code, normalizedCode, profileId, resolvedPlayerId, resolvedPlayerName, contestId, orderId]
+          )
+          generatedVouchers.push(code)
+          inserted = true
+        } catch (insertErr: any) {
+          if (insertErr.code === "23505") continue
+          throw insertErr
+        }
+      }
+    }
+
+    // 5. Backwards-compatibility: Auto-assign lucky ticket entry in contest_tickets
     if (autoAssign) {
       for (let i = 0; i < ticketCount; i++) {
         let assigned = false
@@ -138,17 +204,12 @@ export async function buyContestTicketsAction(params: {
       }
     }
 
-    // 5. Query dynamic platform settings for referral economics and unlock thresholds
-    const settingsRes = await client.query(
-      `SELECT key, value FROM site_settings 
-       WHERE key IN ('contest_referral_drive_pct', 'contest_referral_cash_pct', 'contest_cash_unlock_threshold')`
-    )
-    const sMap = new Map(settingsRes.rows.map((r: { key: string; value: string }) => [r.key, r.value]))
+    // 6. Referral economics and unlock thresholds
     const driveRewardPct = (Number(sMap.get("contest_referral_drive_pct")) || 25) / 100
     const cashCommissionPct = (Number(sMap.get("contest_referral_cash_pct")) || 25) / 100
     const cashUnlockThreshold = Number(sMap.get("contest_cash_unlock_threshold")) || 20
 
-    // 6. Update Buyer's Referral Profile
+    // 7. Update Buyer's Referral Profile
     await client.query(
       `UPDATE referral_profiles
        SET tickets_bought = tickets_bought + $1,
@@ -158,7 +219,7 @@ export async function buyContestTicketsAction(params: {
       [ticketCount, cashUnlockThreshold, userEmail.toLowerCase(), userPhone || "NONE"]
     )
 
-    // 7. Handle Referral Commission if referral code used
+    // 8. Handle Referral Commission if referral code used
     if (codeToUse) {
       const code = codeToUse
       const refQuery = await client.query(
@@ -201,7 +262,7 @@ export async function buyContestTicketsAction(params: {
 
     safeRevalidate("/")
     safeRevalidate("/members")
-    return { ok: true, orderId, creditsAdded: creditsIssued }
+    return { ok: true, orderId, creditsAdded: creditsIssued, vouchers: generatedVouchers }
   } catch (err) {
     await client.query("ROLLBACK")
     console.error("[buyContestTicketsAction error]:", err)

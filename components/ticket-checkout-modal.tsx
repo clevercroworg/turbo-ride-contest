@@ -33,7 +33,8 @@ export function TicketCheckoutModal({
   const [referralCode, setReferralCode] = useState<string>("")
   const [loading, setLoading] = useState<boolean>(false)
   const [error, setError] = useState<string | null>(null)
-  const [successOrder, setSuccessOrder] = useState<{ orderId: string; credits: number } | null>(null)
+  const [successOrder, setSuccessOrder] = useState<{ orderId: string; credits: number; vouchers?: string[] } | null>(null)
+  const [copiedCode, setCopiedCode] = useState<string | null>(null)
 
   useEffect(() => {
     if (typeof window !== "undefined" && isOpen) {
@@ -50,6 +51,12 @@ export function TicketCheckoutModal({
   }, [isOpen])
 
   if (!isOpen) return null
+
+  const copyVoucher = (code: string) => {
+    navigator.clipboard.writeText(code)
+    setCopiedCode(code)
+    setTimeout(() => setCopiedCode(null), 2500)
+  }
 
   const handleCheckout = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -76,6 +83,7 @@ export function TicketCheckoutModal({
       setSuccessOrder({
         orderId: res.orderId || "COMPLETED",
         credits: res.creditsAdded || ticketCount * ticketPrice,
+        vouchers: res.vouchers || [],
       })
 
       // Confetti burst
@@ -123,7 +131,7 @@ export function TicketCheckoutModal({
               Your order <span className="text-zinc-950 font-bold">{successOrder.orderId}</span> is confirmed. <span className="text-emerald-600 font-bold">+{successOrder.credits.toLocaleString("en-IN")} Drive Credits</span> have been added to your wallet.
             </p>
 
-            <div className="w-full p-4 rounded-2xl bg-zinc-50 border border-zinc-200 mb-6 text-left text-xs">
+            <div className="w-full p-4 rounded-2xl bg-zinc-50 border border-zinc-200 mb-5 text-left text-xs">
               <div className="flex justify-between py-1 text-zinc-500 font-medium">
                 <span>Tickets Allocated:</span>
                 <span className="text-zinc-950 font-bold">{ticketCount} Tickets</span>
@@ -137,6 +145,56 @@ export function TicketCheckoutModal({
                 <span className="text-emerald-600 font-bold">+{successOrder.credits.toLocaleString("en-IN")} Credits</span>
               </div>
             </div>
+
+            {/* Coin Rush Game Vouchers Section */}
+            {successOrder.vouchers && successOrder.vouchers.length > 0 && (
+              <div className="w-full p-4 rounded-2xl bg-amber-50 border border-amber-200/80 mb-6 text-left">
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-[11px] font-black uppercase tracking-wider text-amber-800">
+                    🎮 Your Coin Rush Vouchers ({successOrder.vouchers.length})
+                  </span>
+                  <a
+                    href="https://teal-macaron-2f4a5c.netlify.app/leaderboard"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-[11px] text-[#ea580c] font-bold hover:underline"
+                  >
+                    Leaderboard ↗
+                  </a>
+                </div>
+                <p className="text-[11px] text-zinc-600 mb-3 leading-relaxed">
+                  Enter each code in Turboride Coin Rush to race, score points, and climb the leaderboard!
+                </p>
+                <div className="flex flex-col gap-2 max-h-40 overflow-y-auto pr-1">
+                  {successOrder.vouchers.map((code) => (
+                    <div
+                      key={code}
+                      className="flex items-center justify-between bg-white border border-amber-200/60 rounded-xl px-3.5 py-2 text-xs font-mono font-bold text-zinc-900 shadow-2xs"
+                    >
+                      <span className="tracking-wider">{code}</span>
+                      <button
+                        type="button"
+                        onClick={() => copyVoucher(code)}
+                        className="text-[11px] font-sans font-bold px-2.5 py-1 rounded-md bg-zinc-100 hover:bg-zinc-200 text-zinc-700 transition-colors cursor-pointer"
+                      >
+                        {copiedCode === code ? "✓ Copied" : "Copy"}
+                      </button>
+                    </div>
+                  ))}
+                </div>
+                <div className="mt-3 pt-3 border-t border-amber-200">
+                  <a
+                    href="https://teal-macaron-2f4a5c.netlify.app/"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="w-full py-2.5 rounded-xl bg-[#ea580c] hover:bg-[#c2410c] text-white font-black text-xs uppercase tracking-wider flex items-center justify-center gap-1.5 transition-colors shadow-xs"
+                  >
+                    <span>Play Turboride Coin Rush Now</span>
+                    <ArrowRight size={14} weight="bold" />
+                  </a>
+                </div>
+              </div>
+            )}
 
             <div className="flex flex-col sm:flex-row gap-3 w-full">
               <a
