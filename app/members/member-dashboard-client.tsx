@@ -666,7 +666,7 @@ export function MemberDashboardClient({
                   </div>
                   <h3 className="mt-2.5 font-display text-base sm:text-lg font-bold text-zinc-900">Enter a contest</h3>
                   <p className="mt-1 text-xs sm:text-sm leading-relaxed text-zinc-600">
-                    Choose a car, pick your 5-digit lucky number to enter its draw. Add more entries for more chances.
+                    Choose a car, get your game voucher code, and race on Coin Rush to enter the contest. Add more entries for more chances.
                   </p>
                 </div>
                 <span className="absolute -bottom-3 left-1/2 z-10 flex size-6 -translate-x-1/2 items-center justify-center rounded-full border border-zinc-200 bg-white text-zinc-400 md:-right-3 md:bottom-auto md:left-auto md:top-1/2 md:translate-x-1/2 md:-translate-y-1/2 shadow-xs">
@@ -1125,7 +1125,7 @@ export function MemberDashboardClient({
                 </div>
                 <div className="flex items-center gap-2 shrink-0">
                   <a
-                    href="https://teal-macaron-2f4a5c.netlify.app/leaderboard"
+                    href="https://game.turboridesupercars.com/leaderboard.html"
                     target="_blank"
                     rel="noopener noreferrer"
                     className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-zinc-200 bg-white hover:bg-zinc-50 text-xs font-bold text-zinc-700 transition-colors shadow-2xs"
@@ -1134,7 +1134,7 @@ export function MemberDashboardClient({
                     <ExternalLink className="size-3" />
                   </a>
                   <a
-                    href="https://teal-macaron-2f4a5c.netlify.app/"
+                    href="https://game.turboridesupercars.com/"
                     target="_blank"
                     rel="noopener noreferrer"
                     className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-[#ea580c] hover:bg-[#c2410c] text-white text-xs font-bold uppercase tracking-wider transition-colors shadow-xs"
@@ -1202,7 +1202,7 @@ export function MemberDashboardClient({
 
                           {isActive ? (
                             <a
-                              href="https://teal-macaron-2f4a5c.netlify.app/"
+                              href="https://game.turboridesupercars.com/"
                               target="_blank"
                               rel="noopener noreferrer"
                               className="w-full py-1.5 rounded-lg bg-zinc-950 hover:bg-zinc-800 text-white font-bold text-[11px] uppercase tracking-wider flex items-center justify-center gap-1.5 transition-colors cursor-pointer"
@@ -1247,24 +1247,7 @@ export function MemberDashboardClient({
                 </div>
               )}
 
-              {/* Legacy 5-digit Lucky Tickets summary (if member had historical lucky numbers) */}
-              {ticketStats.tickets.length > 0 && (
-                <details className="pt-2 text-xs text-zinc-500">
-                  <summary className="cursor-pointer font-bold hover:text-zinc-800 transition-colors">
-                    Historical Lucky Numbers Archive ({ticketStats.tickets.length})
-                  </summary>
-                  <div className="flex flex-wrap gap-1.5 mt-2 max-h-28 overflow-y-auto">
-                    {ticketStats.tickets.map((t) => (
-                      <span
-                        key={t.id}
-                        className="inline-flex items-center px-2 py-1 rounded bg-zinc-100 text-zinc-700 font-mono text-[11px] font-bold"
-                      >
-                        #{t.ticketNumber}
-                      </span>
-                    ))}
-                  </div>
-                </details>
-              )}
+
             </div>
           </section>
 

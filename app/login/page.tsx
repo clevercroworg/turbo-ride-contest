@@ -31,7 +31,7 @@ function LoginContent() {
         return
       }
 
-      setSuccess("Garage access granted! Loading your lucky tickets & wallet...")
+      setSuccess("Garage access granted! Loading your game vouchers & wallet...")
       setTimeout(() => {
         router.push(redirectTarget)
         router.refresh()
@@ -82,7 +82,7 @@ function LoginContent() {
                 Access Member Garage
               </h1>
               <p className="text-xs sm:text-sm text-zinc-500 mt-2 max-w-xs mx-auto leading-relaxed">
-                Enter your registered mobile number or email to view your allocated lucky tickets, live drive credits, and member rewards.
+                Enter your registered mobile number or email to view your game vouchers, live drive credits, and member rewards.
               </p>
             </div>
 

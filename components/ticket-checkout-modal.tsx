@@ -154,7 +154,7 @@ export function TicketCheckoutModal({
                     🎮 Your Coin Rush Vouchers ({successOrder.vouchers.length})
                   </span>
                   <a
-                    href="https://teal-macaron-2f4a5c.netlify.app/leaderboard"
+                    href="https://game.turboridesupercars.com/leaderboard.html"
                     target="_blank"
                     rel="noopener noreferrer"
                     className="text-[11px] text-[#ea580c] font-bold hover:underline"
@@ -184,7 +184,7 @@ export function TicketCheckoutModal({
                 </div>
                 <div className="mt-3 pt-3 border-t border-amber-200">
                   <a
-                    href="https://teal-macaron-2f4a5c.netlify.app/"
+                    href="https://game.turboridesupercars.com/"
                     target="_blank"
                     rel="noopener noreferrer"
                     className="w-full py-2.5 rounded-xl bg-[#ea580c] hover:bg-[#c2410c] text-white font-black text-xs uppercase tracking-wider flex items-center justify-center gap-1.5 transition-colors shadow-xs"

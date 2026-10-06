@@ -43,7 +43,8 @@ export function checkGameAuthAndRateLimit(req: NextRequest): {
     }
   }
 
-  // Rate Limiting: 60 requests per minute
+  // Rate Limiting: 600 requests per minute (allows high-concurrency game server traffic)
+  const RATE_LIMIT_PER_MINUTE = Number(process.env.GAME_API_RATE_LIMIT) || 600
   const now = Date.now()
   const clientIp = req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() || req.headers.get("x-real-ip") || "global"
   const bucketKey = `${token}_${clientIp}`
@@ -56,13 +57,13 @@ export function checkGameAuthAndRateLimit(req: NextRequest): {
     bucket.count++
   }
 
-  if (bucket.count > 60) {
+  if (bucket.count > RATE_LIMIT_PER_MINUTE) {
     const retryAfter = Math.max(1, Math.ceil((bucket.resetAt - now) / 1000))
     return {
       authorized: true,
       rateLimited: true,
       errorResponse: NextResponse.json(
-        { ok: false, error: "Too many requests. Rate limit is 60 requests per minute." },
+        { ok: false, error: `Too many requests. Rate limit is ${RATE_LIMIT_PER_MINUTE} requests per minute.` },
         {
           status: 429,
           headers: {

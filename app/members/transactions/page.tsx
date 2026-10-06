@@ -78,7 +78,7 @@ export default async function TransactionsPage() {
         category: "entries",
         title: "Contest entry",
         status: "CONFIRMED",
-        description: `Porsche 911 GT3 RS · Lucky number ${t.ticket_number}`,
+        description: `Porsche 718 Cayman · Entry #${t.ticket_number}`,
         createdAt: new Date(t.created_at).toISOString(),
         displayAmount: "+1 ticket",
         isPositive: true,
