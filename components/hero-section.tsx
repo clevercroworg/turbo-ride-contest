@@ -124,11 +124,11 @@ export function HeroSection({
             </p>
 
             {/* Clean Action Row - High-Contrast Jet Black Primary CTA on Orange Canvas */}
-            <div className="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-2.5 sm:gap-3 mb-4 sm:mb-5 w-full sm:w-auto">
+            <div className="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-2.5 sm:gap-3 mb-4 sm:mb-5 w-full sm:w-auto lg:w-full xl:max-w-xl">
               <button
                 type="button"
                 onClick={onAllocationClick || handleScrollToAllocation}
-                className="w-full sm:w-auto h-[48px] sm:h-[52px] px-6 sm:px-7 md:px-8 lg:px-5 xl:px-8 rounded-none bg-zinc-950 hover:bg-black text-white text-sm sm:text-base font-black uppercase tracking-wider transition-all shadow-[0_4px_18px_rgba(0,0,0,0.35)] hover:shadow-[0_6px_24px_rgba(0,0,0,0.5)] active:scale-[0.99] flex items-center justify-center gap-2.5 cursor-pointer border border-zinc-900"
+                className="w-full sm:w-auto h-[48px] sm:h-[52px] px-6 sm:px-7 md:px-8 lg:px-4 rounded-none bg-zinc-950 hover:bg-black text-white text-sm sm:text-base lg:text-sm font-black uppercase tracking-wider lg:tracking-wide transition-all shadow-[0_4px_18px_rgba(0,0,0,0.35)] hover:shadow-[0_6px_24px_rgba(0,0,0,0.5)] active:scale-[0.99] flex items-center justify-center gap-2.5 cursor-pointer border border-zinc-900"
               >
                 <Ticket size={20} weight="fill" className="shrink-0 text-white" />
                 <span className="whitespace-nowrap">
@@ -139,7 +139,7 @@ export function HeroSection({
 
               <a
                 href="#how-it-works"
-                className="hidden sm:inline-flex h-[48px] sm:h-[52px] px-5 sm:px-6 md:px-7 lg:px-5 xl:px-6 rounded-none bg-white hover:bg-zinc-100 text-zinc-950 border border-white text-sm sm:text-base font-black uppercase tracking-wider transition-all shadow-md items-center justify-center text-center cursor-pointer whitespace-nowrap"
+                className="hidden sm:inline-flex lg:flex-1 h-[48px] sm:h-[52px] px-5 sm:px-6 md:px-7 lg:px-4 rounded-none bg-white hover:bg-zinc-100 text-zinc-950 border border-white text-sm sm:text-base lg:text-sm font-black uppercase tracking-wider lg:tracking-wide transition-all shadow-md items-center justify-center text-center cursor-pointer whitespace-nowrap"
               >
                 How It Works
               </a>
