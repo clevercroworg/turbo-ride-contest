@@ -1,5 +1,6 @@
 "use server"
 
+import { requireAdmin } from "./admin-guard"
 import { pool } from "./db"
 import { revalidatePath } from "next/cache"
 import type { AdminPlatformSettings } from "./types"
@@ -142,6 +143,7 @@ function formatRelativeTime(dateInput: string | Date | null | undefined): string
 }
 
 export async function getAdminOverviewData() {
+  await requireAdmin()
   try {
     const [
       ordersRes,
@@ -266,6 +268,7 @@ export async function getAdminOverviewData() {
 
 // CONTEST MANAGEMENT ACTIONS
 export async function getAdminContests(): Promise<AdminContest[]> {
+  await requireAdmin()
   try {
     const res = await pool.query(`SELECT * FROM contests ORDER BY created_at ASC`)
     return res.rows.map((r) => ({
@@ -300,6 +303,7 @@ export async function updateContestAction(
   contestId: string,
   data: Partial<AdminContest>
 ): Promise<{ ok: boolean; error?: string }> {
+  await requireAdmin()
   try {
     const fields: string[] = []
     const values: any[] = []
@@ -392,6 +396,7 @@ export async function updateContestAction(
 }
 
 export async function setActiveContestAction(contestId: string): Promise<{ ok: boolean; error?: string }> {
+  await requireAdmin()
   const client = await pool.connect()
   try {
     await client.query("BEGIN")
@@ -434,6 +439,7 @@ export async function createContestAction(data: {
   youtubeUrl?: string
   status: string
 }): Promise<{ ok: boolean; error?: string }> {
+  await requireAdmin()
   try {
     await pool.query(
       `INSERT INTO contests (id, car_name, title, subtitle, worth_display, ticket_price, credits_per_ticket, target_tickets, sold_tickets, image_url, gallery_images, youtube_url, status, created_at, updated_at)
@@ -475,6 +481,7 @@ export async function createContestAction(data: {
 
 // MEMBERS MANAGEMENT ACTIONS
 export async function getAdminMembers(): Promise<AdminMember[]> {
+  await requireAdmin()
   try {
     const res = await pool.query(
       `SELECT 
@@ -509,6 +516,7 @@ export async function updateMemberStatusAction(
   memberId: string,
   newStatus: "active" | "kyc_pending" | "flagged"
 ): Promise<{ ok: boolean; error?: string }> {
+  await requireAdmin()
   try {
     await pool.query(
       `UPDATE referral_profiles SET status = $1, updated_at = NOW() WHERE id = $2 OR user_email = $2`,
@@ -524,6 +532,7 @@ export async function updateMemberStatusAction(
 
 // ORDERS MANAGEMENT ACTIONS
 export async function getAdminOrders(): Promise<AdminOrder[]> {
+  await requireAdmin()
   try {
     const res = await pool.query(
       `SELECT id, user_name as "userName", user_email as "userEmail", user_phone as "userPhone",
@@ -557,6 +566,7 @@ export async function updateOrderStatusAction(
   orderId: string,
   status: "completed" | "pending" | "refunded"
 ): Promise<{ ok: boolean; error?: string }> {
+  await requireAdmin()
   try {
     await pool.query(
       `UPDATE contest_orders SET status = $1 WHERE id = $2`,
@@ -578,6 +588,7 @@ export async function getAdminPayouts(): Promise<{
   payoutHistory: AdminPayout[]
   stats: { dueNow: number; paidToDate: number; onHold: number }
 }> {
+  await requireAdmin()
   try {
     const res = await pool.query(
       `SELECT id, payout_code as "payoutCode", user_name as "userName", user_email as "userEmail",
@@ -629,6 +640,7 @@ export async function processPayoutAction(
   payoutId: string,
   newStatus: "paid" | "hold" | "due"
 ): Promise<{ ok: boolean; error?: string }> {
+  await requireAdmin()
   try {
     const paidAtSql = newStatus === "paid" ? "NOW()" : "NULL"
     await pool.query(
@@ -647,6 +659,7 @@ export async function processPayoutAction(
 
 // REDEMPTIONS ACTIONS
 export async function getAdminRedemptions(): Promise<AdminRedemption[]> {
+  await requireAdmin()
   try {
     const res = await pool.query(
       `SELECT id, ref_code as "refCode", user_name as "userName", user_email as "userEmail",
@@ -679,6 +692,7 @@ export async function updateRedemptionStatusAction(
   status: "Requested" | "Scheduled" | "Fulfilled",
   slot?: string
 ): Promise<{ ok: boolean; error?: string }> {
+  await requireAdmin()
   try {
     if (slot) {
       await pool.query(
@@ -701,6 +715,7 @@ export async function updateRedemptionStatusAction(
 }
 
 export async function getAdminTickets(contestId?: string): Promise<AdminTicket[]> {
+  await requireAdmin()
   try {
     const where = contestId && contestId !== "all" ? "WHERE ct.contest_id = $1" : ""
     const params = contestId && contestId !== "all" ? [contestId] : []
@@ -784,6 +799,7 @@ export async function getAdminSettingsAction(): Promise<AdminPlatformSettings> {
 }
 
 export async function saveAdminSettingsAction(settings: AdminPlatformSettings): Promise<{ ok: boolean; error?: string }> {
+  await requireAdmin()
   const client = await pool.connect()
   try {
     await client.query("BEGIN")
@@ -845,6 +861,7 @@ export async function updateContestShowcaseAction(data: {
   soldTickets: number
   ticketPrice: number
 }): Promise<{ ok: boolean; error?: string }> {
+  await requireAdmin()
   try {
     await pool.query(
       `UPDATE contests
@@ -878,6 +895,7 @@ export async function updateContestShowcaseAction(data: {
 
 // SUPPORT TICKETS MANAGEMENT
 export async function getAdminSupportTickets(): Promise<AdminSupportTicket[]> {
+  await requireAdmin()
   try {
     const res = await pool.query(`SELECT * FROM support_tickets ORDER BY created_at DESC`)
     return res.rows.map((r) => ({
@@ -909,6 +927,7 @@ export async function replyToSupportTicketAction(
   replyText: string,
   adminName: string = "TurboRide Support"
 ): Promise<{ ok: boolean; error?: string }> {
+  await requireAdmin()
   try {
     if (!replyText || !replyText.trim()) {
       return { ok: false, error: "Reply text cannot be empty." }
@@ -954,6 +973,7 @@ export async function updateSupportTicketStatusAction(
   ticketId: string,
   status: "open" | "resolved"
 ): Promise<{ ok: boolean; error?: string }> {
+  await requireAdmin()
   try {
     await pool.query(
       `UPDATE support_tickets 
@@ -1089,6 +1109,7 @@ export async function addMemberReplyAction(
 }
 
 export async function loadAdminFullProps() {
+  await requireAdmin()
   const [
     overviewData,
     contests,

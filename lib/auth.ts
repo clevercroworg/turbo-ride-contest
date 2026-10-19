@@ -245,14 +245,10 @@ export async function getAdminSession(): Promise<AdminSession | null> {
     if (!raw) return null
 
     let token = raw
-    let cachedEmail = ""
-    let cachedRole = "superadmin"
 
     try {
       const parsed = JSON.parse(raw)
       if (parsed?.token) token = parsed.token
-      if (parsed?.email) cachedEmail = parsed.email
-      if (parsed?.role) cachedRole = parsed.role
     } catch {
       // token is raw string
     }
@@ -277,17 +273,8 @@ export async function getAdminSession(): Promise<AdminSession | null> {
       }
     }
 
-    // Fallback verification if cookie stored session details and env matches
-    const expectedEmail = (process.env.ADMIN_EMAIL || "admin@turboride.com").toLowerCase()
-    if (cachedEmail && cachedEmail.toLowerCase() === expectedEmail) {
-      return {
-        email: cachedEmail,
-        name: "TurboRide Administrator",
-        role: cachedRole,
-        loggedInAt: new Date().toISOString(),
-      }
-    }
-
+    // Only a live admin_sessions row grants access. Cookie contents alone are never
+    // trusted: the cookie is client-controlled and could otherwise be forged.
     cookieStore.delete(ADMIN_COOKIE)
     return null
   } catch (err) {

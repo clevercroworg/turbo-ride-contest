@@ -34,28 +34,16 @@ import {
 } from "lucide-react"
 
 import { MembersHeader } from "@/components/members/members-header"
-import { 
-  buyContestTicketsAction, 
-  assignTicketNumberAction, 
+import {
+  assignTicketNumberAction,
   autoPickTicketNumberAction
 } from "@/lib/credits"
-import { 
-  createRazorpayOrderAction, 
-  verifyAndCompleteRazorpayPaymentAction 
+import {
+  createRazorpayOrderAction,
+  verifyAndCompleteRazorpayPaymentAction
 } from "@/lib/razorpay"
+import { loadRazorpayScript } from "@/lib/load-razorpay"
 import { logoutMember } from "@/lib/auth"
-
-function loadRazorpayScript(): Promise<boolean> {
-  return new Promise((resolve) => {
-    if (typeof window === "undefined") return resolve(false)
-    if ((window as any).Razorpay) return resolve(true)
-    const script = document.createElement("script")
-    script.src = "https://checkout.razorpay.com/v1/checkout.js"
-    script.onload = () => resolve(true)
-    script.onerror = () => resolve(false)
-    document.body.appendChild(script)
-  })
-}
 
 function getYouTubeEmbedUrl(url: string): string {
   if (!url) return ""
@@ -308,19 +296,13 @@ export function MemberDashboardClient({
         throw new Error("Unable to load Razorpay payment gateway. Please check your internet connection.")
       }
 
-      const totalCost = qty * unitPrice
-      const receipt = `RCP-${Date.now()}`
-
-      // 1. Create Razorpay order on server
+      // 1. Create Razorpay order on server (amount is priced server-side)
       const orderRes = await createRazorpayOrderAction({
-        amountInINR: totalCost,
-        receipt,
-        notes: {
-          contestId: currentContest.id || contest.id,
-          ticketCount: String(qty),
-          userEmail: session.email,
-          userPhone: session.phone,
-        },
+        contestId: currentContest.id || contest.id,
+        ticketCount: qty,
+        userEmail: session.email,
+        userPhone: session.phone,
+        userName: session.name,
       })
 
       if (!orderRes.ok || !orderRes.orderId) {
@@ -355,12 +337,6 @@ export function MemberDashboardClient({
               razorpayOrderId: response.razorpay_order_id || orderRes.orderId,
               razorpayPaymentId: response.razorpay_payment_id,
               razorpaySignature: response.razorpay_signature,
-              contestId: currentContest.id || contest.id,
-              ticketCount: qty,
-              userEmail: session.email,
-              userPhone: session.phone,
-              userName: session.name,
-              referralCodeUsed: session.referralCode,
             })
 
             if (!verifyRes.ok) {

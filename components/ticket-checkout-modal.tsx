@@ -3,7 +3,8 @@
 import { useState, useEffect } from "react"
 import confetti from "canvas-confetti"
 import { X, Ticket, CheckCircle, ArrowRight, ShieldCheck } from "@phosphor-icons/react"
-import { buyContestTicketsAction } from "@/lib/credits"
+import { createRazorpayOrderAction, verifyAndCompleteRazorpayPaymentAction } from "@/lib/razorpay"
+import { createRazorpayCheckout, loadRazorpayScript } from "@/lib/load-razorpay"
 
 interface CheckoutModalProps {
   isOpen: boolean
@@ -64,7 +65,13 @@ export function TicketCheckoutModal({
     setLoading(true)
 
     try {
-      const res = await buyContestTicketsAction({
+      const isLoaded = await loadRazorpayScript()
+      if (!isLoaded) {
+        throw new Error("Unable to load Razorpay payment gateway. Please check your internet connection.")
+      }
+
+      // 1. Create Razorpay order on server (amount is priced server-side)
+      const orderRes = await createRazorpayOrderAction({
         contestId,
         ticketCount,
         userEmail,
@@ -74,31 +81,66 @@ export function TicketCheckoutModal({
         autoAssign: true,
       })
 
-      if (!res.ok) {
-        setError(res.error || "Failed to process ticket request.")
-        setLoading(false)
-        return
+      if (!orderRes.ok || !orderRes.orderId) {
+        throw new Error(orderRes.error || "Failed to create payment order.")
       }
 
-      setSuccessOrder({
-        orderId: res.orderId || "COMPLETED",
-        credits: res.creditsAdded || ticketCount * ticketPrice,
-        vouchers: res.vouchers || [],
+      // 2. Open Razorpay Checkout; tickets are only issued after server-side verification
+      const rzp = createRazorpayCheckout({
+        key: orderRes.keyId,
+        amount: orderRes.amount,
+        currency: "INR",
+        name: "TurboRide Supercars",
+        description: `${ticketCount} Contest Ticket${ticketCount > 1 ? "s" : ""} + ${(ticketCount * ticketPrice).toLocaleString("en-IN")} Drive Credits`,
+        order_id: orderRes.orderId,
+        prefill: { name: userName, email: userEmail, contact: userPhone },
+        theme: { color: "#ea580c" },
+        modal: {
+          ondismiss: () => setLoading(false),
+        },
+        handler: async (response: { razorpay_order_id?: string; razorpay_payment_id: string; razorpay_signature: string }) => {
+          try {
+            const res = await verifyAndCompleteRazorpayPaymentAction({
+              razorpayOrderId: response.razorpay_order_id || orderRes.orderId!,
+              razorpayPaymentId: response.razorpay_payment_id,
+              razorpaySignature: response.razorpay_signature,
+            })
+
+            if (!res.ok) {
+              setError(res.error || "Payment verification failed.")
+              return
+            }
+
+            setSuccessOrder({
+              orderId: res.orderId || "COMPLETED",
+              credits: res.creditsAdded || ticketCount * ticketPrice,
+              vouchers: res.vouchers || [],
+            })
+
+            // Confetti burst
+            try {
+              confetti({
+                particleCount: 100,
+                spread: 70,
+                origin: { y: 0.6 },
+              })
+            } catch {
+              // ignore confetti errors
+            }
+          } catch (err: unknown) {
+            setError(err instanceof Error ? err.message : "Failed to finalize tickets after payment.")
+          } finally {
+            setLoading(false)
+          }
+        },
       })
-
-      // Confetti burst
-      try {
-        confetti({
-          particleCount: 100,
-          spread: 70,
-          origin: { y: 0.6 },
-        })
-      } catch {
-        // ignore confetti errors
-      }
+      rzp.on("payment.failed", (response) => {
+        setError(`Payment failed: ${response.error?.description || "Transaction was declined."}`)
+        setLoading(false)
+      })
+      rzp.open()
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : "Network error. Please try again.")
-    } finally {
       setLoading(false)
     }
   }

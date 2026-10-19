@@ -1,5 +1,6 @@
 "use server"
 
+import { requireAdmin } from "./admin-guard"
 import { pool } from "./db"
 import { revalidatePath } from "next/cache"
 import { REWARDS_CATALOG } from "./catalog"
@@ -329,6 +330,7 @@ export async function updateRedemptionStatusAction(
   redemptionId: string,
   newStatus: "scheduled" | "fulfilled" | "cancelled"
 ): Promise<{ ok: boolean; error?: string }> {
+  await requireAdmin()
   try {
     await pool.query(
       `UPDATE reward_redemptions SET status = $1 WHERE id = $2`,
