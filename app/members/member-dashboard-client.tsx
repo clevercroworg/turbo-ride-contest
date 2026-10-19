@@ -123,6 +123,7 @@ import type {
   ReferralRecord, 
   ActiveVoucher 
 } from "@/lib/types"
+import type { AdminPlatformSettings } from "@/lib/types"
 import type { GameVoucherRecord } from "@/lib/vouchers"
 
 interface MemberDashboardClientProps {
@@ -140,18 +141,7 @@ interface MemberDashboardClientProps {
   initialReferrals: ReferralRecord[]
   initialVouchers?: ActiveVoucher[]
   gameVouchers?: GameVoucherRecord[]
-  adminSettings?: {
-    ticketPrice: number
-    creditsPerTicket: number
-    maxCustomerPurchaseLimit?: number
-    creditRewardPercent: number
-    cashCommissionPercent: number
-    cashUnlockThreshold: number
-    fallbackPayoutPercent: number
-    drawType: string
-    isPaused: boolean
-    isClosed: boolean
-  }
+  adminSettings?: AdminPlatformSettings
 }
 
 // Multi-contest data definition for the interactive carousel stage
@@ -272,11 +262,11 @@ export function MemberDashboardClient({
   }
 
   // Dynamic economics from adminSettings & active contest
-  const unitPrice = currentContest.ticketPrice || contest.ticketPrice || adminSettings?.ticketPrice || 1000
+  const unitPrice = currentContest.ticketPrice || contest.ticketPrice || adminSettings?.tiers["1"].price || 1000
   const creditRewardPercent = adminSettings?.creditRewardPercent ?? 25
   const cashCommissionPercent = adminSettings?.cashCommissionPercent ?? 25
-  const cashUnlockThreshold = adminSettings?.cashUnlockThreshold ?? 20
-  const platformTicketPrice = adminSettings?.ticketPrice ?? unitPrice
+  const cashUnlockCredits = adminSettings?.cashUnlockCredits ?? 25000
+  const platformTicketPrice = adminSettings?.tiers["1"].price ?? unitPrice
   const driveRewardPerTicket = Math.round(platformTicketPrice * (creditRewardPercent / 100))
   const refCode = referralProfile?.referralCode || session.phone?.slice(-4) || "4021"
   const productionBaseUrl = process.env.NEXT_PUBLIC_APP_URL || "https://win.turboridesupercars.com"
@@ -1238,12 +1228,12 @@ export function MemberDashboardClient({
                 </h2>
               </div>
               <p className="mt-1 text-xs sm:text-sm text-zinc-600">
-                Every friend who buys at least 1 ticket earns you {creditRewardPercent}% of their drive credits. Buy {cashUnlockThreshold} tickets to also unlock a {cashCommissionPercent}% cash commission.
+                Every friend who buys at least 1 ticket earns you {creditRewardPercent}% of their drive credits. Buy {cashUnlockCredits.toLocaleString("en-IN")} credits worth of tickets to also unlock a {cashCommissionPercent}% cash commission.
               </p>
             </div>
 
             {/* Notification Banner: Cash Commission Unlocked */}
-            {(referralProfile?.isCashUnlocked || ticketStats.totalBought >= cashUnlockThreshold) && (
+            {referralProfile?.isCashUnlocked && (
               <div className="rounded-2xl border border-rose-200/80 bg-rose-50/50 p-3.5 sm:p-4 flex items-center gap-3">
                 <div className="size-6 sm:size-7 rounded-full border border-rose-300 bg-white flex items-center justify-center text-rose-600 text-xs font-bold shrink-0 font-mono">
                   ₹

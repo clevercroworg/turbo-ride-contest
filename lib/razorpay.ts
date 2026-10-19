@@ -8,13 +8,16 @@ import {
   MAX_TICKETS_PER_ORDER,
   checkPurchaseLimit,
   checkRazorpayPayment,
-  getContestPricing,
+  checkTierTicketLimit,
+  isContestOpen,
   isValidRazorpaySignature,
   purchaseFromOrderNotes,
   settleTicketPurchase,
   type RazorpayOrderRecord,
   type RazorpayPaymentRecord,
 } from "./ticket-settlement"
+import { isTicketTier, readTierSettings } from "./tiers"
+import type { TicketTier } from "./types"
 
 function safeRevalidate(path: string) {
   try {
@@ -40,12 +43,13 @@ async function razorpayGet<T>(path: string): Promise<T | null> {
 
 /**
  * 1. Create a server-side Razorpay Order for ticket checkout.
- * The amount is always computed here from the contest's stored price; the browser only
- * says how many tickets it wants. What was bought is stored in the order's notes, which
+ * The amount is always computed here from the tier's price in Settings; the browser only
+ * says which tier and how many tickets it wants. What was bought is stored in the order's notes, which
  * only the server can write, and settlement later reads it back from Razorpay.
  */
 export async function createRazorpayOrderAction(params: {
   contestId: string
+  tier?: TicketTier
   ticketCount: number
   userEmail: string
   userPhone: string
@@ -71,11 +75,27 @@ export async function createRazorpayOrderAction(params: {
       return { ok: false, error: "Please enter your email or phone to receive tickets." }
     }
 
-    const pricing = await getContestPricing(pool, params.contestId)
-    if (!pricing) {
-      return { ok: false, error: "This contest is not available." }
+    const tier: TicketTier = params.tier ?? "1"
+    if (!isTicketTier(tier)) {
+      return { ok: false, error: "Please choose a valid ticket tier." }
     }
-    const cost = ticketCount * pricing.ticketPrice
+    if (!(await isContestOpen(pool, params.contestId))) {
+      return { ok: false, error: "This contest is not open for entries." }
+    }
+    const pricing = (await readTierSettings(pool))[tier]
+    const cost = ticketCount * pricing.price
+
+    const tierLimitError = await checkTierTicketLimit(pool, {
+      contestId: params.contestId,
+      tier,
+      userEmail,
+      userPhone,
+      ticketCount,
+      maxTickets: pricing.maxTicketsPerCustomer,
+    })
+    if (tierLimitError) {
+      return { ok: false, error: tierLimitError }
+    }
 
     const limitError = await checkPurchaseLimit(pool, { userEmail, userPhone, cost })
     if (limitError) {
@@ -103,9 +123,11 @@ export async function createRazorpayOrderAction(params: {
         receipt: `RCP-${Date.now()}`,
         notes: {
           contestId: params.contestId,
+          tier,
           ticketCount: String(ticketCount),
-          ticketPrice: String(pricing.ticketPrice),
+          ticketPrice: String(pricing.price),
           creditsPerTicket: String(pricing.creditsPerTicket),
+          vouchersPerTicket: String(pricing.vouchersPerTicket),
           userEmail,
           userPhone,
           userName: (params.userName || "").trim().slice(0, 100),

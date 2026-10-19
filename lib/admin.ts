@@ -4,6 +4,16 @@ import { requireAdmin } from "./admin-guard"
 import { pool } from "./db"
 import { revalidatePath } from "next/cache"
 import type { AdminPlatformSettings } from "./types"
+import {
+  ALL_TIER_KEYS,
+  CASH_UNLOCK_CREDITS_KEY,
+  DEFAULT_CASH_UNLOCK_CREDITS,
+  TICKET_TIERS,
+  TIER_DEFAULTS,
+  TIER_SETTING_KEYS,
+  readTierSettings,
+  tiersFromSettingsMap,
+} from "./tiers"
 
 function safeRevalidate(path: string) {
   try {
@@ -56,6 +66,7 @@ export interface AdminOrder {
   amountPaid: number
   creditsIssued: number
   paymentGateway: string
+  tier: "1" | "2"
   status: "completed" | "pending" | "refunded"
   createdAt: string
 }
@@ -325,12 +336,6 @@ export async function updateContestAction(
       fields.push(`worth_display = $${idx++}`)
       values.push(data.worthDisplay)
     }
-    if (data.ticketPrice !== undefined) {
-      fields.push(`ticket_price = $${idx++}`)
-      values.push(data.ticketPrice)
-      fields.push(`credits_per_ticket = $${idx++}`)
-      values.push(data.ticketPrice) // Keep 1:1 drive credits
-    }
     if (data.targetTickets !== undefined) {
       fields.push(`target_tickets = $${idx++}`)
       values.push(data.targetTickets)
@@ -432,7 +437,6 @@ export async function createContestAction(data: {
   title: string
   subtitle?: string
   worthDisplay: string
-  ticketPrice: number
   targetTickets: number
   imageUrl: string
   galleryImages?: string[]
@@ -441,9 +445,11 @@ export async function createContestAction(data: {
 }): Promise<{ ok: boolean; error?: string }> {
   await requireAdmin()
   try {
+    // Prices are managed only in Settings; a new contest uses the Tier 1 price
+    const tier1 = (await readTierSettings(pool))["1"]
     await pool.query(
       `INSERT INTO contests (id, car_name, title, subtitle, worth_display, ticket_price, credits_per_ticket, target_tickets, sold_tickets, image_url, gallery_images, youtube_url, status, created_at, updated_at)
-       VALUES ($1, $2, $3, $4, $5, $6, $6, $7, 0, $8, $9::jsonb, $10, $11, NOW(), NOW())
+       VALUES ($1, $2, $3, $4, $5, $6, $12, $7, 0, $8, $9::jsonb, $10, $11, NOW(), NOW())
        ON CONFLICT (id) DO UPDATE SET
          car_name = EXCLUDED.car_name,
          title = EXCLUDED.title,
@@ -460,12 +466,13 @@ export async function createContestAction(data: {
         data.title,
         data.subtitle || "Official TurboRide Grand Draw",
         data.worthDisplay,
-        data.ticketPrice,
+        tier1.price,
         data.targetTickets,
         data.imageUrl,
         JSON.stringify(data.galleryImages || []),
         data.youtubeUrl || "",
         data.status,
+        tier1.creditsPerTicket,
       ]
     )
 
@@ -538,7 +545,7 @@ export async function getAdminOrders(): Promise<AdminOrder[]> {
       `SELECT id, user_name as "userName", user_email as "userEmail", user_phone as "userPhone",
               contest_id as "contestId", ticket_count as "ticketCount", amount_paid as "amountPaid",
               credits_issued as "creditsIssued", payment_gateway as "paymentGateway", status,
-              created_at as "createdAt"
+              tier, created_at as "createdAt"
        FROM contest_orders
        ORDER BY created_at DESC`
     )
@@ -553,6 +560,7 @@ export async function getAdminOrders(): Promise<AdminOrder[]> {
       amountPaid: Number(r.amountPaid || 0),
       creditsIssued: Number(r.creditsIssued || 0),
       paymentGateway: r.paymentGateway || "UPI",
+      tier: r.tier === "2" ? "2" : "1",
       status: r.status === "completed" ? "completed" : r.status === "refunded" ? "refunded" : "pending",
       createdAt: r.createdAt ? new Date(r.createdAt).toISOString() : new Date().toISOString(),
     }))
@@ -754,28 +762,27 @@ export async function getAdminTickets(contestId?: string): Promise<AdminTicket[]
 export async function getAdminSettingsAction(): Promise<AdminPlatformSettings> {
   try {
     const res = await pool.query(
-      `SELECT key, value FROM site_settings 
-       WHERE key IN (
-         'contest_ticket_price',
-         'contest_credit_multiplier',
-         'contest_max_customer_limit',
-         'contest_referral_drive_pct',
-         'contest_referral_cash_pct',
-         'contest_cash_unlock_threshold',
-         'contest_fallback_payout_pct',
-         'contest_draw_type',
-         'contest_is_paused',
-         'contest_is_closed'
-       )`
+      `SELECT key, value FROM site_settings
+       WHERE key = ANY($1)`,
+      [[
+        ...ALL_TIER_KEYS,
+        'contest_max_customer_limit',
+        'contest_referral_drive_pct',
+        'contest_referral_cash_pct',
+        'contest_fallback_payout_pct',
+        'contest_draw_type',
+        'contest_is_paused',
+        'contest_is_closed',
+      ]]
     )
-    const map = new Map(res.rows.map((r: { key: string; value: string }) => [r.key, r.value]))
+    const map = new Map<string, string>(res.rows.map((r: { key: string; value: string }) => [r.key, r.value]))
+    const cashUnlock = Number(map.get(CASH_UNLOCK_CREDITS_KEY))
     return {
-      ticketPrice: Number(map.get("contest_ticket_price")) || 1000,
-      creditsPerTicket: Number(map.get("contest_credit_multiplier")) || 1000,
+      tiers: tiersFromSettingsMap(map),
       maxCustomerPurchaseLimit: Number(map.get("contest_max_customer_limit")) || 100000,
       creditRewardPercent: Number(map.get("contest_referral_drive_pct")) || 25,
       cashCommissionPercent: Number(map.get("contest_referral_cash_pct")) || 25,
-      cashUnlockThreshold: Number(map.get("contest_cash_unlock_threshold")) || 25,
+      cashUnlockCredits: map.has(CASH_UNLOCK_CREDITS_KEY) && Number.isFinite(cashUnlock) ? cashUnlock : DEFAULT_CASH_UNLOCK_CREDITS,
       fallbackPayoutPercent: Number(map.get("contest_fallback_payout_pct")) || 70,
       drawType: map.get("contest_draw_type") || "Provably Fair Digital Draw",
       isPaused: map.get("contest_is_paused") === "true",
@@ -784,12 +791,11 @@ export async function getAdminSettingsAction(): Promise<AdminPlatformSettings> {
   } catch (err) {
     console.error("[getAdminSettingsAction error]:", err)
     return {
-      ticketPrice: 1000,
-      creditsPerTicket: 1000,
+      tiers: TIER_DEFAULTS,
       maxCustomerPurchaseLimit: 100000,
       creditRewardPercent: 25,
       cashCommissionPercent: 25,
-      cashUnlockThreshold: 25,
+      cashUnlockCredits: DEFAULT_CASH_UNLOCK_CREDITS,
       fallbackPayoutPercent: 70,
       drawType: "Provably Fair Digital Draw",
       isPaused: false,
@@ -798,8 +804,26 @@ export async function getAdminSettingsAction(): Promise<AdminPlatformSettings> {
   }
 }
 
+function validatePlatformSettings(settings: AdminPlatformSettings): string | null {
+  for (const tier of TICKET_TIERS) {
+    const t = settings.tiers?.[tier]
+    const label = `Tier ${tier}`
+    if (!t) return `${label} settings are missing.`
+    if (!Number.isInteger(t.price) || t.price < 1) return `${label} price must be a whole number above 0.`
+    if (!Number.isInteger(t.creditsPerTicket) || t.creditsPerTicket < 0) return `${label} credits per ticket must be 0 or more.`
+    if (!Number.isInteger(t.vouchersPerTicket) || t.vouchersPerTicket < 1 || t.vouchersPerTicket > 10) return `${label} vouchers per ticket must be between 1 and 10.`
+    if (!Number.isInteger(t.maxTicketsPerCustomer) || t.maxTicketsPerCustomer < 0) return `${label} max tickets must be 0 (no limit) or more.`
+    if (!t.prizeTitle?.trim()) return `${label} prize name is required.`
+    if (t.prizeTitle.length > 80 || (t.prizeDescription || "").length > 300) return `${label} prize text is too long.`
+  }
+  if (!Number.isInteger(settings.cashUnlockCredits) || settings.cashUnlockCredits < 0) return "Cash unlock credits must be 0 or more."
+  return null
+}
+
 export async function saveAdminSettingsAction(settings: AdminPlatformSettings): Promise<{ ok: boolean; error?: string }> {
   await requireAdmin()
+  const settingsError = validatePlatformSettings(settings)
+  if (settingsError) return { ok: false, error: settingsError }
   const client = await pool.connect()
   try {
     await client.query("BEGIN")
@@ -814,23 +838,31 @@ export async function saveAdminSettingsAction(settings: AdminPlatformSettings): 
       )
     }
 
-    await upsertSetting("contest_ticket_price", String(settings.ticketPrice))
-    await upsertSetting("contest_credit_multiplier", String(settings.creditsPerTicket))
+    for (const tier of TICKET_TIERS) {
+      const t = settings.tiers[tier]
+      const keys = TIER_SETTING_KEYS[tier]
+      await upsertSetting(keys.price, String(t.price))
+      await upsertSetting(keys.creditsPerTicket, String(t.creditsPerTicket))
+      await upsertSetting(keys.vouchersPerTicket, String(t.vouchersPerTicket))
+      await upsertSetting(keys.maxTicketsPerCustomer, String(t.maxTicketsPerCustomer))
+      await upsertSetting(keys.prizeTitle, t.prizeTitle.trim())
+      await upsertSetting(keys.prizeDescription, t.prizeDescription.trim())
+    }
     await upsertSetting("contest_max_customer_limit", String(settings.maxCustomerPurchaseLimit || 100000))
     await upsertSetting("contest_referral_drive_pct", String(settings.creditRewardPercent))
     await upsertSetting("contest_referral_cash_pct", String(settings.cashCommissionPercent))
-    await upsertSetting("contest_cash_unlock_threshold", String(settings.cashUnlockThreshold))
+    await upsertSetting(CASH_UNLOCK_CREDITS_KEY, String(settings.cashUnlockCredits))
     await upsertSetting("contest_fallback_payout_pct", String(settings.fallbackPayoutPercent))
     await upsertSetting("contest_draw_type", String(settings.drawType))
     await upsertSetting("contest_is_paused", String(settings.isPaused))
     await upsertSetting("contest_is_closed", String(settings.isClosed))
 
-    // Also synchronize active contest ticket_price and credits_per_ticket
+    // The active contest displays the Tier 1 price across the public site
     await client.query(
       `UPDATE contests 
        SET ticket_price = $1, credits_per_ticket = $2, updated_at = NOW()
        WHERE status = 'active'`,
-      [settings.ticketPrice, settings.creditsPerTicket]
+      [settings.tiers["1"].price, settings.tiers["1"].creditsPerTicket]
     )
 
     await client.query("COMMIT")
@@ -848,48 +880,6 @@ export async function saveAdminSettingsAction(settings: AdminPlatformSettings): 
     return { ok: false, error: "Failed to persist platform settings to database." }
   } finally {
     client.release()
-  }
-}
-
-export async function updateContestShowcaseAction(data: {
-  id: string
-  title: string
-  subtitle: string
-  carName: string
-  worthDisplay: string
-  targetTickets: number
-  soldTickets: number
-  ticketPrice: number
-}): Promise<{ ok: boolean; error?: string }> {
-  await requireAdmin()
-  try {
-    await pool.query(
-      `UPDATE contests
-       SET title = $1, subtitle = $2, car_name = $3, worth_display = $4,
-           target_tickets = $5, sold_tickets = $6, ticket_price = $7,
-           credits_per_ticket = $7, updated_at = NOW()
-       WHERE id = $8`,
-      [
-        data.title,
-        data.subtitle,
-        data.carName,
-        data.worthDisplay,
-        data.targetTickets,
-        data.soldTickets,
-        data.ticketPrice,
-        data.id,
-      ]
-    )
-
-    safeRevalidate("/")
-    safeRevalidate("/admin")
-    safeRevalidate("/admin/contests")
-    safeRevalidate("/members")
-
-    return { ok: true }
-  } catch (err) {
-    console.error("[updateContestShowcaseAction error]:", err)
-    return { ok: false, error: "Failed to update contest showcase." }
   }
 }
 

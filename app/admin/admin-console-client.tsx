@@ -51,7 +51,8 @@ import {
   updateSupportTicketStatusAction,
 } from "@/lib/admin"
 import { logoutAdminAction, type AdminSession } from "@/lib/auth"
-import type { AdminPlatformSettings } from "@/lib/types"
+import type { AdminPlatformSettings, TicketTierSettings } from "@/lib/types"
+import { DEFAULT_CASH_UNLOCK_CREDITS, TICKET_TIERS, TIER_DEFAULTS } from "@/lib/tiers"
 
 interface AdminConsoleProps {
   initialOverview: any
@@ -283,7 +284,6 @@ export function AdminConsoleClient({
   const [hpTitle, setHpTitle] = useState(activeContest?.title || "PORSCHE 718 CAYMAN")
   const [hpSubtitle, setHpSubtitle] = useState(activeContest?.subtitle || "The yellow mid-engine legend. One lucky entry drives it home.")
   const [hpWorth, setHpWorth] = useState(activeContest?.worthDisplay || "Worth over ₹1.6 Crore")
-  const [hpPrice, setHpPrice] = useState(activeContest?.ticketPrice || 1000)
   const [hpTarget, setHpTarget] = useState(activeContest?.targetTickets || 10000)
   const [hpSold, setHpSold] = useState(activeContest?.soldTickets || 6362)
   const [isVehicleDropdownOpen, setIsVehicleDropdownOpen] = useState(false)
@@ -293,7 +293,6 @@ export function AdminConsoleClient({
       setHpTitle(activeContest.title)
       setHpSubtitle(activeContest.subtitle)
       setHpWorth(activeContest.worthDisplay)
-      setHpPrice(activeContest.ticketPrice)
       setHpTarget(activeContest.targetTickets)
       setHpSold(activeContest.soldTickets)
     }
@@ -332,7 +331,6 @@ export function AdminConsoleClient({
     title: "",
     subtitle: "",
     worthDisplay: "",
-    ticketPrice: 1000,
     targetTickets: 10000,
     imageUrl: "/cars/porsche-side.png",
     galleryImages: ["", "", "", ""],
@@ -343,12 +341,11 @@ export function AdminConsoleClient({
   // Settings State matching Screenshot 2 (Persisted to PostgreSQL)
   const [settings, setSettings] = useState<AdminPlatformSettings>(
     initialSettings || {
-      ticketPrice: 1000,
-      creditsPerTicket: 1000,
+      tiers: TIER_DEFAULTS,
       maxCustomerPurchaseLimit: 100000,
       creditRewardPercent: 25,
       cashCommissionPercent: 25,
-      cashUnlockThreshold: 25,
+      cashUnlockCredits: DEFAULT_CASH_UNLOCK_CREDITS,
       fallbackPayoutPercent: 70,
       drawType: "Provably Fair Digital Draw",
       isPaused: false,
@@ -387,7 +384,6 @@ export function AdminConsoleClient({
       title: editingContest.title,
       subtitle: editingContest.subtitle,
       worthDisplay: editingContest.worthDisplay,
-      ticketPrice: Number(editingContest.ticketPrice),
       targetTickets: Number(editingContest.targetTickets),
       soldTickets: Number(editingContest.soldTickets),
       status: editingContest.status,
@@ -407,77 +403,16 @@ export function AdminConsoleClient({
         setHpTitle(editingContest.title)
         setHpSubtitle(editingContest.subtitle)
         setHpWorth(editingContest.worthDisplay)
-        setHpPrice(Number(editingContest.ticketPrice))
         setHpTarget(Number(editingContest.targetTickets))
         setHpSold(Number(editingContest.soldTickets))
       }
       setEditingContest(null)
-      showToast(`Contest "${editingContest.carName}" updated! Public site reflects new pricing & details.`)
+      showToast(`Contest "${editingContest.carName}" updated! Public site reflects new details.`)
       router.refresh()
     } else {
       showToast(res.error || "Failed to save contest.", "error")
     }
     setActionLoading(false)
-  }
-
-  const handleSaveHomepageSettings = async (e?: React.FormEvent) => {
-    if (e) e.preventDefault()
-    if (!activeContest) return
-    setActionLoading(true)
-    try {
-      const res = await updateContestAction(activeContest.id, {
-        title: hpTitle,
-        subtitle: hpSubtitle,
-        worthDisplay: hpWorth,
-        ticketPrice: Number(hpPrice),
-        targetTickets: Number(hpTarget),
-        soldTickets: Number(hpSold),
-      })
-      if (!res.ok) throw new Error(res.error)
-
-      setContests((prev) =>
-        prev.map((c) =>
-          c.id === activeContest.id
-            ? {
-              ...c,
-              title: hpTitle,
-              subtitle: hpSubtitle,
-              worthDisplay: hpWorth,
-              ticketPrice: Number(hpPrice),
-              targetTickets: Number(hpTarget),
-              soldTickets: Number(hpSold),
-            }
-            : c
-        )
-      )
-      showToast("Homepage hero text, price & display settings saved successfully!")
-      router.refresh()
-    } catch (err: any) {
-      showToast(err.message || "Failed to update homepage settings.", "error")
-    } finally {
-      setActionLoading(false)
-    }
-  }
-
-  const handleQuickUpdatePrice = async (contestId: string, newPrice: number) => {
-    setActionLoading(true)
-    try {
-      const res = await updateContestAction(contestId, { ticketPrice: newPrice })
-      if (!res.ok) throw new Error(res.error)
-
-      setContests((prev) =>
-        prev.map((c) => (c.id === contestId ? { ...c, ticketPrice: newPrice, creditsPerTicket: newPrice } : c))
-      )
-      if (activeContest?.id === contestId) {
-        setHpPrice(newPrice)
-      }
-      showToast(`Ticket price updated to ₹${newPrice.toLocaleString("en-IN")}! Public site reflects change.`)
-      router.refresh()
-    } catch (err: any) {
-      showToast(err.message || "Failed to update price.", "error")
-    } finally {
-      setActionLoading(false)
-    }
   }
 
   // Filtered Admin Tickets
@@ -560,7 +495,6 @@ export function AdminConsoleClient({
       carName: newContest.carName.trim(),
       title: newContest.title.trim(),
       worthDisplay: newContest.worthDisplay.trim(),
-      ticketPrice: Number(newContest.ticketPrice),
       targetTickets: Number(newContest.targetTickets),
       imageUrl: newContest.imageUrl,
       galleryImages: newContest.galleryImages,
@@ -577,8 +511,8 @@ export function AdminConsoleClient({
           title: newContest.title,
           subtitle: "Official TurboRide Grand Draw",
           worthDisplay: newContest.worthDisplay,
-          ticketPrice: Number(newContest.ticketPrice),
-          creditsPerTicket: Number(newContest.ticketPrice),
+          ticketPrice: settings.tiers["1"].price,
+          creditsPerTicket: settings.tiers["1"].creditsPerTicket,
           soldTickets: 0,
           targetTickets: Number(newContest.targetTickets),
           imageUrl: newContest.imageUrl,
@@ -1955,6 +1889,7 @@ export function AdminConsoleClient({
                     <tr className="border-b border-zinc-100 text-zinc-400 text-[10px] uppercase font-bold tracking-wider">
                       <th className="pb-3 font-semibold">Order</th>
                       <th className="pb-3 font-semibold">Member</th>
+                      <th className="pb-3 font-semibold text-center">Tier</th>
                       <th className="pb-3 font-semibold text-right">Tickets</th>
                       <th className="pb-3 font-semibold text-right">Amount</th>
                       <th className="pb-3 font-semibold">Method</th>
@@ -1967,6 +1902,7 @@ export function AdminConsoleClient({
                       <tr key={o.id} className="hover:bg-zinc-50/50">
                         <td className="py-3.5 text-zinc-500 text-[11px]">{o.id}</td>
                         <td className="py-3.5 text-zinc-950 font-bold">{formatMemberName(o.userName)}</td>
+                        <td className="py-3.5 text-center font-bold text-zinc-700">{o.tier === "2" ? "Tier 2" : "Tier 1"}</td>
                         <td className="py-3.5 text-right font-black text-zinc-950">{o.ticketCount}</td>
                         <td className="py-3.5 text-right font-bold text-zinc-900">₹{o.amountPaid.toLocaleString("en-IN")}</td>
                         <td className="py-3.5 text-zinc-600 font-medium">{o.paymentGateway || "UPI"}</td>
@@ -1994,7 +1930,7 @@ export function AdminConsoleClient({
                     ))}
                     {paginatedOrders.length === 0 && (
                       <tr>
-                        <td colSpan={7} className="py-8 text-center text-zinc-400 italic">
+                        <td colSpan={8} className="py-8 text-center text-zinc-400 italic">
                           No orders found matching your search.
                         </td>
                       </tr>
@@ -2906,64 +2842,127 @@ export function AdminConsoleClient({
             {/* 4 Cards in 2x2 Grid */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
 
-              {/* CARD 1: PRICING & CREDITS */}
-              <div className="rounded-2xl bg-white border border-zinc-200/90 p-4 sm:p-6 shadow-xs flex flex-col justify-between">
-                <div>
-                  <h3 className="font-black text-xs uppercase tracking-wider text-zinc-900 mb-4">
-                    PRICING & CREDITS
-                  </h3>
+              {/* CARD 1: TICKET TIERS (prices are managed only here) */}
+              <div className="md:col-span-2 rounded-2xl bg-white border border-zinc-200/90 p-4 sm:p-6 shadow-xs">
+                <h3 className="font-black text-xs uppercase tracking-wider text-zinc-900 mb-1">
+                  TICKET TIERS
+                </h3>
+                <p className="text-[11px] text-zinc-500 mb-4">
+                  Customers can buy either tier. The tier is sent to Coin Rush as voucher_type so each tier has its own leaderboard.
+                </p>
 
-                  <div className="grid grid-cols-2 gap-3 sm:gap-4">
-                    <div>
-                      <label className="block text-xs font-semibold text-zinc-700 mb-1.5">
-                        Ticket price
-                      </label>
-                      <div className="flex items-center bg-zinc-100 rounded-xl px-3.5 py-2.5">
-                        <span className="text-zinc-500 text-xs font-bold mr-2">₹</span>
-                        <input
-                          type="number"
-                          value={settings.ticketPrice}
-                          onChange={(e) => setSettings({ ...settings, ticketPrice: Number(e.target.value) })}
-                          className="w-full bg-transparent text-xs sm:text-sm font-bold text-zinc-900 focus:outline-none"
-                        />
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
+                  {TICKET_TIERS.map((tier) => {
+                    const t = settings.tiers[tier]
+                    const setTier = (patch: Partial<TicketTierSettings>) =>
+                      setSettings({ ...settings, tiers: { ...settings.tiers, [tier]: { ...t, ...patch } } })
+                    return (
+                      <div key={tier} className="rounded-xl border border-zinc-200 p-4">
+                        <div className="text-xs font-black uppercase tracking-wider text-[#ea580c] mb-3">
+                          Tier {tier}
+                        </div>
+
+                        <div className="grid grid-cols-2 gap-3">
+                          <div>
+                            <label className="block text-xs font-semibold text-zinc-700 mb-1.5">Ticket price</label>
+                            <div className="flex items-center bg-zinc-100 rounded-xl px-3.5 py-2.5">
+                              <span className="text-zinc-500 text-xs font-bold mr-2">₹</span>
+                              <input
+                                type="number"
+                                min={1}
+                                value={t.price}
+                                onChange={(e) => setTier({ price: Number(e.target.value) })}
+                                className="w-full bg-transparent text-xs sm:text-sm font-bold text-zinc-900 focus:outline-none"
+                              />
+                            </div>
+                          </div>
+
+                          <div>
+                            <label className="block text-xs font-semibold text-zinc-700 mb-1.5">Credits per ticket</label>
+                            <div className="flex items-center justify-between bg-zinc-100 rounded-xl px-3.5 py-2.5">
+                              <input
+                                type="number"
+                                min={0}
+                                value={t.creditsPerTicket}
+                                onChange={(e) => setTier({ creditsPerTicket: Number(e.target.value) })}
+                                className="w-full bg-transparent text-xs sm:text-sm font-bold text-zinc-900 focus:outline-none"
+                              />
+                              <span className="text-zinc-500 text-xs font-bold ml-2">cr</span>
+                            </div>
+                          </div>
+
+                          <div>
+                            <label className="block text-xs font-semibold text-zinc-700 mb-1.5">Vouchers per ticket</label>
+                            <div className="flex items-center bg-zinc-100 rounded-xl px-3.5 py-2.5">
+                              <input
+                                type="number"
+                                min={1}
+                                max={10}
+                                value={t.vouchersPerTicket}
+                                onChange={(e) => setTier({ vouchersPerTicket: Number(e.target.value) })}
+                                className="w-full bg-transparent text-xs sm:text-sm font-bold text-zinc-900 focus:outline-none"
+                              />
+                            </div>
+                            <span className="block text-[11px] text-zinc-400 mt-1">Coin Rush codes per ticket</span>
+                          </div>
+
+                          <div>
+                            <label className="block text-xs font-semibold text-zinc-700 mb-1.5">Max tickets per customer</label>
+                            <div className="flex items-center bg-zinc-100 rounded-xl px-3.5 py-2.5">
+                              <input
+                                type="number"
+                                min={0}
+                                value={t.maxTicketsPerCustomer}
+                                onChange={(e) => setTier({ maxTicketsPerCustomer: Number(e.target.value) })}
+                                className="w-full bg-transparent text-xs sm:text-sm font-bold text-zinc-900 focus:outline-none"
+                              />
+                            </div>
+                            <span className="block text-[11px] text-zinc-400 mt-1">Per contest · 0 = no limit</span>
+                          </div>
+                        </div>
+
+                        <div className="mt-3">
+                          <label className="block text-xs font-semibold text-zinc-700 mb-1.5">Prize name</label>
+                          <input
+                            type="text"
+                            maxLength={80}
+                            value={t.prizeTitle}
+                            onChange={(e) => setTier({ prizeTitle: e.target.value })}
+                            className="w-full bg-zinc-100 rounded-xl px-3.5 py-2.5 text-xs sm:text-sm font-bold text-zinc-900 focus:outline-none"
+                          />
+                        </div>
+                        <div className="mt-3">
+                          <label className="block text-xs font-semibold text-zinc-700 mb-1.5">Prize description</label>
+                          <textarea
+                            rows={2}
+                            maxLength={300}
+                            value={t.prizeDescription}
+                            onChange={(e) => setTier({ prizeDescription: e.target.value })}
+                            className="w-full bg-zinc-100 rounded-xl px-3.5 py-2.5 text-xs sm:text-sm font-medium text-zinc-900 focus:outline-none resize-none"
+                          />
+                          <span className="block text-[11px] text-zinc-400 mt-1">Shown on the website for this tier</span>
+                        </div>
                       </div>
-                      <span className="block text-[11px] text-zinc-400 mt-1">Single source of truth</span>
-                    </div>
+                    )
+                  })}
+                </div>
 
-                    <div>
-                      <label className="block text-xs font-semibold text-zinc-700 mb-1.5">
-                        Credits per ticket
-                      </label>
-                      <div className="flex items-center justify-between bg-zinc-100 rounded-xl px-3.5 py-2.5">
-                        <input
-                          type="number"
-                          value={settings.creditsPerTicket}
-                          onChange={(e) => setSettings({ ...settings, creditsPerTicket: Number(e.target.value) })}
-                          className="w-full bg-transparent text-xs sm:text-sm font-bold text-zinc-900 focus:outline-none"
-                        />
-                        <span className="text-zinc-500 text-xs font-bold ml-2">cr</span>
-                      </div>
-                      <span className="block text-[11px] text-zinc-400 mt-1">1:1 Drive credit parity</span>
-                    </div>
+                <div className="mt-4 pt-3.5 border-t border-zinc-100 max-w-sm">
+                  <label className="block text-xs font-semibold text-zinc-700 mb-1.5">
+                    Max Customer Purchase Limit (₹)
+                  </label>
+                  <div className="flex items-center bg-zinc-100 rounded-xl px-3.5 py-2.5">
+                    <span className="text-zinc-500 text-xs font-bold mr-2">₹</span>
+                    <input
+                      type="number"
+                      value={settings.maxCustomerPurchaseLimit || 100000}
+                      onChange={(e) => setSettings({ ...settings, maxCustomerPurchaseLimit: Number(e.target.value) })}
+                      className="w-full bg-transparent text-xs sm:text-sm font-bold text-zinc-900 focus:outline-none"
+                    />
                   </div>
-
-                  <div className="mt-4 pt-3.5 border-t border-zinc-100">
-                    <label className="block text-xs font-semibold text-zinc-700 mb-1.5">
-                      Max Customer Purchase Limit (₹)
-                    </label>
-                    <div className="flex items-center bg-zinc-100 rounded-xl px-3.5 py-2.5">
-                      <span className="text-zinc-500 text-xs font-bold mr-2">₹</span>
-                      <input
-                        type="number"
-                        value={settings.maxCustomerPurchaseLimit || 100000}
-                        onChange={(e) => setSettings({ ...settings, maxCustomerPurchaseLimit: Number(e.target.value) })}
-                        className="w-full bg-transparent text-xs sm:text-sm font-bold text-zinc-900 focus:outline-none"
-                      />
-                    </div>
-                    <span className="block text-[11px] text-zinc-400 mt-1">
-                      Max lifetime purchase limit per customer (Default: ₹1,00,000 / 1 Lakh)
-                    </span>
-                  </div>
+                  <span className="block text-[11px] text-zinc-400 mt-1">
+                    Max lifetime purchase limit per customer across both tiers (Default: ₹1,00,000 / 1 Lakh)
+                  </span>
                 </div>
               </div>
 
@@ -3015,13 +3014,13 @@ export function AdminConsoleClient({
                     <div className="flex items-center justify-between bg-zinc-100 rounded-xl px-3.5 py-2.5">
                       <input
                         type="number"
-                        value={settings.cashUnlockThreshold}
-                        onChange={(e) => setSettings({ ...settings, cashUnlockThreshold: Number(e.target.value) })}
+                        value={settings.cashUnlockCredits}
+                        onChange={(e) => setSettings({ ...settings, cashUnlockCredits: Number(e.target.value) })}
                         className="w-full bg-transparent text-xs sm:text-sm font-bold text-zinc-900 focus:outline-none"
                       />
-                      <span className="text-zinc-500 text-xs font-bold ml-2">tickets</span>
+                      <span className="text-zinc-500 text-xs font-bold ml-2">credits</span>
                     </div>
-                    <span className="block text-[11px] text-zinc-400 mt-1">Buy to unlock cash commission</span>
+                    <span className="block text-[11px] text-zinc-400 mt-1">Purchased credits needed to unlock cash commission</span>
                   </div>
                 </div>
               </div>
@@ -3248,22 +3247,6 @@ export function AdminConsoleClient({
                     required
                   />
                 </div>
-                <div>
-                  <div className="flex items-center justify-between mb-1">
-                    <label className="block text-xs font-bold text-zinc-700">
-                      Ticket Price (₹)
-                    </label>
-                    <span className="text-[10px] text-zinc-400 font-medium">From Admin Settings</span>
-                  </div>
-                  <input
-                    type="number"
-                    value={settings.ticketPrice || editingContest.ticketPrice}
-                    readOnly
-                    disabled
-                    className="w-full h-10 px-3.5 rounded-xl border border-zinc-200 bg-zinc-100 text-zinc-600 text-xs cursor-not-allowed font-semibold"
-                  />
-                  <span className="block text-[10px] text-zinc-400 mt-1">Configured centrally in Settings</span>
-                </div>
               </div>
 
               <div className="grid grid-cols-2 gap-3">
@@ -3451,22 +3434,6 @@ export function AdminConsoleClient({
                     className="w-full h-10 px-3.5 rounded-xl border border-zinc-300 text-xs focus:outline-none focus:ring-2 focus:ring-[#ea580c]"
                     required
                   />
-                </div>
-                <div>
-                  <div className="flex items-center justify-between mb-1">
-                    <label className="block text-xs font-bold text-zinc-700">
-                      Ticket Price (₹)
-                    </label>
-                    <span className="text-[10px] text-zinc-400 font-medium">From Admin Settings</span>
-                  </div>
-                  <input
-                    type="number"
-                    value={settings.ticketPrice || newContest.ticketPrice}
-                    readOnly
-                    disabled
-                    className="w-full h-10 px-3.5 rounded-xl border border-zinc-200 bg-zinc-100 text-zinc-600 text-xs cursor-not-allowed font-semibold"
-                  />
-                  <span className="block text-[10px] text-zinc-400 mt-1">Configured centrally in Settings</span>
                 </div>
               </div>
 

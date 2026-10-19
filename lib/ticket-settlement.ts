@@ -1,6 +1,8 @@
 import crypto from "crypto"
 import type { PoolClient } from "pg"
-import { generateSingleVoucherCode, formatPlayerId, sanitizePlayerName, voucherTypeForPrice } from "./vouchers"
+import { generateSingleVoucherCode, formatPlayerId, sanitizePlayerName } from "./vouchers"
+import { isTicketTier, readCashUnlockCredits } from "./tiers"
+import type { TicketTier } from "./types"
 
 // Server-only helpers for paid ticket purchases. Deliberately NOT a "use server" module:
 // nothing here may be callable from the browser. Settlement only ever runs after a
@@ -10,18 +12,41 @@ type Queryable = Pick<PoolClient, "query">
 
 export const MAX_TICKETS_PER_ORDER = 1000
 
-export interface ContestPricing {
-  ticketPrice: number
-  creditsPerTicket: number
+/** Whether the contest exists and is currently open for entries. */
+export async function isContestOpen(db: Queryable, contestId: string): Promise<boolean> {
+  const res = await db.query(`SELECT status FROM contests WHERE id = $1 LIMIT 1`, [contestId])
+  return res.rows[0]?.status === "active"
 }
 
-/** Current price and credit parity for a contest, as stored in the database. */
-export async function getContestPricing(db: Queryable, contestId: string): Promise<ContestPricing | null> {
-  const res = await db.query(`SELECT ticket_price, credits_per_ticket FROM contests WHERE id = $1 LIMIT 1`, [contestId])
-  if (res.rows.length === 0) return null
-  const ticketPrice = Number(res.rows[0].ticket_price) || 1000
-  const creditsPerTicket = Number(res.rows[0].credits_per_ticket) || ticketPrice
-  return { ticketPrice, creditsPerTicket }
+/**
+ * Enforces a tier's per-customer ticket cap for one contest (0 = no limit).
+ * Returns an error message when the purchase would exceed it.
+ */
+export async function checkTierTicketLimit(
+  db: Queryable,
+  params: { contestId: string; tier: TicketTier; userEmail: string; userPhone: string; ticketCount: number; maxTickets: number }
+): Promise<string | null> {
+  if (!params.maxTickets) return null
+  const cleanEmail = params.userEmail?.trim().toLowerCase() || ""
+  const cleanDigits = params.userPhone?.replace(/\D/g, "").slice(-10) || ""
+  const res = await db.query(
+    `SELECT COALESCE(SUM(ticket_count), 0) AS bought
+     FROM contest_orders
+     WHERE status = 'completed' AND contest_id = $1 AND COALESCE(tier, '1') = $2
+       AND (
+         (user_email IS NOT NULL AND LOWER(user_email) = $3 AND $3 != '')
+         OR (user_phone IS NOT NULL AND user_phone LIKE $4 AND $4 != '')
+       )`,
+    [params.contestId, params.tier, cleanEmail || "NOMATCH", cleanDigits ? `%${cleanDigits}` : "NOMATCH"]
+  )
+  const bought = Number(res.rows[0]?.bought) || 0
+  if (bought + params.ticketCount > params.maxTickets) {
+    const left = Math.max(0, params.maxTickets - bought)
+    return left > 0
+      ? `Each customer can buy up to ${params.maxTickets} Tier ${params.tier} tickets. You can buy ${left} more.`
+      : `Each customer can buy up to ${params.maxTickets} Tier ${params.tier} tickets, and you have reached that limit.`
+  }
+  return null
 }
 
 /**
@@ -58,9 +83,11 @@ export async function checkPurchaseLimit(
 export interface PaidTicketPurchase {
   orderId: string
   contestId: string
+  tier: TicketTier
   ticketCount: number
   ticketPrice: number
   creditsPerTicket: number
+  vouchersPerTicket: number
   userEmail: string
   userPhone: string
   userName?: string
@@ -90,11 +117,11 @@ export async function settleTicketPurchase(
 
   // 1. Record the order. ON CONFLICT + RETURNING makes concurrent retries settle exactly once.
   const orderRes = await client.query(
-    `INSERT INTO contest_orders (id, user_phone, user_email, user_name, contest_id, ticket_count, amount_paid, credits_issued, referral_code_used, payment_gateway, payment_id, status, created_at)
-     VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, 'completed', NOW())
+    `INSERT INTO contest_orders (id, user_phone, user_email, user_name, contest_id, tier, ticket_count, amount_paid, credits_issued, referral_code_used, payment_gateway, payment_id, status, created_at)
+     VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, 'completed', NOW())
      ON CONFLICT (id) DO NOTHING
      RETURNING id`,
-    [p.orderId, userPhone, userEmail, p.userName || "Member", p.contestId, p.ticketCount, cost, creditsIssued, codeToUse || null, p.gateway, p.paymentId]
+    [p.orderId, userPhone, userEmail, p.userName || "Member", p.contestId, p.tier, p.ticketCount, cost, creditsIssued, codeToUse || null, p.gateway, p.paymentId]
   )
   if (orderRes.rows.length === 0) {
     const existing = await client.query(`SELECT code FROM game_vouchers WHERE order_id = $1 ORDER BY id`, [p.orderId])
@@ -111,7 +138,8 @@ export async function settleTicketPurchase(
   // 3. Increment Contest Ticket Count
   await client.query(`UPDATE contests SET sold_tickets = sold_tickets + $1, updated_at = NOW() WHERE id = $2`, [p.ticketCount, p.contestId])
 
-  // 4. Generate 12-digit Turboride Coin Rush game vouchers (1 per ticket)
+  // 4. Generate 12-digit Turboride Coin Rush game vouchers (vouchersPerTicket per ticket).
+  //    voucher_type is the tier, so the game routes scores to that tier's leaderboard.
   const cleanDigits = userPhone.replace(/\D/g, "").slice(-10)
   const profRes = await client.query(
     `SELECT id, user_name FROM referral_profiles
@@ -121,10 +149,10 @@ export async function settleTicketPurchase(
   const profileId = profRes.rows[0]?.id || primaryId
   const playerName = sanitizePlayerName(profRes.rows[0]?.user_name || p.userName)
   const playerId = formatPlayerId(profileId)
-  const voucherType = voucherTypeForPrice(p.ticketPrice)
+  const voucherCount = p.ticketCount * p.vouchersPerTicket
 
   const vouchers: string[] = []
-  for (let i = 0; i < p.ticketCount; i++) {
+  for (let i = 0; i < voucherCount; i++) {
     let inserted = false
     let attempts = 0
     while (!inserted && attempts < 15) {
@@ -137,7 +165,7 @@ export async function settleTicketPurchase(
         ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, 'active', NOW())
         ON CONFLICT DO NOTHING
         RETURNING code`,
-        [code, normalizedCode, profileId, playerId, playerName, p.contestId, p.orderId, voucherType]
+        [code, normalizedCode, profileId, playerId, playerName, p.contestId, p.orderId, p.tier]
       )
       if (res.rows.length > 0) {
         vouchers.push(code)
@@ -161,9 +189,9 @@ export async function settleTicketPurchase(
         )
         if (check.rows.length === 0) {
           await client.query(
-            `INSERT INTO contest_tickets (id, contest_id, user_phone, user_email, user_name, ticket_number, order_id, created_at)
-             VALUES ($1, $2, $3, $4, $5, $6, $7, NOW())`,
-            [`TKT-${Date.now()}-${candidate}-${i}`, p.contestId, userPhone, userEmail, p.userName || "Member", candidate, p.orderId]
+            `INSERT INTO contest_tickets (id, contest_id, user_phone, user_email, user_name, ticket_number, order_id, tier, created_at)
+             VALUES ($1, $2, $3, $4, $5, $6, $7, $8, NOW())`,
+            [`TKT-${Date.now()}-${candidate}-${i}`, p.contestId, userPhone, userEmail, p.userName || "Member", candidate, p.orderId, p.tier]
           )
           assigned = true
         }
@@ -171,24 +199,36 @@ export async function settleTicketPurchase(
     }
   }
 
-  // 6. Referral economics and unlock thresholds
+  // 6. Referral economics
   const settingsRes = await client.query(
     `SELECT key, value FROM site_settings
-     WHERE key IN ('contest_referral_drive_pct', 'contest_referral_cash_pct', 'contest_cash_unlock_threshold')`
+     WHERE key IN ('contest_referral_drive_pct', 'contest_referral_cash_pct')`
   )
   const sMap = new Map(settingsRes.rows.map((r: { key: string; value: string }) => [r.key, r.value]))
   const driveRewardPct = (Number(sMap.get("contest_referral_drive_pct")) || 25) / 100
   const cashCommissionPct = (Number(sMap.get("contest_referral_cash_pct")) || 25) / 100
-  const cashUnlockThreshold = Number(sMap.get("contest_cash_unlock_threshold")) || 20
+  const cashUnlockCredits = await readCashUnlockCredits(client)
 
-  // 7. Update Buyer's Referral Profile
+  // 7. Update Buyer's Referral Profile. Cash commission unlocks once the buyer's
+  //    purchased drive credits (all completed orders, this one included) reach the threshold.
+  const purchasedRes = await client.query(
+    `SELECT COALESCE(SUM(credits_issued), 0) AS credits
+     FROM contest_orders
+     WHERE status = 'completed'
+       AND (
+         (user_email IS NOT NULL AND LOWER(user_email) = $1 AND $1 != '')
+         OR (user_phone IS NOT NULL AND user_phone LIKE $2 AND $2 != '')
+       )`,
+    [userEmail || "NOMATCH", cleanDigits ? `%${cleanDigits}` : "NOMATCH"]
+  )
+  const purchasedCredits = Number(purchasedRes.rows[0]?.credits) || 0
   await client.query(
     `UPDATE referral_profiles
      SET tickets_bought = tickets_bought + $1,
-         is_cash_unlocked = CASE WHEN (tickets_bought + $1) >= $2 THEN TRUE ELSE is_cash_unlocked END,
+         is_cash_unlocked = CASE WHEN $2 THEN TRUE ELSE is_cash_unlocked END,
          updated_at = NOW()
      WHERE LOWER(user_email) = $3 OR user_phone = $4`,
-    [p.ticketCount, cashUnlockThreshold, userEmail, userPhone || "NONE"]
+    [p.ticketCount, purchasedCredits >= cashUnlockCredits, userEmail, userPhone || "NONE"]
   )
 
   // 8. Referral commission. A buyer can never earn commission on their own purchase.
@@ -269,13 +309,19 @@ export function purchaseFromOrderNotes(order: RazorpayOrderRecord): Omit<PaidTic
   const ticketCount = Number(n.ticketCount)
   const ticketPrice = Number(n.ticketPrice)
   const creditsPerTicket = Number(n.creditsPerTicket)
-  if (!n.contestId || !Number.isInteger(ticketCount) || ticketCount < 1 || !ticketPrice || !creditsPerTicket) return null
+  // Orders created before tiers existed carry no tier/vouchers notes: Tier 1, 1 voucher each
+  const tier = n.tier ?? "1"
+  const vouchersPerTicket = n.vouchersPerTicket === undefined ? 1 : Number(n.vouchersPerTicket)
+  if (!n.contestId || !Number.isInteger(ticketCount) || ticketCount < 1 || !ticketPrice || !Number.isFinite(creditsPerTicket) || creditsPerTicket < 0) return null
+  if (!isTicketTier(tier) || !Number.isInteger(vouchersPerTicket) || vouchersPerTicket < 1) return null
   if (ticketCount * ticketPrice * 100 !== order.amount) return null
   return {
     contestId: n.contestId,
+    tier,
     ticketCount,
     ticketPrice,
     creditsPerTicket,
+    vouchersPerTicket,
     userEmail: n.userEmail || "",
     userPhone: n.userPhone || "",
     userName: n.userName || undefined,

@@ -5,21 +5,10 @@ import { pool } from "./db"
 export const VOUCHER_ALPHABET = "23456789ABCDEFGHJKMNPQRSTUVWXYZ"
 
 /**
- * Voucher pricing tier, used by the Coin Rush game server to route scores to
- * separate leaderboards: "1" = ₹1,000 tier, "2" = ₹2,000 tier.
+ * Voucher tier, used by the Coin Rush game server to route scores to separate
+ * leaderboards. It is the ticket tier the voucher was bought with ("1" or "2").
  */
 export type VoucherType = "1" | "2"
-
-/** Ticket price (₹) at or above which vouchers are issued as tier "2". */
-export const VOUCHER_TYPE_2_MIN_PRICE = 2000
-
-/**
- * Derive the voucher tier from the per-ticket price paid at purchase.
- * e.g. 1000 -> "1", 2000 -> "2"
- */
-export function voucherTypeForPrice(ticketPrice: number): VoucherType {
-  return ticketPrice >= VOUCHER_TYPE_2_MIN_PRICE ? "2" : "1"
-}
 
 export interface GameVoucherRecord {
   id: number

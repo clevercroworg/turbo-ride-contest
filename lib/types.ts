@@ -90,13 +90,25 @@ export interface ActiveVoucher {
   bookingLaps?: number
 }
 
-export interface AdminPlatformSettings {
-  ticketPrice: number
+export type TicketTier = "1" | "2"
+
+export interface TicketTierSettings {
+  price: number
   creditsPerTicket: number
+  vouchersPerTicket: number
+  /** Max tickets of this tier one customer can buy per contest. 0 = no limit. */
+  maxTicketsPerCustomer: number
+  prizeTitle: string
+  prizeDescription: string
+}
+
+export interface AdminPlatformSettings {
+  tiers: Record<TicketTier, TicketTierSettings>
   maxCustomerPurchaseLimit: number
   creditRewardPercent: number
   cashCommissionPercent: number
-  cashUnlockThreshold: number
+  /** Purchased drive credits needed to unlock cash referral commission. */
+  cashUnlockCredits: number
   fallbackPayoutPercent: number
   drawType: string
   isPaused: boolean
