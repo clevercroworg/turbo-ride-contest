@@ -196,8 +196,9 @@ The application adheres to a strict **Industrial-Brutalist Supercar Aesthetic**.
 
 ## 🔗 Shared Integrations
 
-*   **Database**: Shared Neon PostgreSQL instance (`user_credits`, `credit_transactions`, `contests`, `contest_tickets`, `referral_profiles`, `reward_redemptions`).
+*   **Database**: Shared Neon PostgreSQL instance (`user_credits`, `credit_transactions`, `contests`, `contest_tickets`, `referral_profiles`, `reward_redemptions`, `game_vouchers`, `game_voucher_redemptions`).
+*   **Coin Rush Game Integration**: Server-to-server REST endpoints (`/api/vouchers/check`, `/api/vouchers/redeem`) with 600 req/min rate limit and Bearer authentication connecting to external WebGL Game Server (`https://game.turboridesupercars.com/`) and live public Leaderboard (`https://game.turboridesupercars.com/leaderboard.html`).
 *   **Booking Engine Integration**: Redemptions in `/members/rewards` debit credits and redirect to `${NEXT_PUBLIC_BOOKING_APP_URL}/checkout` with pre-filled parameters.
 *   **Git Remote**: `https://github.com/clevercroworg/turbo-ride-contest.git` (branch `main`).
-*   **Live Production URL**: `https://turbo-ride-contest.vercel.app`.
-*   **Architecture Reference**: See `../PROJECT_STRUCTURE.md` for complete multi-project ecosystem documentation.
+*   **Live Production URL**: `https://turbo-ride-contest.vercel.app` (custom domain: `https://win.turboridesupercars.com`).
+*   **Full Documentation**: See `../PROJECT_STRUCTURE.md` and `../GAME_INTEGRATION_AND_INSTRUCTIONS.md` for complete ecosystem architecture and developer handovers.
