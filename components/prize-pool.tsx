@@ -1,14 +1,18 @@
 import Image from "next/image"
 import { PorscheSpecs } from "./porsche-specs"
+import { TICKET_TIERS } from "@/lib/tiers"
+import type { TicketTier, TicketTierSettings } from "@/lib/types"
 
 interface PrizePoolProps {
   carName?: string
   worthDisplay?: string
+  tiers?: Record<TicketTier, TicketTierSettings>
 }
 
 export function PrizePool({
   carName = "Porsche 718 Cayman",
   worthDisplay = "Worth over ₹1.6 Crore",
+  tiers,
 }: PrizePoolProps = {}) {
   return (
     <section id="the-car" className="py-14 sm:py-20 lg:py-24 bg-[#fafafa] border-t border-zinc-200">
@@ -33,6 +37,32 @@ export function PrizePool({
             <span>Live Draw Triggered When 10,000 Tickets Sell Out</span>
           </div>
         </div>
+
+        {/* Prizes by Ticket Tier (managed in Admin Settings) - Sharp Edges */}
+        {tiers && (
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6 mb-8">
+            {TICKET_TIERS.map((t) => (
+              <div key={t} className="rounded-none bg-white border border-zinc-200 shadow-2xs p-5 sm:p-6 lg:p-7">
+                <div className="flex items-center justify-between gap-3 mb-3">
+                  <span className="text-[11px] sm:text-xs font-mono font-black uppercase tracking-wider text-[#ea580c]">
+                    Tier {t} Prize
+                  </span>
+                  <span className="text-xs sm:text-sm font-black text-white bg-zinc-950 px-2.5 py-1 rounded-none tabular-nums">
+                    ₹{tiers[t].price.toLocaleString("en-IN")} Ticket
+                  </span>
+                </div>
+                <h3 className="text-xl sm:text-2xl font-black uppercase tracking-tight text-zinc-950 leading-tight">
+                  {tiers[t].prizeTitle}
+                </h3>
+                {tiers[t].prizeDescription && (
+                  <p className="mt-2 text-sm text-zinc-600 font-medium leading-relaxed">
+                    {tiers[t].prizeDescription}
+                  </p>
+                )}
+              </div>
+            ))}
+          </div>
+        )}
 
         {/* 1st Prize Grand Feature Card: Horizontal Architectural Stage - Sharp Edges */}
         <div className="rounded-none bg-white border border-zinc-200 overflow-hidden shadow-2xs mb-8 group">

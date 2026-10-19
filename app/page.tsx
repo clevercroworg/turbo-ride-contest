@@ -1,6 +1,8 @@
 import { getActiveContest } from "@/lib/contests"
 import { getMemberSession } from "@/lib/auth"
 import { getUserDriveCredits } from "@/lib/credits"
+import { pool } from "@/lib/db"
+import { readTierSettings } from "@/lib/tiers"
 import { cookies } from "next/headers"
 import { HomeClient } from "./home-client"
 
@@ -27,10 +29,12 @@ export default async function HomePage({ searchParams }: HomePageProps) {
   const contest = await getActiveContest()
   const session = await getMemberSession()
   const userCredits = session ? await getUserDriveCredits(session.email, session.phone) : 0
+  const tiers = await readTierSettings(pool)
 
   return (
     <HomeClient
       contest={contest}
+      tiers={tiers}
       memberEmail={session?.email}
       userCredits={userCredits}
     />

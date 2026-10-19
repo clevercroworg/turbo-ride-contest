@@ -14,17 +14,19 @@ import { ReferralEngine } from "@/components/referral-engine"
 import { FaqAccordion } from "@/components/faq-accordion"
 import { Footer } from "@/components/footer"
 import { TicketCheckoutModal } from "@/components/ticket-checkout-modal"
-import type { Contest } from "@/lib/types"
+import type { Contest, TicketTier, TicketTierSettings } from "@/lib/types"
 
 interface HomeClientProps {
   contest: Contest
+  tiers: Record<TicketTier, TicketTierSettings>
   memberEmail?: string
   userCredits?: number
 }
 
-export function HomeClient({ contest, memberEmail, userCredits = 0 }: HomeClientProps) {
+export function HomeClient({ contest, tiers, memberEmail, userCredits = 0 }: HomeClientProps) {
   const [modalOpen, setModalOpen] = useState(false)
   const [selectedTicketCount, setSelectedTicketCount] = useState(10)
+  const [selectedTier, setSelectedTier] = useState<TicketTier>("1")
 
   const handleOpenBuy = (count: number = 10) => {
     setSelectedTicketCount(count)
@@ -61,7 +63,9 @@ export function HomeClient({ contest, memberEmail, userCredits = 0 }: HomeClient
           onBuyClick={(count) => handleOpenBuy(count || 10)}
           soldTickets={contest.soldTickets}
           targetTickets={contest.targetTickets}
-          ticketPrice={contest.ticketPrice}
+          tiers={tiers}
+          selectedTier={selectedTier}
+          onTierChange={setSelectedTier}
           carName={contest.carName}
         />
 
@@ -94,6 +98,7 @@ export function HomeClient({ contest, memberEmail, userCredits = 0 }: HomeClient
         <PrizePool
           carName={contest.carName}
           worthDisplay={contest.worthDisplay}
+          tiers={tiers}
         />
 
         {/* 6. Referral Engine: 2-Tier Program */}
@@ -118,7 +123,9 @@ export function HomeClient({ contest, memberEmail, userCredits = 0 }: HomeClient
         onClose={() => setModalOpen(false)}
         initialCount={selectedTicketCount}
         contestId={contest.id}
-        ticketPrice={contest.ticketPrice}
+        tiers={tiers}
+        tier={selectedTier}
+        onTierChange={setSelectedTier}
         carName={contest.carName}
         defaultEmail={memberEmail}
       />

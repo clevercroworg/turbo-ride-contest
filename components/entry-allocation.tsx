@@ -2,6 +2,8 @@
 
 import { useState } from "react"
 import { Ticket, ArrowRight, ShieldCheck, CheckCircle } from "@phosphor-icons/react"
+import { TICKET_TIERS } from "@/lib/tiers"
+import type { TicketTier, TicketTierSettings } from "@/lib/types"
 
 interface EntryAllocationProps {
   onBuyClick: (ticketCount: number) => void
@@ -10,7 +12,9 @@ interface EntryAllocationProps {
   totalTicketsSold?: number
   soldTickets?: number
   targetTickets?: number
-  ticketPrice?: number
+  tiers: Record<TicketTier, TicketTierSettings>
+  selectedTier: TicketTier
+  onTierChange: (tier: TicketTier) => void
   carName?: string
 }
 
@@ -19,9 +23,14 @@ export function EntryAllocation({
   totalTicketsSold,
   soldTickets,
   targetTickets = 10000,
-  ticketPrice = 1000,
+  tiers,
+  selectedTier,
+  onTierChange,
 }: EntryAllocationProps) {
   const [selectedTickets, setSelectedTickets] = useState(10)
+  const tier = tiers[selectedTier]
+  const ticketPrice = tier.price
+  const maxTickets = tier.maxTicketsPerCustomer
 
   const ticketsSold = totalTicketsSold ?? soldTickets ?? 6413
   const totalCap = targetTickets || 10000
@@ -35,8 +44,15 @@ export function EntryAllocation({
     { count: 50, label: "50", bonus: "VIP CLUB" },
   ]
 
-  const totalCost = selectedTickets * ticketPrice
-  const totalCredits = selectedTickets * ticketPrice
+  const isAllowed = (count: number) => !maxTickets || count <= maxTickets
+  // Keep the chosen quantity within the selected tier's per-customer cap
+  const effectiveTickets = isAllowed(selectedTickets)
+    ? selectedTickets
+    : Math.max(1, ...ticketOptions.map((o) => o.count).filter(isAllowed))
+
+  const totalCost = effectiveTickets * ticketPrice
+  const totalCredits = effectiveTickets * tier.creditsPerTicket
+
 
   const renderCalculatorCard = () => (
     <div className="max-w-xl md:max-w-2xl lg:max-w-xl mx-auto">
@@ -51,23 +67,59 @@ export function EntryAllocation({
             </span>
           </div>
           <span className="text-xs sm:text-[13px] text-zinc-950 font-bold">
-            1 Ticket = ₹{ticketPrice.toLocaleString("en-IN")} (100% Back)
+            1 Ticket = ₹{ticketPrice.toLocaleString("en-IN")}{" "}
+            {tier.creditsPerTicket === ticketPrice ? "(100% Back)" : `(${tier.creditsPerTicket.toLocaleString("en-IN")} Credits)`}
           </span>
+        </div>
+
+        {/* Tier Selector - Two Sharp-Edged Cards */}
+        <div className="grid grid-cols-2 gap-1.5 xs:gap-2 sm:gap-2.5 mb-4">
+          {TICKET_TIERS.map((t) => {
+            const tierInfo = tiers[t]
+            const isSelected = selectedTier === t
+            return (
+              <button
+                key={t}
+                type="button"
+                onClick={() => onTierChange(t)}
+                aria-pressed={isSelected}
+                className={`p-2.5 xs:p-3 sm:p-4 rounded-none text-left flex flex-col transition-all cursor-pointer border ${
+                  isSelected
+                    ? "bg-zinc-950 text-white border-zinc-950 shadow-md"
+                    : "bg-zinc-50 hover:bg-zinc-100 text-zinc-950 border-zinc-200"
+                }`}
+              >
+                <span className={`text-[10px] sm:text-[11px] font-extrabold uppercase tracking-wider ${isSelected ? "text-orange-400" : "text-[#ea580c]"}`}>
+                  Tier {t}
+                </span>
+                <span className="text-lg xs:text-xl sm:text-2xl font-black leading-tight tabular-nums mt-0.5">
+                  ₹{tierInfo.price.toLocaleString("en-IN")}
+                </span>
+                <span className={`text-[11px] sm:text-xs font-bold mt-1 leading-snug ${isSelected ? "text-zinc-200" : "text-zinc-700"}`}>
+                  Win {tierInfo.prizeTitle}
+                </span>
+              </button>
+            )
+          })}
         </div>
 
         {/* 5 Selector Buttons - Sharp Edged */}
         <div className="grid grid-cols-5 gap-1 xs:gap-1.5 sm:gap-2.5 mb-4">
           {ticketOptions.map((opt) => {
-            const isSelected = selectedTickets === opt.count
+            const isSelected = effectiveTickets === opt.count
+            const allowed = isAllowed(opt.count)
             return (
               <button
                 key={opt.count}
                 type="button"
+                disabled={!allowed}
                 onClick={() => setSelectedTickets(opt.count)}
-                className={`relative py-2 xs:py-2.5 sm:py-3 px-0.5 xs:px-1 rounded-none flex flex-col items-center justify-center transition-all cursor-pointer border ${
-                  isSelected
-                    ? "bg-zinc-950 text-white border-zinc-950 shadow-md scale-[1.02]"
-                    : "bg-zinc-50 hover:bg-zinc-100 text-zinc-800 border-zinc-200"
+                className={`relative py-2 xs:py-2.5 sm:py-3 px-0.5 xs:px-1 rounded-none flex flex-col items-center justify-center transition-all border ${
+                  !allowed
+                    ? "bg-zinc-50 text-zinc-300 border-zinc-100 cursor-not-allowed"
+                    : isSelected
+                    ? "bg-zinc-950 text-white border-zinc-950 shadow-md scale-[1.02] cursor-pointer"
+                    : "bg-zinc-50 hover:bg-zinc-100 text-zinc-800 border-zinc-200 cursor-pointer"
                 }`}
               >
                 {opt.bonus && (
@@ -117,21 +169,21 @@ export function EntryAllocation({
               Draw Entries
             </span>
             <span className="text-base sm:text-xl font-black text-[#ea580c] tracking-tight block tabular-nums">
-              {selectedTickets} {selectedTickets === 1 ? "Entry" : "Entries"}
+              {effectiveTickets} {effectiveTickets === 1 ? "Entry" : "Entries"}
             </span>
-            <span className="text-[10px] text-orange-600 font-bold block">Grand Draw</span>
+            <span className="text-[10px] text-orange-600 font-bold block">Tier {selectedTier} Draw</span>
           </div>
         </div>
 
         {/* Primary Action Button - Sharp */}
         <button
           type="button"
-          onClick={() => onBuyClick(selectedTickets)}
+          onClick={() => onBuyClick(effectiveTickets)}
           className="w-full py-3.5 sm:py-4 px-5 rounded-none bg-[#ea580c] hover:bg-[#c2410c] text-white text-sm sm:text-base font-bold uppercase tracking-wider transition-all shadow-[0_6px_20px_rgba(234,88,12,0.35)] hover:shadow-[0_8px_28px_rgba(234,88,12,0.5)] active:scale-[0.99] flex items-center justify-center gap-2.5 cursor-pointer mb-4"
         >
           <Ticket size={18} weight="fill" className="shrink-0" />
           <span>
-            Get {selectedTickets} {selectedTickets === 1 ? "Ticket" : "Tickets"} · ₹{totalCost.toLocaleString("en-IN")}
+            Get {effectiveTickets} {effectiveTickets === 1 ? "Ticket" : "Tickets"} · ₹{totalCost.toLocaleString("en-IN")}
           </span>
           <ArrowRight size={16} weight="bold" className="shrink-0" />
         </button>

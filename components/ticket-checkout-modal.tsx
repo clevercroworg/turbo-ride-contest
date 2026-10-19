@@ -5,13 +5,17 @@ import confetti from "canvas-confetti"
 import { X, Ticket, CheckCircle, ArrowRight, ShieldCheck } from "@phosphor-icons/react"
 import { createRazorpayOrderAction, verifyAndCompleteRazorpayPaymentAction } from "@/lib/razorpay"
 import { createRazorpayCheckout, loadRazorpayScript } from "@/lib/load-razorpay"
+import { TICKET_TIERS } from "@/lib/tiers"
+import type { TicketTier, TicketTierSettings } from "@/lib/types"
 
 interface CheckoutModalProps {
   isOpen: boolean
   onClose: () => void
   initialCount?: number
   contestId?: string
-  ticketPrice?: number
+  tiers: Record<TicketTier, TicketTierSettings>
+  tier: TicketTier
+  onTierChange: (tier: TicketTier) => void
   carName?: string
   defaultEmail?: string
   defaultPhone?: string
@@ -22,7 +26,9 @@ export function TicketCheckoutModal({
   onClose,
   initialCount = 10,
   contestId = "porsche-718",
-  ticketPrice = 1000,
+  tiers,
+  tier,
+  onTierChange,
   carName = "Porsche 718 Cayman",
   defaultEmail = "",
   defaultPhone = "",
@@ -36,6 +42,18 @@ export function TicketCheckoutModal({
   const [error, setError] = useState<string | null>(null)
   const [successOrder, setSuccessOrder] = useState<{ orderId: string; credits: number; vouchers?: string[] } | null>(null)
   const [copiedCode, setCopiedCode] = useState<string | null>(null)
+
+  const tierInfo = tiers[tier]
+  const ticketPrice = tierInfo.price
+  const creditsPerTicket = tierInfo.creditsPerTicket
+  const maxTickets = tierInfo.maxTicketsPerCustomer
+
+  // The modal stays mounted while closed, so pick up the quantity chosen on the page each time it opens
+  const [wasOpen, setWasOpen] = useState(isOpen)
+  if (isOpen !== wasOpen) {
+    setWasOpen(isOpen)
+    if (isOpen) setTicketCount(initialCount)
+  }
 
   useEffect(() => {
     if (typeof window !== "undefined" && isOpen) {
@@ -73,6 +91,7 @@ export function TicketCheckoutModal({
       // 1. Create Razorpay order on server (amount is priced server-side)
       const orderRes = await createRazorpayOrderAction({
         contestId,
+        tier,
         ticketCount,
         userEmail,
         userPhone,
@@ -91,7 +110,7 @@ export function TicketCheckoutModal({
         amount: orderRes.amount,
         currency: "INR",
         name: "TurboRide Supercars",
-        description: `${ticketCount} Contest Ticket${ticketCount > 1 ? "s" : ""} + ${(ticketCount * ticketPrice).toLocaleString("en-IN")} Drive Credits`,
+        description: `${ticketCount} Tier ${tier} Ticket${ticketCount > 1 ? "s" : ""} + ${(ticketCount * creditsPerTicket).toLocaleString("en-IN")} Drive Credits`,
         order_id: orderRes.orderId,
         prefill: { name: userName, email: userEmail, contact: userPhone },
         theme: { color: "#ea580c" },
@@ -113,7 +132,7 @@ export function TicketCheckoutModal({
 
             setSuccessOrder({
               orderId: res.orderId || "COMPLETED",
-              credits: res.creditsAdded || ticketCount * ticketPrice,
+              credits: res.creditsAdded || ticketCount * creditsPerTicket,
               vouchers: res.vouchers || [],
             })
 
@@ -181,6 +200,10 @@ export function TicketCheckoutModal({
               <div className="flex justify-between py-1 text-zinc-500 font-medium">
                 <span>Draw Active:</span>
                 <span className="text-[#ea580c] font-bold">{carName}</span>
+              </div>
+              <div className="flex justify-between py-1 text-zinc-500 font-medium">
+                <span>Tier:</span>
+                <span className="text-zinc-950 font-bold">Tier {tier} · {tierInfo.prizeTitle}</span>
               </div>
               <div className="flex justify-between py-1 text-zinc-500 font-medium">
                 <span>Wallet Balance:</span>
@@ -271,6 +294,33 @@ export function TicketCheckoutModal({
 
             <form onSubmit={handleCheckout} className="flex flex-col gap-5">
               
+              {/* Tier Selector */}
+              <div>
+                <label className="block text-xs uppercase text-zinc-950 font-black mb-2">
+                  Choose Tier
+                </label>
+                <div className="grid grid-cols-2 gap-1.5">
+                  {TICKET_TIERS.map((t) => (
+                    <button
+                      key={t}
+                      type="button"
+                      onClick={() => onTierChange(t)}
+                      aria-pressed={tier === t}
+                      className={`py-2 px-2.5 rounded-lg text-left transition-all cursor-pointer ${
+                        tier === t
+                          ? "bg-[#ea580c] text-white shadow-xs"
+                          : "bg-zinc-100 text-zinc-950 hover:bg-zinc-200 border border-zinc-200"
+                      }`}
+                    >
+                      <span className="block text-xs font-black">Tier {t} · ₹{tiers[t].price.toLocaleString("en-IN")}</span>
+                      <span className={`block text-[11px] font-semibold ${tier === t ? "text-orange-50" : "text-zinc-600"}`}>
+                        Win {tiers[t].prizeTitle}
+                      </span>
+                    </button>
+                  ))}
+                </div>
+              </div>
+
               {/* Ticket Quantity Stepper */}
               <div>
                 <label className="block text-xs uppercase text-zinc-950 font-black mb-2">
@@ -281,8 +331,9 @@ export function TicketCheckoutModal({
                     <button
                       key={p}
                       type="button"
+                      disabled={!!maxTickets && p > maxTickets}
                       onClick={() => setTicketCount(p)}
-                      className={`py-2 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+                      className={`py-2 rounded-lg text-xs font-bold transition-all cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed ${
                         ticketCount === p
                           ? "bg-[#ea580c] text-white font-black shadow-xs"
                           : "bg-zinc-100 text-zinc-950 hover:bg-zinc-200 border border-zinc-200 font-bold"
@@ -302,7 +353,7 @@ export function TicketCheckoutModal({
                 </div>
                 <div className="text-right">
                   <span className="text-zinc-950 font-black block">Credits Received</span>
-                  <span className="text-base font-black text-emerald-600 tabular-nums">+{(ticketCount * ticketPrice).toLocaleString("en-IN")} Credits</span>
+                  <span className="text-base font-black text-emerald-600 tabular-nums">+{(ticketCount * creditsPerTicket).toLocaleString("en-IN")} Credits</span>
                 </div>
               </div>
 
@@ -388,7 +439,7 @@ export function TicketCheckoutModal({
 
               <div className="flex items-center justify-center gap-2 text-xs text-zinc-950 font-bold">
                 <ShieldCheck size={16} className="text-emerald-600 shrink-0" weight="fill" />
-                <span>100% Capital Protected · ₹{ticketPrice.toLocaleString("en-IN")} = {ticketPrice.toLocaleString("en-IN")} Drive Credits</span>
+                <span>100% Capital Protected · ₹{ticketPrice.toLocaleString("en-IN")} = {creditsPerTicket.toLocaleString("en-IN")} Drive Credits</span>
               </div>
 
             </form>

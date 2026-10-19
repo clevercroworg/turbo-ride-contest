@@ -123,7 +123,8 @@ import type {
   ReferralRecord, 
   ActiveVoucher 
 } from "@/lib/types"
-import type { AdminPlatformSettings } from "@/lib/types"
+import type { AdminPlatformSettings, TicketTier } from "@/lib/types"
+import { TICKET_TIERS } from "@/lib/tiers"
 import type { GameVoucherRecord } from "@/lib/vouchers"
 
 interface MemberDashboardClientProps {
@@ -184,6 +185,7 @@ export function MemberDashboardClient({
 
   // Ticket Buying State
   const [ticketBuyCount, setTicketBuyCount] = useState<number>(1)
+  const [buyTier, setBuyTier] = useState<TicketTier>("1")
   const [buying, setBuying] = useState<boolean>(false)
   const [buyMsg, setBuyMsg] = useState<{ type: "success" | "error"; text: string } | null>(null)
 
@@ -267,6 +269,9 @@ export function MemberDashboardClient({
   const cashCommissionPercent = adminSettings?.cashCommissionPercent ?? 25
   const cashUnlockCredits = adminSettings?.cashUnlockCredits ?? 25000
   const platformTicketPrice = adminSettings?.tiers["1"].price ?? unitPrice
+  const buyTierInfo = adminSettings?.tiers[buyTier]
+  const buyPrice = buyTierInfo?.price ?? unitPrice
+  const buyCredits = buyTierInfo?.creditsPerTicket ?? buyPrice
   const driveRewardPerTicket = Math.round(platformTicketPrice * (creditRewardPercent / 100))
   const refCode = referralProfile?.referralCode || session.phone?.slice(-4) || "4021"
   const productionBaseUrl = process.env.NEXT_PUBLIC_APP_URL || "https://win.turboridesupercars.com"
@@ -289,10 +294,14 @@ export function MemberDashboardClient({
       // 1. Create Razorpay order on server (amount is priced server-side)
       const orderRes = await createRazorpayOrderAction({
         contestId: currentContest.id || contest.id,
+        tier: buyTier,
         ticketCount: qty,
         userEmail: session.email,
         userPhone: session.phone,
         userName: session.name,
+        // Tier 2 draw numbers are assigned automatically so they keep their tier;
+        // Tier 1 members still pick their own lucky numbers below.
+        autoAssign: buyTier === "2",
       })
 
       if (!orderRes.ok || !orderRes.orderId) {
@@ -305,7 +314,7 @@ export function MemberDashboardClient({
         amount: orderRes.amount,
         currency: "INR",
         name: "TurboRide Supercars",
-        description: `${qty} Contest Ticket${qty > 1 ? "s" : ""} + ${(qty * unitPrice).toLocaleString("en-IN")} Drive Credits`,
+        description: `${qty} Tier ${buyTier} Ticket${qty > 1 ? "s" : ""} + ${(qty * buyCredits).toLocaleString("en-IN")} Drive Credits`,
         order_id: orderRes.orderId,
         prefill: {
           name: session.name || "Member",
@@ -335,16 +344,17 @@ export function MemberDashboardClient({
               return
             }
 
-            setCredits((prev) => prev + qty * unitPrice)
+            setCredits((prev) => prev + (verifyRes.creditsAdded ?? qty * buyCredits))
             setTicketStats((prev) => ({
               ...prev,
               totalBought: prev.totalBought + qty,
-              availableToAssign: prev.availableToAssign + qty,
+              totalAssigned: buyTier === "2" ? prev.totalAssigned + qty : prev.totalAssigned,
+              availableToAssign: buyTier === "2" ? prev.availableToAssign : prev.availableToAssign + qty,
             }))
 
             setBuyMsg({
               type: "success",
-              text: `Payment Confirmed! Added ${qty} ticket${qty > 1 ? "s" : ""} & ${(qty * unitPrice).toLocaleString("en-IN")} permanent Drive Credits to your garage.`,
+              text: `Payment Confirmed! Added ${qty} Tier ${buyTier} ticket${qty > 1 ? "s" : ""} & ${(verifyRes.creditsAdded ?? qty * buyCredits).toLocaleString("en-IN")} permanent Drive Credits to your garage.`,
             })
 
             try {
@@ -710,9 +720,38 @@ export function MemberDashboardClient({
                 )}
               </div>
               <p className="mt-1 text-sm text-zinc-600">
-                Tickets cost ₹{unitPrice.toLocaleString("en-IN")} each. Every ticket gives you 1 contest entry and {unitPrice.toLocaleString("en-IN")} Drive Credits.
+                Tier {buyTier} tickets cost ₹{buyPrice.toLocaleString("en-IN")} each. Every ticket gives you 1 Tier {buyTier} entry and {buyCredits.toLocaleString("en-IN")} Drive Credits.
               </p>
             </div>
+
+            {/* Tier Selector */}
+            {adminSettings && (
+              <div className="grid grid-cols-2 gap-2">
+                {TICKET_TIERS.map((t) => (
+                  <button
+                    key={t}
+                    type="button"
+                    onClick={() => setBuyTier(t)}
+                    aria-pressed={buyTier === t}
+                    className={`p-3 rounded-xl text-left transition-all cursor-pointer ${
+                      buyTier === t
+                        ? "bg-zinc-950 text-white shadow-xs"
+                        : "border border-zinc-200 bg-white hover:bg-zinc-50 text-zinc-800"
+                    }`}
+                  >
+                    <span className={`block text-[11px] font-bold uppercase tracking-wide ${buyTier === t ? "text-orange-400" : "text-[#ea580c]"}`}>
+                      Tier {t}
+                    </span>
+                    <span className="block text-base sm:text-lg font-black font-mono">
+                      ₹{adminSettings.tiers[t].price.toLocaleString("en-IN")}
+                    </span>
+                    <span className={`block text-xs font-semibold ${buyTier === t ? "text-zinc-300" : "text-zinc-600"}`}>
+                      Win {adminSettings.tiers[t].prizeTitle}
+                    </span>
+                  </button>
+                ))}
+              </div>
+            )}
 
             {buyMsg && (
               <div className={`p-4 rounded-xl text-xs sm:text-sm font-semibold flex items-center gap-2 ${
@@ -771,13 +810,13 @@ export function MemberDashboardClient({
               <div>
                 <span className="text-xs text-zinc-500 block uppercase font-medium">You pay</span>
                 <span className="text-xl sm:text-2xl font-black font-mono text-zinc-950">
-                  ₹{(ticketBuyCount * unitPrice).toLocaleString("en-IN")}
+                  ₹{(ticketBuyCount * buyPrice).toLocaleString("en-IN")}
                 </span>
               </div>
               <div className="text-right">
                 <span className="text-xs text-zinc-500 block uppercase font-medium">You get</span>
                 <span className="text-xl sm:text-2xl font-black font-mono text-[#ea580c]">
-                  {(ticketBuyCount * unitPrice).toLocaleString("en-IN")} credits
+                  {(ticketBuyCount * buyCredits).toLocaleString("en-IN")} credits
                 </span>
               </div>
             </div>
@@ -790,7 +829,7 @@ export function MemberDashboardClient({
               className="w-full py-3.5 rounded-xl bg-[#ea580c] hover:bg-[#c2410c] active:scale-[0.99] text-white font-bold text-sm uppercase tracking-wider transition-all disabled:opacity-50 cursor-pointer shadow-xs flex items-center justify-center gap-2"
             >
               <Ticket className="size-4" />
-              <span>{buying ? "Processing..." : `Buy ${ticketBuyCount} ticket${ticketBuyCount > 1 ? "s" : ""} (₹${(ticketBuyCount * unitPrice).toLocaleString("en-IN")})`}</span>
+              <span>{buying ? "Processing..." : `Buy ${ticketBuyCount} ticket${ticketBuyCount > 1 ? "s" : ""} (₹${(ticketBuyCount * buyPrice).toLocaleString("en-IN")})`}</span>
             </button>
           </section>
 
