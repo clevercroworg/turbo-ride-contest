@@ -4,6 +4,23 @@ import { pool } from "./db"
 // Unambiguous 32-character alphabet (no 0, O, 1, I, L)
 export const VOUCHER_ALPHABET = "23456789ABCDEFGHJKMNPQRSTUVWXYZ"
 
+/**
+ * Voucher pricing tier, used by the Coin Rush game server to route scores to
+ * separate leaderboards: "1" = ₹1,000 tier, "2" = ₹2,000 tier.
+ */
+export type VoucherType = "1" | "2"
+
+/** Ticket price (₹) at or above which vouchers are issued as tier "2". */
+export const VOUCHER_TYPE_2_MIN_PRICE = 2000
+
+/**
+ * Derive the voucher tier from the per-ticket price paid at purchase.
+ * e.g. 1000 -> "1", 2000 -> "2"
+ */
+export function voucherTypeForPrice(ticketPrice: number): VoucherType {
+  return ticketPrice >= VOUCHER_TYPE_2_MIN_PRICE ? "2" : "1"
+}
+
 export interface GameVoucherRecord {
   id: number
   code: string
@@ -14,6 +31,7 @@ export interface GameVoucherRecord {
   contestId?: string
   orderId?: string
   status: "active" | "used" | "expired" | "void"
+  voucherType: VoucherType
   createdAt: string
   expiresAt?: string | null
   usedAt?: string | null
@@ -95,8 +113,10 @@ export async function createGameVouchersForOrder(params: {
   contestId: string
   orderId: string
   count: number
+  voucherType?: VoucherType
 }): Promise<{ ok: boolean; vouchers: string[]; error?: string }> {
   const { userId, contestId, orderId, count } = params
+  const voucherType = params.voucherType || "1"
   if (count <= 0) return { ok: true, vouchers: [] }
 
   const playerId = params.playerId || formatPlayerId(userId)
@@ -120,10 +140,10 @@ export async function createGameVouchersForOrder(params: {
           await client.query(
             `INSERT INTO game_vouchers (
               code, normalized_code, user_id, player_id, player_name,
-              contest_id, order_id, status, created_at
+              contest_id, order_id, voucher_type, status, created_at
             )
-            VALUES ($1, $2, $3, $4, $5, $6, $7, 'active', NOW())`,
-            [code, normalizedCode, userId, playerId, playerName, contestId, orderId]
+            VALUES ($1, $2, $3, $4, $5, $6, $7, $8, 'active', NOW())`,
+            [code, normalizedCode, userId, playerId, playerName, contestId, orderId, voucherType]
           )
           createdCodes.push(code)
           inserted = true
@@ -169,7 +189,8 @@ export async function getUserGameVouchers(
       `SELECT gv.id, gv.code, gv.normalized_code as "normalizedCode",
               gv.user_id as "userId", gv.player_id as "playerId",
               gv.player_name as "playerName", gv.contest_id as "contestId",
-              gv.order_id as "orderId", gv.status, gv.created_at as "createdAt",
+              gv.order_id as "orderId", gv.status, gv.voucher_type as "voucherType",
+              gv.created_at as "createdAt",
               gv.expires_at as "expiresAt", gv.used_at as "usedAt",
               gv.game_session_id as "gameSessionId"
        FROM game_vouchers gv
@@ -193,7 +214,7 @@ export async function getUserGameVouchers(
  * API Logic: Check voucher validity (Read-only, Endpoint 1)
  */
 export async function checkVoucherValidity(rawCode: string): Promise<
-  | { ok: true; status: "active"; voucher_id: string; player_id: string; player_name: string }
+  | { ok: true; status: "active"; voucher_id: string; voucher_type: VoucherType; player_id: string; player_name: string }
   | { ok: false; status: "used" | "expired" | "void" | "not_found" }
 > {
   const normalized = normalizeVoucherCode(rawCode)
@@ -203,7 +224,7 @@ export async function checkVoucherValidity(rawCode: string): Promise<
 
   try {
     const res = await pool.query(
-      `SELECT id, status, player_id, player_name, expires_at
+      `SELECT id, status, voucher_type, player_id, player_name, expires_at
        FROM game_vouchers
        WHERE normalized_code = $1
        LIMIT 1`,
@@ -226,6 +247,7 @@ export async function checkVoucherValidity(rawCode: string): Promise<
         ok: true,
         status: "active",
         voucher_id: String(v.id),
+        voucher_type: v.voucher_type,
         player_id: v.player_id,
         player_name: v.player_name,
       }
@@ -250,7 +272,7 @@ export async function redeemVoucherAtomic(params: {
   ipAddress?: string
   userAgent?: string
 }): Promise<
-  | { ok: true; status: "used"; voucher_id: string; player_id: string; player_name: string; used_at: string }
+  | { ok: true; status: "used"; voucher_id: string; voucher_type: VoucherType; player_id: string; player_name: string; used_at: string }
   | { ok: false; status: "used" | "expired" | "void" | "not_found" }
 > {
   const { rawCode, sessionId, ipAddress, userAgent } = params
@@ -272,7 +294,7 @@ export async function redeemVoucherAtomic(params: {
        WHERE normalized_code = $1
          AND status = 'active'
          AND (expires_at IS NULL OR expires_at > NOW())
-       RETURNING id, code, player_id, player_name, used_at`,
+       RETURNING id, code, voucher_type, player_id, player_name, used_at`,
       [normalized, sessionId]
     )
 
@@ -292,6 +314,7 @@ export async function redeemVoucherAtomic(params: {
         ok: true,
         status: "used",
         voucher_id: String(v.id),
+        voucher_type: v.voucher_type,
         player_id: v.player_id,
         player_name: v.player_name,
         used_at: new Date(v.used_at).toISOString(),
@@ -301,7 +324,7 @@ export async function redeemVoucherAtomic(params: {
     // 2. Row was not updated. Check reason:
     // Case A: Idempotent network retry with the SAME session_id?
     const sameSessionRes = await client.query(
-      `SELECT id, code, player_id, player_name, used_at
+      `SELECT id, code, voucher_type, player_id, player_name, used_at
        FROM game_vouchers
        WHERE normalized_code = $1 AND game_session_id = $2 AND status = 'used'
        LIMIT 1`,
@@ -323,6 +346,7 @@ export async function redeemVoucherAtomic(params: {
         ok: true,
         status: "used",
         voucher_id: String(v.id),
+        voucher_type: v.voucher_type,
         player_id: v.player_id,
         player_name: v.player_name,
         used_at: new Date(v.used_at).toISOString(),

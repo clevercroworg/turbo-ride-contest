@@ -5,7 +5,7 @@ import { pool } from "./db"
 import { revalidatePath } from "next/cache"
 import { loginOrSignupMember } from "./auth"
 import { cookies } from "next/headers"
-import { generateSingleVoucherCode, formatPlayerId, sanitizePlayerName } from "./vouchers"
+import { generateSingleVoucherCode, formatPlayerId, sanitizePlayerName, voucherTypeForPrice } from "./vouchers"
 
 function safeRevalidate(path: string) {
   try {
@@ -214,6 +214,7 @@ export async function verifyAndCompleteRazorpayPaymentAction(params: {
     const profileId = profRes.rows[0]?.id || primaryId
     const resolvedPlayerName = sanitizePlayerName(profRes.rows[0]?.user_name || userName)
     const resolvedPlayerId = formatPlayerId(profileId)
+    const voucherType = voucherTypeForPrice(ticketPrice)
 
     const generatedVouchers: string[] = []
     for (let i = 0; i < ticketCount; i++) {
@@ -226,9 +227,9 @@ export async function verifyAndCompleteRazorpayPaymentAction(params: {
           await client.query(
             `INSERT INTO game_vouchers (
               code, normalized_code, user_id, player_id, player_name,
-              contest_id, order_id, status, created_at
-            ) VALUES ($1, $2, $3, $4, $5, $6, $7, 'active', NOW())`,
-            [code, normalizedCode, profileId, resolvedPlayerId, resolvedPlayerName, contestId, razorpayOrderId]
+              contest_id, order_id, voucher_type, status, created_at
+            ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, 'active', NOW())`,
+            [code, normalizedCode, profileId, resolvedPlayerId, resolvedPlayerName, contestId, razorpayOrderId, voucherType]
           )
           generatedVouchers.push(code)
           inserted = true
