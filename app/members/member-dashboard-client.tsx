@@ -1152,9 +1152,27 @@ export function MemberDashboardClient({
 
               {/* Vouchers Grid / Empty State */}
               {gameVouchers && gameVouchers.length > 0 ? (
-                <div className="space-y-3">
+                <div className="space-y-6">
+                  {TICKET_TIERS.filter((t) => gameVouchers.some((v) => (v.voucherType || "1") === t)).map((tier) => {
+                    const tierVouchers = gameVouchers.filter((v) => (v.voucherType || "1") === tier)
+                    const tierInfo = adminSettings?.tiers[tier]
+                    return (
+                  <div key={tier} className="space-y-3">
+                    <div className="flex flex-wrap items-center justify-between gap-2 border-b border-zinc-200 pb-2">
+                      <div className="flex items-center gap-2">
+                        <span className="px-2 py-0.5 rounded-md bg-zinc-950 text-white text-[11px] font-bold uppercase tracking-wide">
+                          Tier {tier}
+                        </span>
+                        <span className="text-xs sm:text-sm font-bold text-zinc-950">
+                          {tierInfo ? `₹${tierInfo.price.toLocaleString("en-IN")} vouchers · Win ${tierInfo.prizeTitle}` : `Tier ${tier} vouchers`}
+                        </span>
+                      </div>
+                      <span className="text-[11px] font-semibold text-zinc-500">
+                        {tierVouchers.length} {tierVouchers.length === 1 ? "code" : "codes"} · Tier {tier} leaderboard
+                      </span>
+                    </div>
                   <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
-                    {gameVouchers.map((v) => {
+                    {tierVouchers.map((v) => {
                       const isActive = v.status === "active"
                       const isUsed = v.status === "used"
                       const isCopied = copiedVoucher === v.code
@@ -1224,6 +1242,9 @@ export function MemberDashboardClient({
                       )
                     })}
                   </div>
+                  </div>
+                    )
+                  })}
                 </div>
               ) : (
                 <div className="rounded-xl border border-dashed border-amber-200 bg-amber-50/40 p-5 sm:p-6 text-center space-y-3">
